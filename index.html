@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>채용관리시스템 (ATS)</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Malgun Gothic',sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+}
+
+.header{
+    height:70px;
+    background:#1f2937;
+    color:white;
+    display:flex;
+    align-items:center;
+    padding:0 30px;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.container{
+    display:flex;
+    height:calc(100vh - 70px);
+}
+
+.sidebar{
+    width:260px;
+    background:#111827;
+    color:white;
+    overflow-y:auto;
+}
+
+.sidebar h3{
+    padding:20px;
+    border-bottom:1px solid #374151;
+}
+
+.sidebar ul{
+    list-style:none;
+}
+
+.sidebar ul li{
+    padding:15px 20px;
+    cursor:pointer;
+    border-bottom:1px solid #1f2937;
+}
+
+.sidebar ul li:hover{
+    background:#2563eb;
+}
+
+.content{
+    flex:1;
+    padding:20px;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card h2{
+    font-size:28px;
+    color:#2563eb;
+    margin-top:10px;
+}
+
+.section{
+    margin-top:25px;
+    background:white;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+table th,
+table td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+table th{
+    background:#f3f4f6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+채용관리시스템 (ATS)
+</div>
+
+<div class="container">
+
+<div class="sidebar">
+
+<h3>📊 대시보드</h3>
+
+<ul>
+<li>채용공고관리</li>
+<li>지원자관리</li>
+<li>서류전형</li>
+<li>면접관리</li>
+<li>최종합격관리</li>
+<li>계약관리</li>
+<li>채용분석</li>
+<li>알림관리</li>
+<li>시스템관리</li>
+</ul>
+
+</div>
+
+<div class="content">
+
+<div class="cards">
+
+<div class="card">
+진행중 공고
+<h2>0</h2>
+</div>
+
+<div class="card">
+지원자 수
+<h2>0</h2>
+</div>
+
+<div class="card">
+면접 예정
+<h2>0</h2>
+</div>
+
+<div class="card">
+최종합격
+<h2>0</h2>
+</div>
+
+</div>
+
+<div class="section">
+
+<h2 style="margin-bottom:15px;">
+최근 지원자 현황
+</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>지원일</th>
+<th>성명</th>
+<th>지원직무</th>
+<th>경력</th>
+<th>상태</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td colspan="5">
+등록된 지원자가 없습니다.
+</td>
+</tr>
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>
