@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>채용관리시스템 (ATS)</title>
-
 <style>
 *{
     margin:0;
@@ -12,11 +11,9 @@
     box-sizing:border-box;
     font-family:'Malgun Gothic',sans-serif;
 }
-
 body{
     background:#f4f6f9;
 }
-
 .header{
     height:70px;
     background:#1f2937;
@@ -27,62 +24,57 @@ body{
     font-size:24px;
     font-weight:bold;
 }
-
 .container{
     display:flex;
     height:calc(100vh - 70px);
 }
-
 .sidebar{
     width:260px;
     background:#111827;
     color:white;
     overflow-y:auto;
 }
-
 .sidebar h3{
     padding:20px;
     border-bottom:1px solid #374151;
+    cursor:pointer;
 }
-
 .sidebar ul{
     list-style:none;
 }
-
 .sidebar ul li{
     padding:15px 20px;
     cursor:pointer;
     border-bottom:1px solid #1f2937;
 }
-
 .sidebar ul li:hover{
     background:#2563eb;
 }
-
+.sidebar h3.active,
+.sidebar ul li.active{
+    background:#2563eb;
+}
 .content{
     flex:1;
     padding:20px;
+    overflow-y:auto;
 }
-
 .cards{
     display:grid;
     grid-template-columns:repeat(4,1fr);
     gap:20px;
 }
-
 .card{
     background:white;
     padding:20px;
     border-radius:10px;
     box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
-
 .card h2{
     font-size:28px;
     color:#2563eb;
     margin-top:10px;
 }
-
 .section{
     margin-top:25px;
     background:white;
@@ -90,110 +82,1104 @@ body{
     padding:20px;
     box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
-
 table{
     width:100%;
     border-collapse:collapse;
 }
-
 table th,
 table td{
     border:1px solid #ddd;
     padding:10px;
     text-align:center;
 }
-
 table th{
     background:#f3f4f6;
 }
+
+/* ===== 추가 UI 요소 ===== */
+.toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+    flex-wrap:wrap;
+    gap:10px;
+}
+.filter-bar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+.filter-bar input,
+.filter-bar select{
+    padding:9px;
+    border:1px solid #ddd;
+    border-radius:6px;
+    font-size:14px;
+}
+.btn{
+    padding:8px 16px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:500;
+    transition:opacity .15s;
+}
+.btn:hover{opacity:.85;}
+.btn-primary{background:#2563eb;color:#fff;}
+.btn-secondary{background:#6b7280;color:#fff;}
+.btn-danger{background:#dc2626;color:#fff;}
+.btn-success{background:#16a34a;color:#fff;}
+.btn-sm{padding:5px 10px;font-size:12px;}
+td.actions{
+    display:flex;
+    gap:6px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+.badge{
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:12px;
+    font-size:12px;
+    font-weight:600;
+    color:#fff;
+    white-space:nowrap;
+}
+.badge-gray{background:#6b7280;}
+.badge-orange{background:#f59e0b;}
+.badge-blue{background:#2563eb;}
+.badge-red{background:#ef4444;}
+.badge-purple{background:#8b5cf6;}
+.badge-indigo{background:#6366f1;}
+.badge-green{background:#16a34a;}
+.badge-active{background:#2563eb;}
+.badge-closed{background:#6b7280;}
+
+.empty{
+    text-align:center;
+    color:#9ca3af;
+    padding:30px !important;
+}
+
+.modal-overlay{
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    background:rgba(0,0,0,.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+    padding:20px;
+}
+.modal{
+    background:#fff;
+    border-radius:10px;
+    padding:25px;
+    width:460px;
+    max-width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+}
+.modal h3{
+    margin-bottom:18px;
+    font-size:18px;
+    color:#111827;
+}
+.form-group{
+    margin-bottom:14px;
+}
+.form-group label{
+    display:block;
+    margin-bottom:5px;
+    font-size:13px;
+    color:#374151;
+    font-weight:500;
+}
+.form-group input,
+.form-group select,
+.form-group textarea{
+    width:100%;
+    padding:9px;
+    border:1px solid #ddd;
+    border-radius:6px;
+    font-size:14px;
+    font-family:inherit;
+}
+.modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:20px;
+}
+
+.analytics-bar-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:12px;
+}
+.analytics-bar-label{
+    width:110px;
+    font-size:13px;
+    color:#374151;
+    flex-shrink:0;
+}
+.analytics-bar-track{
+    flex:1;
+    background:#e5e7eb;
+    border-radius:6px;
+    height:18px;
+    overflow:hidden;
+}
+.analytics-bar-fill{
+    height:100%;
+    background:#2563eb;
+    border-radius:6px;
+    transition:width .3s;
+}
+.analytics-bar-count{
+    width:36px;
+    text-align:right;
+    font-size:13px;
+    font-weight:600;
+    flex-shrink:0;
+}
+
+.notif-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    padding:14px 4px;
+    border-bottom:1px solid #eee;
+}
+.notif-item.unread{
+    background:#eff6ff;
+}
+.notif-item:last-child{
+    border-bottom:none;
+}
+
+@media (max-width:900px){
+    .cards{grid-template-columns:repeat(2,1fr);}
+}
 </style>
 </head>
-
 <body>
-
 <div class="header">
 채용관리시스템 (ATS)
 </div>
-
 <div class="container">
-
 <div class="sidebar">
-
-<h3>📊 대시보드</h3>
-
+<h3 data-view="dashboard" class="active">📊 대시보드</h3>
 <ul>
-<li>채용공고관리</li>
-<li>지원자관리</li>
-<li>서류전형</li>
-<li>면접관리</li>
-<li>최종합격관리</li>
-<li>계약관리</li>
-<li>채용분석</li>
-<li>알림관리</li>
-<li>시스템관리</li>
+<li data-view="jobs">채용공고관리</li>
+<li data-view="applicants">지원자관리</li>
+<li data-view="screening">서류전형</li>
+<li data-view="interviews">면접관리</li>
+<li data-view="finalHires">최종합격관리</li>
+<li data-view="contracts">계약관리</li>
+<li data-view="analytics">채용분석</li>
+<li data-view="notifications">알림관리</li>
+<li data-view="system">시스템관리</li>
 </ul>
-
 </div>
-
-<div class="content">
-
+<div class="content" id="content">
 <div class="cards">
-
-<div class="card">
-진행중 공고
-<h2>0</h2>
+<div class="card">진행중 공고<h2>0</h2></div>
+<div class="card">지원자 수<h2>0</h2></div>
+<div class="card">면접 예정<h2>0</h2></div>
+<div class="card">최종합격<h2>0</h2></div>
 </div>
-
-<div class="card">
-지원자 수
-<h2>0</h2>
-</div>
-
-<div class="card">
-면접 예정
-<h2>0</h2>
-</div>
-
-<div class="card">
-최종합격
-<h2>0</h2>
-</div>
-
-</div>
-
 <div class="section">
-
-<h2 style="margin-bottom:15px;">
-최근 지원자 현황
-</h2>
-
+<h2 style="margin-bottom:15px;">최근 지원자 현황</h2>
 <table>
-
-<thead>
-<tr>
-<th>지원일</th>
-<th>성명</th>
-<th>지원직무</th>
-<th>경력</th>
-<th>상태</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td colspan="5">
-등록된 지원자가 없습니다.
-</td>
-</tr>
-</tbody>
-
+<thead><tr><th>지원일</th><th>성명</th><th>지원직무</th><th>경력</th><th>상태</th></tr></thead>
+<tbody><tr><td colspan="5" class="empty">불러오는 중...</td></tr></tbody>
 </table>
-
+</div>
+</div>
 </div>
 
-</div>
+<script type="module">
+/* =========================================================================
+   채용관리시스템(ATS) - Firebase Firestore 연동
+   -------------------------------------------------------------------------
+   - 이 파일은 빌드 도구(Vite/Webpack 등) 없이 브라우저에서 바로 동작하도록
+     Firebase JS SDK를 CDN(ESM)으로 불러옵니다.
+   - 만약 React/Vite 같은 번들러 프로젝트에서 사용 중이라면
+       npm install firebase
+     설치 후 아래 import 구문의 URL 부분만
+       import { initializeApp } from "firebase/app";
+     형태로 바꿔주면 동일하게 동작합니다.
+   - 운영 배포 전 Firestore 콘솔에서 보안 규칙을 반드시 설정하세요.
+     (하단 "Firestore 보안 규칙 예시" 주석 참고)
+   ========================================================================= */
 
-</div>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAnalytics, isSupported as isAnalyticsSupported } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+import {
+  getFirestore, collection, doc,
+  addDoc, updateDoc, deleteDoc, setDoc,
+  onSnapshot, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+/* ===== 사용자가 제공한 Firebase 프로젝트 설정 ===== */
+const firebaseConfig = {
+  apiKey: "AIzaSyA1wwPmNs9Y_MVCANN6iqj0Nn6H1YHvm3w",
+  authDomain: "recruitments-1d3a0.firebaseapp.com",
+  projectId: "recruitments-1d3a0",
+  storageBucket: "recruitments-1d3a0.firebasestorage.app",
+  messagingSenderId: "115005966065",
+  appId: "1:115005966065:web:7f6320ef3a862d888c8b50",
+  measurementId: "G-363D2G3TFE"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Analytics는 일부 환경(로컬 file://, 차단된 네트워크 등)에서 초기화에 실패할 수 있어
+// 전체 앱 동작에 영향이 없도록 별도로 감싸서 처리합니다.
+isAnalyticsSupported().then(supported => {
+  if (supported) {
+    try { getAnalytics(app); } catch (e) { console.warn("Analytics 초기화 건너뜀:", e); }
+  }
+}).catch(() => {});
+
+/* ===== Firestore 컬렉션 참조 =====
+   컬렉션은 최초로 문서를 저장하는 순간 자동으로 생성되므로
+   콘솔에서 미리 만들어둘 필요는 없습니다. */
+const colJobs          = collection(db, "jobPostings");
+const colApplicants    = collection(db, "applicants");
+const colNotifications = collection(db, "notifications");
+const colContracts     = collection(db, "contracts");
+const colAdmins        = collection(db, "admins");
+const settingsDocRef   = doc(db, "settings", "general");
+
+/* ===== 지원자 상태 정의 ===== */
+const APPLICANT_STATUSES = ["서류접수", "서류전형중", "면접예정", "면접완료", "최종합격", "불합격"];
+const STATUS_BADGE_CLASS = {
+  "서류접수":  "badge-gray",
+  "서류전형중":"badge-orange",
+  "면접예정":  "badge-purple",
+  "면접완료":  "badge-indigo",
+  "최종합격":  "badge-green",
+  "불합격":    "badge-red"
+};
+
+/* ===== 전역 캐시 (실시간 동기화) ===== */
+let jobsCache = [];
+let applicantsCache = [];
+let notificationsCache = [];
+let contractsCache = [];
+let adminsCache = [];
+let settingsCache = {};
+let currentView = "dashboard";
+
+/* 지원자관리 화면의 검색/필터 상태 */
+let applicantSearchTerm = "";
+let applicantFilterJob = "";
+let applicantFilterStatus = "";
+
+const contentEl = document.getElementById("content");
+
+/* ===== 공용 유틸 ===== */
+function esc(str) {
+  if (str === null || str === undefined) return "";
+  return String(str).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+function fmtDate(ts) {
+  if (!ts) return "-";
+  const d = typeof ts.toDate === "function" ? ts.toDate() : new Date(ts);
+  if (isNaN(d.getTime())) return "-";
+  return d.toLocaleDateString("ko-KR");
+}
+function fmtDateTime(ts) {
+  if (!ts) return "-";
+  const d = typeof ts.toDate === "function" ? ts.toDate() : new Date(ts);
+  if (isNaN(d.getTime())) return "-";
+  return d.toLocaleString("ko-KR");
+}
+function badge(status, type = "applicant") {
+  if (type === "job") {
+    return `<span class="badge ${status === "진행중" ? "badge-active" : "badge-closed"}">${esc(status)}</span>`;
+  }
+  const cls = STATUS_BADGE_CLASS[status] || "badge-gray";
+  return `<span class="badge ${cls}">${esc(status)}</span>`;
+}
+function getApplicantName(id) {
+  const a = applicantsCache.find(x => x.id === id);
+  return a ? a.name : "지원자";
+}
+async function createNotification(message, type = "info") {
+  try {
+    await addDoc(colNotifications, { message, type, read: false, createdAt: serverTimestamp() });
+  } catch (e) {
+    console.error("알림 생성 실패", e);
+  }
+}
+
+/* ===== 모달 공용 헬퍼 ===== */
+function showModal(html) {
+  closeModal();
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.id = "modalOverlay";
+  overlay.innerHTML = `<div class="modal">${html}</div>`;
+  overlay.addEventListener("click", e => { if (e.target === overlay) closeModal(); });
+  document.body.appendChild(overlay);
+}
+function closeModal() {
+  const overlay = document.getElementById("modalOverlay");
+  if (overlay) overlay.remove();
+}
+
+/* =========================================================================
+   렌더링 라우터
+   ========================================================================= */
+function rerender() {
+  switch (currentView) {
+    case "dashboard":   renderDashboard(); break;
+    case "jobs":        renderJobs(); break;
+    case "applicants":  renderApplicants(); break;
+    case "screening":   renderScreening(); break;
+    case "interviews":  renderInterviews(); break;
+    case "finalHires":  renderFinalHires(); break;
+    case "contracts":   renderContracts(); break;
+    case "analytics":   renderAnalytics(); break;
+    case "notifications": renderNotifications(); break;
+    case "system":      renderSystem(); break;
+  }
+}
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll(".sidebar [data-view]").forEach(el => {
+    el.classList.toggle("active", el.dataset.view === view);
+  });
+  rerender();
+}
+
+/* =========================================================================
+   1. 대시보드
+   ========================================================================= */
+function renderDashboard() {
+  const activeJobs = jobsCache.filter(j => j.status === "진행중").length;
+  const totalApplicants = applicantsCache.length;
+  const upcomingInterviews = applicantsCache.filter(a => a.status === "면접예정").length;
+  const finalHires = applicantsCache.filter(a => a.status === "최종합격").length;
+  const recent = applicantsCache.slice(0, 5);
+
+  const rows = recent.length ? recent.map(a => `
+    <tr>
+      <td>${fmtDate(a.appliedAt)}</td>
+      <td>${esc(a.name)}</td>
+      <td>${esc(a.jobTitle || "-")}</td>
+      <td>${esc(a.experience || "-")}</td>
+      <td>${badge(a.status)}</td>
+    </tr>`).join("") : `<tr><td colspan="5" class="empty">등록된 지원자가 없습니다.</td></tr>`;
+
+  contentEl.innerHTML = `
+    <div class="cards">
+      <div class="card">진행중 공고<h2>${activeJobs}</h2></div>
+      <div class="card">지원자 수<h2>${totalApplicants}</h2></div>
+      <div class="card">면접 예정<h2>${upcomingInterviews}</h2></div>
+      <div class="card">최종합격<h2>${finalHires}</h2></div>
+    </div>
+    <div class="section">
+      <h2 style="margin-bottom:15px;">최근 지원자 현황</h2>
+      <table>
+        <thead><tr><th>지원일</th><th>성명</th><th>지원직무</th><th>경력</th><th>상태</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+/* =========================================================================
+   2. 채용공고관리
+   ========================================================================= */
+function renderJobs() {
+  const rows = jobsCache.length ? jobsCache.map(j => `
+    <tr>
+      <td>${esc(j.title)}</td>
+      <td>${esc(j.department || "-")}</td>
+      <td>${esc(j.position || "-")}</td>
+      <td>${j.headcount || 0}명</td>
+      <td>${j.deadline || "-"}</td>
+      <td>${badge(j.status, "job")}</td>
+      <td class="actions">
+        <button class="btn btn-secondary btn-sm" data-action="edit-job" data-id="${j.id}">수정</button>
+        <button class="btn btn-danger btn-sm" data-action="remove-job" data-id="${j.id}">삭제</button>
+      </td>
+    </tr>`).join("") : `<tr><td colspan="7" class="empty">등록된 채용공고가 없습니다.</td></tr>`;
+
+  contentEl.innerHTML = `
+    <div class="section">
+      <div class="toolbar">
+        <h2>채용공고관리</h2>
+        <button class="btn btn-primary" data-action="open-job-modal">+ 공고 등록</button>
+      </div>
+      <table>
+        <thead><tr><th>공고명</th><th>부서</th><th>직무</th><th>모집인원</th><th>마감일</th><th>상태</th><th>관리</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function openJobModal(id) {
+  const job = id ? jobsCache.find(j => j.id === id) : null;
+  showModal(`
+    <h3>${job ? "채용공고 수정" : "채용공고 등록"}</h3>
+    <form id="jobForm">
+      <div class="form-group"><label>공고명</label><input name="title" required value="${job ? esc(job.title) : ""}"></div>
+      <div class="form-group"><label>부서</label><input name="department" value="${job ? esc(job.department || "") : ""}"></div>
+      <div class="form-group"><label>직무</label><input name="position" value="${job ? esc(job.position || "") : ""}"></div>
+      <div class="form-group"><label>모집인원</label><input type="number" name="headcount" min="0" value="${job ? (job.headcount || 0) : 0}"></div>
+      <div class="form-group"><label>마감일</label><input type="date" name="deadline" value="${job ? (job.deadline || "") : ""}"></div>
+      <div class="form-group"><label>상태</label>
+        <select name="status">
+          <option value="진행중" ${job && job.status === "진행중" ? "selected" : ""}>진행중</option>
+          <option value="마감" ${job && job.status === "마감" ? "selected" : ""}>마감</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" data-action="close-modal">취소</button>
+        <button type="submit" class="btn btn-primary">저장</button>
+      </div>
+    </form>`);
+
+  document.getElementById("jobForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const data = {
+      title: fd.get("title").trim(),
+      department: fd.get("department").trim(),
+      position: fd.get("position").trim(),
+      headcount: Number(fd.get("headcount")) || 0,
+      deadline: fd.get("deadline"),
+      status: fd.get("status")
+    };
+    try {
+      if (job) {
+        await updateDoc(doc(db, "jobPostings", job.id), data);
+      } else {
+        await addDoc(colJobs, { ...data, createdAt: serverTimestamp() });
+      }
+      closeModal();
+    } catch (err) {
+      alert("저장 중 오류가 발생했습니다: " + err.message);
+    }
+  });
+}
+async function removeJob(id) {
+  if (!confirm("해당 채용공고를 삭제하시겠습니까? 연결된 지원자 데이터는 유지됩니다.")) return;
+  try { await deleteDoc(doc(db, "jobPostings", id)); }
+  catch (err) { alert("삭제 중 오류: " + err.message); }
+}
+
+/* =========================================================================
+   3. 지원자관리
+   ========================================================================= */
+function renderApplicants() {
+  let list = applicantsCache.slice();
+  if (applicantFilterStatus) list = list.filter(a => a.status === applicantFilterStatus);
+  if (applicantFilterJob) list = list.filter(a => a.jobPostingId === applicantFilterJob);
+  if (applicantSearchTerm) list = list.filter(a => a.name && a.name.includes(applicantSearchTerm));
+
+  const jobOptions = jobsCache.map(j =>
+    `<option value="${j.id}" ${applicantFilterJob === j.id ? "selected" : ""}>${esc(j.title)}</option>`
+  ).join("");
+  const statusOptions = APPLICANT_STATUSES.map(s =>
+    `<option value="${s}" ${applicantFilterStatus === s ? "selected" : ""}>${s}</option>`
+  ).join("");
+
+  const rows = list.length ? list.map(a => `
+    <tr>
+      <td>${fmtDate(a.appliedAt)}</td>
+      <td>${esc(a.name)}</td>
+      <td>${esc(a.jobTitle || "-")}</td>
+      <td>${esc(a.experience || "-")}</td>
+      <td>${esc(a.email || "-")}</td>
+      <td>${badge(a.status)}</td>
+      <td class="actions">
+        <button class="btn btn-secondary btn-sm" data-action="edit-applicant" data-id="${a.id}">수정</button>
+        <button class="btn btn-danger btn-sm" data-action="remove-applicant" data-id="${a.id}">삭제</button>
+      </td>
+    </tr>`).join("") : `<tr><td colspan="7" class="empty">조건에 맞는 지원자가 없습니다.</td></tr>`;
+
+  contentEl.innerHTML = `
+    <div class="section">
+      <div class="toolbar">
+        <h2>지원자관리</h2>
+        <button class="btn btn-primary" data-action="open-applicant-modal">+ 지원자 등록</button>
+      </div>
+      <div class="filter-bar" style="margin-bottom:15px;">
+        <input type="text" id="applicantSearch" placeholder="이름 검색" value="${esc(applicantSearchTerm)}">
+        <select id="applicantJobFilter"><option value="">전체 공고</option>${jobOptions}</select>
+        <select id="applicantStatusFilter"><option value="">전체 상태</option>${statusOptions}</select>
+      </div>
+      <table>
+        <thead><tr><th>지원일</th><th>성명</th><th>지원직무</th><th>경력</th><th>이메일</th><th>상태</th><th>관리</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+
+  document.getElementById("applicantSearch").addEventListener("input", e => {
+    applicantSearchTerm = e.target.value; renderApplicants();
+  });
+  document.getElementById("applicantJobFilter").addEventListener("change", e => {
+    applicantFilterJob = e.target.value; renderApplicants();
+  });
+  document.getElementById("applicantStatusFilter").addEventListener("change", e => {
+    applicantFilterStatus = e.target.value; renderApplicants();
+  });
+}
+
+function openApplicantModal(id) {
+  const applicant = id ? applicantsCache.find(a => a.id === id) : null;
+  const jobOptions = jobsCache.length
+    ? jobsCache.map(j => `<option value="${j.id}" ${applicant && applicant.jobPostingId === j.id ? "selected" : ""}>${esc(j.title)}</option>`).join("")
+    : `<option value="">등록된 공고가 없습니다</option>`;
+
+  showModal(`
+    <h3>${applicant ? "지원자 정보 수정" : "지원자 등록"}</h3>
+    <form id="applicantForm">
+      <div class="form-group"><label>성명</label><input name="name" required value="${applicant ? esc(applicant.name) : ""}"></div>
+      <div class="form-group"><label>이메일</label><input type="email" name="email" value="${applicant ? esc(applicant.email || "") : ""}"></div>
+      <div class="form-group"><label>연락처</label><input name="phone" value="${applicant ? esc(applicant.phone || "") : ""}"></div>
+      <div class="form-group"><label>지원직무(공고)</label><select name="jobPostingId">${jobOptions}</select></div>
+      <div class="form-group"><label>경력</label><input name="experience" placeholder="예: 3년 / 신입" value="${applicant ? esc(applicant.experience || "") : ""}"></div>
+      ${applicant ? `
+      <div class="form-group"><label>상태</label>
+        <select name="status">${APPLICANT_STATUSES.map(s => `<option value="${s}" ${applicant.status === s ? "selected" : ""}>${s}</option>`).join("")}</select>
+      </div>` : ""}
+      <div class="form-group"><label>비고</label><textarea name="notes" rows="3">${applicant ? esc(applicant.notes || "") : ""}</textarea></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" data-action="close-modal">취소</button>
+        <button type="submit" class="btn btn-primary">저장</button>
+      </div>
+    </form>`);
+
+  document.getElementById("applicantForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const jobId = fd.get("jobPostingId") || null;
+    const job = jobsCache.find(j => j.id === jobId);
+    const data = {
+      name: fd.get("name").trim(),
+      email: fd.get("email").trim(),
+      phone: fd.get("phone").trim(),
+      jobPostingId: jobId,
+      jobTitle: job ? job.title : "-",
+      experience: fd.get("experience").trim(),
+      notes: fd.get("notes").trim()
+    };
+    try {
+      if (applicant) {
+        data.status = fd.get("status");
+        await updateDoc(doc(db, "applicants", applicant.id), data);
+      } else {
+        await addDoc(colApplicants, {
+          ...data, status: "서류접수", appliedAt: serverTimestamp(), contractCreated: false
+        });
+      }
+      closeModal();
+    } catch (err) {
+      alert("저장 중 오류가 발생했습니다: " + err.message);
+    }
+  });
+}
+async function removeApplicant(id) {
+  if (!confirm("해당 지원자를 삭제하시겠습니까?")) return;
+  try { await deleteDoc(doc(db, "applicants", id)); }
+  catch (err) { alert("삭제 중 오류: " + err.message); }
+}
+async function updateApplicantStatus(id, status, extra = {}) {
+  try {
+    await updateDoc(doc(db, "applicants", id), { status, ...extra });
+    if (settingsCache.autoNotify !== false) {
+      if (status === "면접예정") createNotification(`${getApplicantName(id)}님의 면접이 예정되었습니다.`, "interview");
+      if (status === "최종합격") createNotification(`${getApplicantName(id)}님이 최종합격 처리되었습니다.`, "final");
+      if (status === "불합격")   createNotification(`${getApplicantName(id)}님이 불합격 처리되었습니다.`, "reject");
+    }
+  } catch (err) {
+    alert("상태 변경 중 오류: " + err.message);
+  }
+}
+
+/* =========================================================================
+   4. 서류전형
+   ========================================================================= */
+function renderScreening() {
+  const list = applicantsCache.filter(a => a.status === "서류접수" || a.status === "서류전형중");
+  const rows = list.length ? list.map(a => `
+    <tr>
+      <td>${fmtDate(a.appliedAt)}</td>
+      <td>${esc(a.name)}</td>
+      <td>${esc(a.jobTitle || "-")}</td>
+      <td>${esc(a.experience || "-")}</td>
+      <td>${badge(a.status)}</td>
+      <td class="actions">
+        ${a.status === "서류접수"
+          ? `<button class="btn btn-primary btn-sm" data-action="start-screening" data-id="${a.id}">전형시작</button>`
+          : `<button class="btn btn-success btn-sm" data-action="pass-screening" data-id="${a.id}">서류통과</button>
+             <button class="btn btn-danger btn-sm" data-action="fail-screening" data-id="${a.id}">불합격</button>`}
+      </td>
+    </tr>`).join("") : `<tr><td colspan="6" class="empty">서류전형 대상자가 없습니다.</td></tr>`;
+
+  contentEl.innerHTML = `
+    <div class="section">
+      <h2 style="margin-bottom:15px;">서류전형</h2>
+      <table>
+        <thead><tr><th>지원일</th><th>성명</th><th>지원직무</th><th>경력</th><th>상태</th><th>관리</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+/* =========================================================================
+   5. 면접관리
+   ========================================================================= */
+function renderInterviews() {
+  const list = applicantsCache.filter(a => a.status === "면접예정" || a.status === "면접완료");
+  const rows = list.length ? list.map(a => `
+    <tr>
+      <td>${esc(a.name)}</td>
+      <td>${esc(a.jobTitle || "-")}</td>
+      <td><input type="date" value="${a.interviewDate || ""}" data-action="set-interview-date" data-id="${a.id}" ${a.status === "면접완료" ? "disabled" : ""}></td>
+      <td>${badge(a.status)}</td>
+      <td class="actions">
+        ${a.status === "면접예정"
+          ? `<button class="btn btn-primary btn-sm" data-action="interview-done" data-id="${a.id}">면접완료</button>`
+          : `<button class="btn btn-success btn-sm" data-action="interview-pass" data-id="${a.id}">최종합격</button>
+             <button class="btn btn-danger btn-sm" data-action="interview-fail" data-id="${a.id}">불합격</button>`}
+      </td>
+    </tr>`).join("") : `<tr><td colspan="5" class="empty">면접 대상자가 없습니다.</td></tr>`;
+
+  contentEl.innerHTML = `
+    <div class="section">
+      <h2 style="margin-bottom:15px;">면접관리</h2>
+      <table>
+        <thead><tr><th>성명</th><th>지원직무</th><th>면접일</th><th>상태</th><th>관리</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+async function setInterviewDate(id, value) {
+  try { await updateDoc(doc(db, "applicants", id), { interviewDate: value }); }
+  catch (err) { alert("면접일 저장 중 오류: " + err.message); }
+}
+
+/* =========================================================================
+   6. 최종합격관리
+   ========================================================================= */
+function renderFinalHires() {
+  const list = applicantsCache.filter(a => a.status === "최종합격");
+  const rows = list.length ? list.map(a => `
+    <tr>
+      <td>${esc(a.name)}</td>
+      <td>${esc(a.jobTitle || "-")}</td>
+      <td>${esc(a.email || "-")}</td>
+      <td>${esc(a.phone || "-")}</td>
+      <td class="actions">
+        ${a.contractCreated
+          ? `<span class="badge badge-green">계약등록완료</span>`
+          : `<button class="btn btn-primary btn-sm" data-action="register-contract" data-id="${a.id}">계약등록</button>`}
+      </td>
+    </tr>`).join("") : `<tr><td colspan="5" class="empty">최종합격자가 없습니다.</td></tr>`;
+
+  contentEl.innerHTML = `
+    <div class="section">
+      <h2 style="margin-bottom:15px;">최종합격관리</h2>
+      <table>
+        <thead><tr><th>성명</th><th>지원직무</th><th>이메일</th><th>연락처</th><th>관리</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+/* =========================================================================
+   7. 계약관리
+   ========================================================================= */
+function renderContracts() {
+  const rows = contractsCache.length ? contractsCache.map(c => `
+    <tr>
+      <td>${esc(c.applicantName)}</td>
+      <td>${esc(c.position || "-")}</td>
+      <td>${c.startDate || "-"}</td>
+      <td>${(c.salary || 0).toLocaleString()}만원</td>
+      <td>${c.status === "완료" ? `<span class="badge badge-green">완료</span>` : `<span class="badge badge-orange">협의중</span>`}</td>
+      <td class="actions">
+        <button class="btn btn-secondary btn-sm" data-action="edit-contract" data-id="${c.id}">수정</button>
+        <button class="btn btn-danger btn-sm" data-action="remove-contract" data-id="${c.id}">삭제</button>
+      </td>
+    </tr>`).join("") : `<tr><td colspan="6" class="empty">등록된 계약이 없습니다.</td></tr>`;
+
+  contentEl.innerHTML = `
+    <div class="section">
+      <div class="toolbar">
+        <h2>계약관리</h2>
+        <button class="btn btn-primary" data-action="open-contract-modal">+ 계약 등록</button>
+      </div>
+      <table>
+        <thead><tr><th>성명</th><th>직무</th><th>입사예정일</th><th>연봉</th><th>상태</th><th>관리</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function openContractModal(applicantId, contractId) {
+  const applicant = applicantId ? applicantsCache.find(a => a.id === applicantId) : null;
+  const contract = contractId ? contractsCache.find(c => c.id === contractId) : null;
+
+  showModal(`
+    <h3>${contract ? "계약 정보 수정" : "계약 등록"}</h3>
+    <form id="contractForm">
+      <div class="form-group"><label>성명</label>
+        <input name="applicantName" required
+          value="${contract ? esc(contract.applicantName) : (applicant ? esc(applicant.name) : "")}"
+          ${applicant ? "readonly" : ""}>
+      </div>
+      <div class="form-group"><label>직무</label>
+        <input name="position"
+          value="${contract ? esc(contract.position || "") : (applicant ? esc(applicant.jobTitle || "") : "")}"
+          ${applicant ? "readonly" : ""}>
+      </div>
+      <div class="form-group"><label>입사예정일</label><input type="date" name="startDate" value="${contract ? (contract.startDate || "") : ""}"></div>
+      <div class="form-group"><label>연봉(만원)</label><input type="number" name="salary" min="0" value="${contract ? (contract.salary || 0) : 0}"></div>
+      <div class="form-group"><label>계약상태</label>
+        <select name="status">
+          <option value="협의중" ${contract && contract.status === "협의중" ? "selected" : ""}>협의중</option>
+          <option value="완료" ${contract && contract.status === "완료" ? "selected" : ""}>완료</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" data-action="close-modal">취소</button>
+        <button type="submit" class="btn btn-primary">저장</button>
+      </div>
+    </form>`);
+
+  document.getElementById("contractForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const data = {
+      applicantName: fd.get("applicantName").trim(),
+      position: fd.get("position").trim(),
+      startDate: fd.get("startDate"),
+      salary: Number(fd.get("salary")) || 0,
+      status: fd.get("status"),
+      applicantId: applicant ? applicant.id : (contract ? (contract.applicantId || null) : null)
+    };
+    try {
+      if (contract) {
+        await updateDoc(doc(db, "contracts", contract.id), data);
+      } else {
+        await addDoc(colContracts, { ...data, createdAt: serverTimestamp() });
+        if (applicant) {
+          await updateDoc(doc(db, "applicants", applicant.id), { contractCreated: true });
+          createNotification(`${applicant.name}님의 계약이 등록되었습니다.`, "contract");
+        }
+      }
+      closeModal();
+    } catch (err) {
+      alert("저장 중 오류가 발생했습니다: " + err.message);
+    }
+  });
+}
+async function removeContract(id) {
+  if (!confirm("해당 계약을 삭제하시겠습니까?")) return;
+  try { await deleteDoc(doc(db, "contracts", id)); }
+  catch (err) { alert("삭제 중 오류: " + err.message); }
+}
+
+/* =========================================================================
+   8. 채용분석
+   ========================================================================= */
+function renderAnalytics() {
+  const total = applicantsCache.length;
+  const counts = {};
+  APPLICANT_STATUSES.forEach(s => { counts[s] = applicantsCache.filter(a => a.status === s).length; });
+  const max = Math.max(1, ...Object.values(counts));
+
+  const bars = APPLICANT_STATUSES.map(s => `
+    <div class="analytics-bar-row">
+      <div class="analytics-bar-label">${s}</div>
+      <div class="analytics-bar-track"><div class="analytics-bar-fill" style="width:${(counts[s] / max * 100)}%"></div></div>
+      <div class="analytics-bar-count">${counts[s]}</div>
+    </div>`).join("");
+
+  const interviewRate = total ? Math.round((counts["면접예정"] + counts["면접완료"] + counts["최종합격"]) / total * 100) : 0;
+  const finalRate = total ? Math.round(counts["최종합격"] / total * 100) : 0;
+
+  const jobActive = jobsCache.filter(j => j.status === "진행중").length;
+  const jobClosed = jobsCache.filter(j => j.status === "마감").length;
+  const jobTotal = Math.max(1, jobActive + jobClosed);
+
+  contentEl.innerHTML = `
+    <div class="cards">
+      <div class="card">총 지원자<h2>${total}</h2></div>
+      <div class="card">면접 전환율<h2>${interviewRate}%</h2></div>
+      <div class="card">최종합격률<h2>${finalRate}%</h2></div>
+      <div class="card">진행중 공고<h2>${jobActive}</h2></div>
+    </div>
+    <div class="section">
+      <h2 style="margin-bottom:15px;">전형 단계별 지원자 분포</h2>
+      ${bars}
+    </div>
+    <div class="section">
+      <h2 style="margin-bottom:15px;">채용공고 현황</h2>
+      <div class="analytics-bar-row">
+        <div class="analytics-bar-label">진행중</div>
+        <div class="analytics-bar-track"><div class="analytics-bar-fill" style="width:${jobActive / jobTotal * 100}%"></div></div>
+        <div class="analytics-bar-count">${jobActive}</div>
+      </div>
+      <div class="analytics-bar-row">
+        <div class="analytics-bar-label">마감</div>
+        <div class="analytics-bar-track"><div class="analytics-bar-fill" style="width:${jobClosed / jobTotal * 100}%"></div></div>
+        <div class="analytics-bar-count">${jobClosed}</div>
+      </div>
+    </div>`;
+}
+
+/* =========================================================================
+   9. 알림관리
+   ========================================================================= */
+function renderNotifications() {
+  const items = notificationsCache.length ? notificationsCache.map(n => `
+    <div class="notif-item ${n.read ? "" : "unread"}">
+      <div>
+        <div>${esc(n.message)}</div>
+        <div style="font-size:12px;color:#9ca3af;margin-top:4px;">${fmtDateTime(n.createdAt)}</div>
+      </div>
+      <div class="actions">
+        ${!n.read ? `<button class="btn btn-secondary btn-sm" data-action="mark-notif-read" data-id="${n.id}">읽음</button>` : ""}
+        <button class="btn btn-danger btn-sm" data-action="delete-notif" data-id="${n.id}">삭제</button>
+      </div>
+    </div>`).join("") : `<div class="empty">알림이 없습니다.</div>`;
+
+  contentEl.innerHTML = `
+    <div class="section">
+      <h2 style="margin-bottom:15px;">알림관리</h2>
+      <form id="notifForm" style="display:flex;gap:10px;margin-bottom:10px;">
+        <input name="message" placeholder="알림 내용을 입력하세요" style="flex:1;padding:9px;border:1px solid #ddd;border-radius:6px;" required>
+        <button type="submit" class="btn btn-primary">알림 추가</button>
+      </form>
+      <div>${items}</div>
+    </div>`;
+
+  document.getElementById("notifForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const msg = fd.get("message").trim();
+    if (!msg) return;
+    await createNotification(msg, "manual");
+    e.target.reset();
+  });
+}
+async function markNotificationRead(id) {
+  try { await updateDoc(doc(db, "notifications", id), { read: true }); }
+  catch (err) { console.error(err); }
+}
+async function deleteNotification(id) {
+  try { await deleteDoc(doc(db, "notifications", id)); }
+  catch (err) { console.error(err); }
+}
+
+/* =========================================================================
+   10. 시스템관리
+   ========================================================================= */
+function renderSystem() {
+  const s = settingsCache || {};
+  const adminRows = adminsCache.length ? adminsCache.map(a => `
+    <tr>
+      <td>${esc(a.name)}</td><td>${esc(a.email)}</td><td>${esc(a.role || "운영자")}</td>
+      <td class="actions"><button class="btn btn-danger btn-sm" data-action="remove-admin" data-id="${a.id}">삭제</button></td>
+    </tr>`).join("") : `<tr><td colspan="4" class="empty">등록된 운영자가 없습니다.</td></tr>`;
+
+  contentEl.innerHTML = `
+    <div class="section">
+      <h2 style="margin-bottom:15px;">시스템 설정</h2>
+      <form id="settingsForm">
+        <div class="form-group"><label>회사명</label><input name="companyName" value="${esc(s.companyName || "")}"></div>
+        <div class="form-group"><label>알림 수신 이메일</label><input type="email" name="notifyEmail" value="${esc(s.notifyEmail || "")}"></div>
+        <div class="form-group"><label><input type="checkbox" name="autoNotify" style="width:auto;display:inline;margin-right:6px;" ${s.autoNotify !== false ? "checked" : ""}> 상태 변경 시 자동 알림 생성</label></div>
+        <button type="submit" class="btn btn-primary">설정 저장</button>
+      </form>
+    </div>
+    <div class="section">
+      <div class="toolbar"><h2>운영자 관리</h2><button class="btn btn-primary" data-action="open-admin-modal">+ 운영자 추가</button></div>
+      <table>
+        <thead><tr><th>이름</th><th>이메일</th><th>역할</th><th>관리</th></tr></thead>
+        <tbody>${adminRows}</tbody>
+      </table>
+      <p style="margin-top:12px;font-size:12px;color:#9ca3af;">
+        ※ 이 화면은 운영자 정보를 기록하는 용도입니다. 실제 로그인·권한 분리가 필요하면
+        Firebase Authentication 연동이 추가로 필요합니다.
+      </p>
+    </div>`;
+
+  document.getElementById("settingsForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const data = {
+      companyName: fd.get("companyName").trim(),
+      notifyEmail: fd.get("notifyEmail").trim(),
+      autoNotify: fd.get("autoNotify") === "on"
+    };
+    try {
+      await setDoc(settingsDocRef, data);
+      alert("설정이 저장되었습니다.");
+    } catch (err) {
+      alert("저장 중 오류: " + err.message);
+    }
+  });
+}
+function openAdminModal() {
+  showModal(`
+    <h3>운영자 추가</h3>
+    <form id="adminForm">
+      <div class="form-group"><label>이름</label><input name="name" required></div>
+      <div class="form-group"><label>이메일</label><input type="email" name="email" required></div>
+      <div class="form-group"><label>역할</label><input name="role" placeholder="예: 인사담당자"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" data-action="close-modal">취소</button>
+        <button type="submit" class="btn btn-primary">추가</button>
+      </div>
+    </form>`);
+  document.getElementById("adminForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    try {
+      await addDoc(colAdmins, {
+        name: fd.get("name").trim(),
+        email: fd.get("email").trim(),
+        role: fd.get("role").trim()
+      });
+      closeModal();
+    } catch (err) {
+      alert("저장 중 오류: " + err.message);
+    }
+  });
+}
+async function removeAdmin(id) {
+  if (!confirm("삭제하시겠습니까?")) return;
+  try { await deleteDoc(doc(db, "admins", id)); }
+  catch (err) { alert("삭제 중 오류: " + err.message); }
+}
+
+/* =========================================================================
+   이벤트 위임 (클릭 / 변경)
+   ========================================================================= */
+contentEl.addEventListener("click", e => {
+  const el = e.target.closest("[data-action]");
+  if (!el) return;
+  const action = el.dataset.action;
+  const id = el.dataset.id;
+  switch (action) {
+    case "open-job-modal":       openJobModal(); break;
+    case "edit-job":             openJobModal(id); break;
+    case "remove-job":           removeJob(id); break;
+
+    case "open-applicant-modal": openApplicantModal(); break;
+    case "edit-applicant":       openApplicantModal(id); break;
+    case "remove-applicant":     removeApplicant(id); break;
+
+    case "start-screening":      updateApplicantStatus(id, "서류전형중"); break;
+    case "pass-screening":       updateApplicantStatus(id, "면접예정"); break;
+    case "fail-screening":       updateApplicantStatus(id, "불합격"); break;
+
+    case "interview-done":       updateApplicantStatus(id, "면접완료"); break;
+    case "interview-pass":       updateApplicantStatus(id, "최종합격"); break;
+    case "interview-fail":       updateApplicantStatus(id, "불합격"); break;
+
+    case "register-contract":    openContractModal(id); break;
+    case "open-contract-modal":  openContractModal(); break;
+    case "edit-contract":        openContractModal(null, id); break;
+    case "remove-contract":      removeContract(id); break;
+
+    case "mark-notif-read":      markNotificationRead(id); break;
+    case "delete-notif":         deleteNotification(id); break;
+
+    case "open-admin-modal":     openAdminModal(); break;
+    case "remove-admin":         removeAdmin(id); break;
+
+    case "close-modal":          closeModal(); break;
+  }
+});
+contentEl.addEventListener("change", e => {
+  const el = e.target.closest('[data-action="set-interview-date"]');
+  if (!el) return;
+  setInterviewDate(el.dataset.id, el.value);
+});
+
+/* =========================================================================
+   사이드바 네비게이션
+   ========================================================================= */
+document.querySelectorAll(".sidebar [data-view]").forEach(el => {
+  el.addEventListener("click", () => switchView(el.dataset.view));
+});
+
+/* =========================================================================
+   Firestore 실시간 리스너 설정
+   ========================================================================= */
+function setupListeners() {
+  onSnapshot(colJobs, snap => {
+    jobsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    jobsCache.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+    rerender();
+  }, err => console.error("jobPostings 구독 오류:", err));
+
+  onSnapshot(colApplicants, snap => {
+    applicantsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    applicantsCache.sort((a, b) => (b.appliedAt?.toMillis?.() || 0) - (a.appliedAt?.toMillis?.() || 0));
+    rerender();
+  }, err => console.error("applicants 구독 오류:", err));
+
+  onSnapshot(colNotifications, snap => {
+    notificationsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    notificationsCache.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+    rerender();
+  }, err => console.error("notifications 구독 오류:", err));
+
+  onSnapshot(colContracts, snap => {
+    contractsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    contractsCache.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+    rerender();
+  }, err => console.error("contracts 구독 오류:", err));
+
+  onSnapshot(colAdmins, snap => {
+    adminsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    rerender();
+  }, err => console.error("admins 구독 오류:", err));
+
+  onSnapshot(settingsDocRef, snap => {
+    settingsCache = snap.exists() ? snap.data() : {};
+    rerender();
+  }, err => console.error("settings 구독 오류:", err));
+}
+
+setupListeners();
+switchView("dashboard");
+
+/* =========================================================================
+   Firestore 보안 규칙 예시 (Firebase 콘솔 > Firestore Database > 규칙)
+   -------------------------------------------------------------------------
+   개발/테스트 중에는 아래처럼 열어둘 수 있지만, 운영 배포 전에는
+   반드시 Firebase Authentication과 연동해 관리자만 쓰기 가능하도록 제한하세요.
+
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /{document=**} {
+         allow read, write: if request.auth != null; // 로그인한 사용자만 허용 (예시)
+       }
+     }
+   }
+   ========================================================================= */
+</script>
 </body>
 </html>
