@@ -246,6 +246,28 @@ td.actions{
     font-size:14px;
     font-family:inherit;
 }
+.form-hint{
+    font-size:12px;
+    color:#9ca3af;
+    margin-top:4px;
+}
+.resume-current{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:8px;
+    font-size:13px;
+    color:#374151;
+    background:#f3f4f6;
+    border-radius:6px;
+    padding:8px 10px;
+}
+.resume-current a{
+    color:#2563eb;
+    text-decoration:none;
+    font-weight:600;
+}
+.resume-current a:hover{text-decoration:underline;}
 .modal-actions{
     display:flex;
     justify-content:flex-end;
@@ -488,8 +510,6 @@ td.actions{
 <h3 data-view="dashboard" class="active">📊 대시보드</h3>
 <ul>
 <li data-view="jobs">채용공고관리</li>
-<li data-view="applicants">지원자관리</li>
-<li data-view="screening">서류전형</li>
 <li data-view="interviews">면접관리</li>
 <li data-view="finalHires">최종합격관리</li>
 <li data-view="contracts">계약관리</li>
@@ -508,7 +528,7 @@ td.actions{
 <div class="section">
 <h2 style="margin-bottom:15px;">최근 지원자 현황</h2>
 <table>
-<thead><tr><th>지원일</th><th>성명</th><th>지원직무</th><th>경력</th><th>상태</th></tr></thead>
+<thead><tr><th>등록일</th><th>성명</th><th>지원직무</th><th>경력</th><th>상태</th></tr></thead>
 <tbody><tr><td colspan="5" class="empty">불러오는 중...</td></tr></tbody>
 </table>
 </div>
@@ -531,6 +551,9 @@ td.actions{
      Authentication > Users 에서 로그인용 계정을 1개 이상 만들어주세요.
    - 운영 배포 전 Firestore 콘솔에서 보안 규칙을 반드시 설정하세요.
      (하단 "Firestore 보안 규칙" 주석 참고 — 로그인 기능과 함께 적용해야 합니다)
+   - 이력서는 별도 Storage 없이 Firestore 문서에 base64 텍스트로 직접
+     저장합니다. Firestore 문서 최대 용량(1MB) 제약 때문에 원본 파일
+     기준 약 700KB 이하로만 첨부를 허용합니다(코드 내 RESUME_MAX_BYTES).
    ========================================================================= */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -577,16 +600,23 @@ const colContracts     = collection(db, "contracts");
 const colAdmins        = collection(db, "admins");
 const settingsDocRef   = doc(db, "settings", "general");
 
-/* ===== 지원자 상태 정의 ===== */
-const APPLICANT_STATUSES = ["서류접수", "서류전형중", "면접예정", "면접완료", "최종합격", "불합격"];
+/* ===== 지원자 상태 정의 =====
+   "지원자관리"/"서류전형" 단계가 제거되어, 이제 지원자(후보자)는
+   면접관리 화면에서 직접 등록되며 기본 상태는 "면접예정"입니다. */
+const APPLICANT_STATUSES = ["면접예정", "면접완료", "최종합격", "불합격"];
 const STATUS_BADGE_CLASS = {
-  "서류접수":  "badge-gray",
-  "서류전형중":"badge-orange",
   "면접예정":  "badge-purple",
   "면접완료":  "badge-indigo",
   "최종합격":  "badge-green",
   "불합격":    "badge-red"
 };
+
+/* ===== 이력서 첨부 제한 =====
+   Firestore 문서 최대 크기는 1MB(약 1,048,576바이트)입니다.
+   base64로 인코딩하면 원본 대비 약 1.37배로 늘어나고, 평가서 등
+   다른 필드도 같은 문서에 함께 저장되므로 여유를 두어 원본 파일
+   기준 700KB로 제한합니다. */
+const RESUME_MAX_BYTES = 700 * 1024;
 
 /* ===== 전역 캐시 (실시간 동기화) ===== */
 let jobsCache = [];
@@ -597,10 +627,8 @@ let adminsCache = [];
 let settingsCache = {};
 let currentView = "dashboard";
 
-/* 지원자관리 화면의 검색/필터 상태 */
-let applicantSearchTerm = "";
-let applicantFilterJob = "";
-let applicantFilterStatus = "";
+/* 면접관리 화면의 검색 상태 */
+let interviewSearchTerm = "";
 
 /* 면접 평가서(템플릿 기반 자동화) 작성 화면 상태 */
 let evaluationApplicantId = null;
@@ -629,6 +657,11 @@ function fmtDateTime(ts) {
   const d = typeof ts.toDate === "function" ? ts.toDate() : new Date(ts);
   if (isNaN(d.getTime())) return "-";
   return d.toLocaleString("ko-KR");
+}
+function fmtBytes(bytes) {
+  if (!bytes) return "0KB";
+  if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + "KB";
+  return (bytes / (1024 * 1024)).toFixed(1) + "MB";
 }
 function badge(status, type = "applicant") {
   if (type === "job") {
@@ -664,6 +697,16 @@ function closeModal() {
   if (overlay) overlay.remove();
 }
 
+/* ===== 파일 → base64 변환 헬퍼 (이력서 첨부용) ===== */
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
 /* =========================================================================
    렌더링 라우터
    ========================================================================= */
@@ -671,8 +714,6 @@ function rerender() {
   switch (currentView) {
     case "dashboard":   renderDashboard(); break;
     case "jobs":        renderJobs(); break;
-    case "applicants":  renderApplicants(); break;
-    case "screening":   renderScreening(); break;
     case "interviews":  renderInterviews(); break;
     case "finalHires":  renderFinalHires(); break;
     case "contracts":   renderContracts(); break;
@@ -702,7 +743,7 @@ function renderDashboard() {
 
   const rows = recent.length ? recent.map(a => `
     <tr>
-      <td>${fmtDate(a.appliedAt)}</td>
+      <td>${fmtDate(a.createdAt)}</td>
       <td>${esc(a.name)}</td>
       <td>${esc(a.jobTitle || "-")}</td>
       <td>${esc(a.experience || "-")}</td>
@@ -719,7 +760,7 @@ function renderDashboard() {
     <div class="section">
       <h2 style="margin-bottom:15px;">최근 지원자 현황</h2>
       <table>
-        <thead><tr><th>지원일</th><th>성명</th><th>지원직무</th><th>경력</th><th>상태</th></tr></thead>
+        <thead><tr><th>등록일</th><th>성명</th><th>지원직무</th><th>경력</th><th>상태</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>`;
@@ -808,77 +849,112 @@ async function removeJob(id) {
 }
 
 /* =========================================================================
-   3. 지원자관리
+   3. 면접관리
+   -------------------------------------------------------------------------
+   "지원자관리"와 "서류전형" 메뉴가 제거됨에 따라, 지원자(후보자)는
+   이 화면에서 직접 등록합니다. 등록 즉시 상태는 "면접예정"이 되며,
+   이름/지원직무/경력/연락처/면접일시/이력서 첨부까지 한 번에 입력합니다.
    ========================================================================= */
-function renderApplicants() {
+function renderInterviews() {
   let list = applicantsCache.slice();
-  if (applicantFilterStatus) list = list.filter(a => a.status === applicantFilterStatus);
-  if (applicantFilterJob) list = list.filter(a => a.jobPostingId === applicantFilterJob);
-  if (applicantSearchTerm) list = list.filter(a => a.name && a.name.includes(applicantSearchTerm));
+  if (interviewSearchTerm) {
+    const term = interviewSearchTerm.trim();
+    list = list.filter(a =>
+      (a.name && a.name.includes(term)) ||
+      (a.jobTitle && a.jobTitle.includes(term)) ||
+      (a.phone && a.phone.includes(term))
+    );
+  }
 
-  const jobOptions = jobsCache.map(j =>
-    `<option value="${j.id}" ${applicantFilterJob === j.id ? "selected" : ""}>${esc(j.title)}</option>`
-  ).join("");
-  const statusOptions = APPLICANT_STATUSES.map(s =>
-    `<option value="${s}" ${applicantFilterStatus === s ? "selected" : ""}>${s}</option>`
-  ).join("");
-
-  const rows = list.length ? list.map(a => `
+  const rows = list.length ? list.map(a => {
+    const interviewLabel = [a.interviewDate, a.interviewTime].filter(Boolean).join(" ") || "-";
+    const resumeCell = a.resume && a.resume.dataUrl
+      ? `<a href="javascript:void(0)" data-action="view-resume" data-id="${a.id}">${esc(a.resume.fileName || "이력서")}</a>`
+      : `<span style="color:#9ca3af;">미첨부</span>`;
+    return `
     <tr>
-      <td>${fmtDate(a.appliedAt)}</td>
       <td>${esc(a.name)}</td>
       <td>${esc(a.jobTitle || "-")}</td>
       <td>${esc(a.experience || "-")}</td>
-      <td>${esc(a.email || "-")}</td>
-      <td>${badge(a.status)}</td>
+      <td>${esc(a.phone || "-")}</td>
+      <td>${interviewLabel}</td>
+      <td>${resumeCell}</td>
+      <td>${badge(a.status)} ${a.evaluation ? '<br><span class="badge badge-eval-done" style="margin-top:4px;">평가서 작성됨</span>' : ""}</td>
       <td class="actions">
         <button class="btn btn-secondary btn-sm" data-action="edit-applicant" data-id="${a.id}">수정</button>
+        <button class="btn btn-secondary btn-sm" data-action="open-evaluation" data-id="${a.id}">${a.evaluation ? "평가서 수정" : "평가서 작성"}</button>
+        ${a.status === "면접예정"
+          ? `<button class="btn btn-primary btn-sm" data-action="interview-done" data-id="${a.id}">면접완료</button>`
+          : (a.status === "면접완료"
+            ? `<button class="btn btn-success btn-sm" data-action="interview-pass" data-id="${a.id}">최종합격</button>
+               <button class="btn btn-danger btn-sm" data-action="interview-fail" data-id="${a.id}">불합격</button>`
+            : "")}
         <button class="btn btn-danger btn-sm" data-action="remove-applicant" data-id="${a.id}">삭제</button>
       </td>
-    </tr>`).join("") : `<tr><td colspan="7" class="empty">조건에 맞는 지원자가 없습니다.</td></tr>`;
+    </tr>`;
+  }).join("") : `<tr><td colspan="8" class="empty">${interviewSearchTerm ? "검색 결과가 없습니다." : "등록된 면접 대상자가 없습니다."}</td></tr>`;
 
   contentEl.innerHTML = `
     <div class="section">
       <div class="toolbar">
-        <h2>지원자관리</h2>
-        <button class="btn btn-primary" data-action="open-applicant-modal">+ 지원자 등록</button>
+        <h2>면접관리</h2>
+        <button class="btn btn-primary" data-action="open-applicant-modal">+ 면접 대상자 등록</button>
       </div>
       <div class="filter-bar" style="margin-bottom:15px;">
-        <input type="text" id="applicantSearch" placeholder="이름 검색" value="${esc(applicantSearchTerm)}">
-        <select id="applicantJobFilter"><option value="">전체 공고</option>${jobOptions}</select>
-        <select id="applicantStatusFilter"><option value="">전체 상태</option>${statusOptions}</select>
+        <input type="text" id="interviewSearch" placeholder="성명 / 지원직무 / 연락처 검색" value="${esc(interviewSearchTerm)}" style="min-width:240px;">
       </div>
       <table>
-        <thead><tr><th>지원일</th><th>성명</th><th>지원직무</th><th>경력</th><th>이메일</th><th>상태</th><th>관리</th></tr></thead>
+        <thead><tr><th>성명</th><th>지원직무</th><th>경력</th><th>연락처</th><th>면접일시</th><th>이력서</th><th>상태</th><th>관리</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>`;
 
-  document.getElementById("applicantSearch").addEventListener("input", e => {
-    applicantSearchTerm = e.target.value; renderApplicants();
-  });
-  document.getElementById("applicantJobFilter").addEventListener("change", e => {
-    applicantFilterJob = e.target.value; renderApplicants();
-  });
-  document.getElementById("applicantStatusFilter").addEventListener("change", e => {
-    applicantFilterStatus = e.target.value; renderApplicants();
+  const searchEl = document.getElementById("interviewSearch");
+  searchEl.addEventListener("input", e => {
+    interviewSearchTerm = e.target.value;
+    renderInterviews();
+    // 입력 중 포커스가 다시 검색창으로 가도록 복원
+    const re = document.getElementById("interviewSearch");
+    if (re) { re.focus(); re.selectionStart = re.selectionEnd = re.value.length; }
   });
 }
 
+/* ===== 면접 대상자 등록/수정 모달 ===== */
 function openApplicantModal(id) {
   const applicant = id ? applicantsCache.find(a => a.id === id) : null;
   const jobOptions = jobsCache.length
-    ? jobsCache.map(j => `<option value="${j.id}" ${applicant && applicant.jobPostingId === j.id ? "selected" : ""}>${esc(j.title)}</option>`).join("")
+    ? `<option value="">직접입력(아래 직무명 사용)</option>` + jobsCache.map(j =>
+        `<option value="${j.id}" ${applicant && applicant.jobPostingId === j.id ? "selected" : ""}>${esc(j.title)}</option>`).join("")
     : `<option value="">등록된 공고가 없습니다</option>`;
 
+  const resumeInfo = applicant && applicant.resume && applicant.resume.dataUrl
+    ? `<div class="resume-current">
+         <span>현재 첨부: <a href="javascript:void(0)" data-action="view-resume" data-id="${applicant.id}">${esc(applicant.resume.fileName)}</a> (${fmtBytes(applicant.resume.size)})</span>
+         <button type="button" class="btn btn-danger btn-sm" id="removeResumeBtn" style="margin-left:auto;">첨부삭제</button>
+       </div>`
+    : "";
+
   showModal(`
-    <h3>${applicant ? "지원자 정보 수정" : "지원자 등록"}</h3>
+    <h3>${applicant ? "면접 대상자 정보 수정" : "면접 대상자 등록"}</h3>
     <form id="applicantForm">
       <div class="form-group"><label>성명</label><input name="name" required value="${applicant ? esc(applicant.name) : ""}"></div>
-      <div class="form-group"><label>이메일</label><input type="email" name="email" value="${applicant ? esc(applicant.email || "") : ""}"></div>
-      <div class="form-group"><label>연락처</label><input name="phone" value="${applicant ? esc(applicant.phone || "") : ""}"></div>
-      <div class="form-group"><label>지원직무(공고)</label><select name="jobPostingId">${jobOptions}</select></div>
+      <div class="form-group"><label>지원직무(채용공고 선택)</label><select name="jobPostingId">${jobOptions}</select></div>
+      <div class="form-group"><label>직무명 (공고를 선택하지 않은 경우 직접 입력)</label><input name="jobTitleManual" placeholder="예: 백엔드 개발자" value="${applicant && !applicant.jobPostingId ? esc(applicant.jobTitle || "") : ""}"></div>
       <div class="form-group"><label>경력</label><input name="experience" placeholder="예: 3년 / 신입" value="${applicant ? esc(applicant.experience || "") : ""}"></div>
+      <div class="form-group"><label>연락처</label><input name="phone" value="${applicant ? esc(applicant.phone || "") : ""}"></div>
+      <div class="form-group"><label>이메일</label><input type="email" name="email" value="${applicant ? esc(applicant.email || "") : ""}"></div>
+      <div class="form-group"><label>면접일시</label>
+        <div style="display:flex;gap:8px;">
+          <input type="date" name="interviewDate" value="${applicant ? (applicant.interviewDate || "") : ""}" style="flex:1;">
+          <input type="time" name="interviewTime" value="${applicant ? (applicant.interviewTime || "") : ""}" style="flex:1;">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>이력서 첨부 (PDF/이미지/문서, 약 700KB 이하)</label>
+        <input type="file" name="resumeFile" id="resumeFileInput" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+        <div class="form-hint">파일은 별도 저장소 없이 시스템 내부(Firestore)에 직접 저장되며, 용량 제한으로 큰 파일은 첨부되지 않습니다.</div>
+        ${resumeInfo}
+      </div>
       ${applicant ? `
       <div class="form-group"><label>상태</label>
         <select name="status">${APPLICANT_STATUSES.map(s => `<option value="${s}" ${applicant.status === s ? "selected" : ""}>${s}</option>`).join("")}</select>
@@ -890,32 +966,84 @@ function openApplicantModal(id) {
       </div>
     </form>`);
 
+  // 첨부 삭제 체크 플래그(폼 제출 시 참조)
+  let removeResumeFlag = false;
+  const removeBtn = document.getElementById("removeResumeBtn");
+  if (removeBtn) {
+    removeBtn.addEventListener("click", () => {
+      removeResumeFlag = true;
+      removeBtn.closest(".resume-current").innerHTML = `<span style="color:#9ca3af;">첨부가 삭제됩니다. 저장을 눌러 확정하세요.</span>`;
+    });
+  }
+
   document.getElementById("applicantForm").addEventListener("submit", async e => {
     e.preventDefault();
-    const fd = new FormData(e.target);
+    const formEl = e.target;
+    const fd = new FormData(formEl);
     const jobId = fd.get("jobPostingId") || null;
     const job = jobsCache.find(j => j.id === jobId);
+    const manualTitle = (fd.get("jobTitleManual") || "").trim();
+
     const data = {
       name: fd.get("name").trim(),
-      email: fd.get("email").trim(),
-      phone: fd.get("phone").trim(),
       jobPostingId: jobId,
-      jobTitle: job ? job.title : "-",
+      jobTitle: job ? job.title : (manualTitle || "-"),
       experience: fd.get("experience").trim(),
+      phone: fd.get("phone").trim(),
+      email: fd.get("email").trim(),
+      interviewDate: fd.get("interviewDate") || "",
+      interviewTime: fd.get("interviewTime") || "",
       notes: fd.get("notes").trim()
     };
+
+    // 이력서 파일 처리
+    const fileInput = document.getElementById("resumeFileInput");
+    const file = fileInput && fileInput.files && fileInput.files[0];
+
+    if (file) {
+      if (file.size > RESUME_MAX_BYTES) {
+        alert(`이력서 파일이 너무 큽니다. 약 ${fmtBytes(RESUME_MAX_BYTES)} 이하 파일만 첨부할 수 있습니다.\n선택한 파일: ${fmtBytes(file.size)}`);
+        return;
+      }
+      try {
+        const dataUrl = await readFileAsDataURL(file);
+        data.resume = {
+          fileName: file.name,
+          mimeType: file.type || "application/octet-stream",
+          size: file.size,
+          dataUrl
+        };
+      } catch (err) {
+        alert("이력서 파일을 읽는 중 오류가 발생했습니다: " + err.message);
+        return;
+      }
+    } else if (removeResumeFlag) {
+      data.resume = null;
+    }
+
     try {
       if (applicant) {
         data.status = fd.get("status");
         await updateDoc(doc(db, "applicants", applicant.id), data);
       } else {
         await addDoc(colApplicants, {
-          ...data, status: "서류접수", appliedAt: serverTimestamp(), contractCreated: false
+          ...data,
+          resume: data.resume || null,
+          status: "면접예정",
+          createdAt: serverTimestamp(),
+          contractCreated: false
         });
+        if (settingsCache.autoNotify !== false) {
+          createNotification(`${data.name}님이 면접 대상자로 등록되었습니다.`, "interview");
+        }
       }
       closeModal();
     } catch (err) {
-      alert("저장 중 오류가 발생했습니다: " + err.message);
+      if (err && err.message && /longer than|exceeds|size/i.test(err.message)) {
+        alert("저장 중 오류: 첨부 파일을 포함한 문서 용량이 너무 큽니다. 더 작은 파일로 다시 시도해주세요.");
+      } else {
+        alert("저장 중 오류가 발생했습니다: " + err.message);
+      }
     }
   });
 }
@@ -937,79 +1065,40 @@ async function updateApplicantStatus(id, status, extra = {}) {
   }
 }
 
-/* =========================================================================
-   4. 서류전형
-   ========================================================================= */
-function renderScreening() {
-  const list = applicantsCache.filter(a => a.status === "서류접수" || a.status === "서류전형중");
-  const rows = list.length ? list.map(a => `
-    <tr>
-      <td>${fmtDate(a.appliedAt)}</td>
-      <td>${esc(a.name)}</td>
-      <td>${esc(a.jobTitle || "-")}</td>
-      <td>${esc(a.experience || "-")}</td>
-      <td>${badge(a.status)}</td>
-      <td class="actions">
-        ${a.status === "서류접수"
-          ? `<button class="btn btn-primary btn-sm" data-action="start-screening" data-id="${a.id}">전형시작</button>`
-          : `<button class="btn btn-success btn-sm" data-action="pass-screening" data-id="${a.id}">서류통과</button>
-             <button class="btn btn-danger btn-sm" data-action="fail-screening" data-id="${a.id}">불합격</button>`}
-      </td>
-    </tr>`).join("") : `<tr><td colspan="6" class="empty">서류전형 대상자가 없습니다.</td></tr>`;
-
-  contentEl.innerHTML = `
-    <div class="section">
-      <h2 style="margin-bottom:15px;">서류전형</h2>
-      <table>
-        <thead><tr><th>지원일</th><th>성명</th><th>지원직무</th><th>경력</th><th>상태</th><th>관리</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
+/* ===== 이력서 열람 (새 창) ===== */
+function viewResume(id) {
+  const applicant = applicantsCache.find(a => a.id === id);
+  if (!applicant || !applicant.resume || !applicant.resume.dataUrl) {
+    alert("첨부된 이력서가 없습니다.");
+    return;
+  }
+  const { dataUrl, mimeType, fileName } = applicant.resume;
+  // 이미지/PDF는 새 창에서 바로 표시, 그 외 형식은 다운로드 처리
+  if (mimeType && (mimeType.startsWith("image/") || mimeType === "application/pdf")) {
+    const w = window.open("", "_blank");
+    if (!w) { alert("팝업이 차단되었습니다. 팝업 차단을 해제한 후 다시 시도해주세요."); return; }
+    if (mimeType === "application/pdf") {
+      w.document.write(`<!DOCTYPE html><html><head><title>${esc(fileName || "이력서")}</title></head>
+        <body style="margin:0;"><iframe src="${dataUrl}" style="width:100%;height:100vh;border:none;"></iframe></body></html>`);
+    } else {
+      w.document.write(`<!DOCTYPE html><html><head><title>${esc(fileName || "이력서")}</title></head>
+        <body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+          <img src="${dataUrl}" style="max-width:100%;max-height:100vh;">
+        </body></html>`);
+    }
+    w.document.close();
+  } else {
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = fileName || "resume";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
 }
 
 /* =========================================================================
-   5. 면접관리
-   ========================================================================= */
-function renderInterviews() {
-  const list = applicantsCache.filter(a => a.status === "면접예정" || a.status === "면접완료");
-  const rows = list.length ? list.map(a => `
-    <tr>
-      <td>${esc(a.name)}</td>
-      <td>${esc(a.jobTitle || "-")}</td>
-      <td>
-        <input type="date" value="${a.interviewDate || ""}" data-action="set-interview-date" data-id="${a.id}" ${a.status === "면접완료" ? "disabled" : ""}>
-        <input type="time" value="${a.interviewTime || ""}" data-action="set-interview-time" data-id="${a.id}" style="margin-top:4px;" ${a.status === "면접완료" ? "disabled" : ""}>
-      </td>
-      <td>${badge(a.status)} ${a.evaluation ? '<br><span class="badge badge-eval-done" style="margin-top:4px;">평가서 작성됨</span>' : ""}</td>
-      <td class="actions">
-        <button class="btn btn-secondary btn-sm" data-action="open-evaluation" data-id="${a.id}">${a.evaluation ? "평가서 수정" : "평가서 작성"}</button>
-        ${a.status === "면접예정"
-          ? `<button class="btn btn-primary btn-sm" data-action="interview-done" data-id="${a.id}">면접완료</button>`
-          : `<button class="btn btn-success btn-sm" data-action="interview-pass" data-id="${a.id}">최종합격</button>
-             <button class="btn btn-danger btn-sm" data-action="interview-fail" data-id="${a.id}">불합격</button>`}
-      </td>
-    </tr>`).join("") : `<tr><td colspan="5" class="empty">면접 대상자가 없습니다.</td></tr>`;
-
-  contentEl.innerHTML = `
-    <div class="section">
-      <h2 style="margin-bottom:15px;">면접관리</h2>
-      <table>
-        <thead><tr><th>성명</th><th>지원직무</th><th>면접일시</th><th>상태</th><th>관리</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
-}
-async function setInterviewDate(id, value) {
-  try { await updateDoc(doc(db, "applicants", id), { interviewDate: value }); }
-  catch (err) { alert("면접일 저장 중 오류: " + err.message); }
-}
-async function setInterviewTime(id, value) {
-  try { await updateDoc(doc(db, "applicants", id), { interviewTime: value }); }
-  catch (err) { alert("면접시간 저장 중 오류: " + err.message); }
-}
-
-/* =========================================================================
-   5-2. 면접 평가서 자동화 (템플릿 기반)
+   3-2. 면접 평가서 자동화 (템플릿 기반)
    -------------------------------------------------------------------------
    면접관이 항목별로 짧게 입력하면, 정해진 양식(①②③... 번호 + 섹션 구분)에
    맞춰 평가서 본문을 자동으로 조립해줍니다. 외부 AI API 없이 동작하므로
@@ -1246,7 +1335,7 @@ function printEvaluation() {
 }
 
 /* =========================================================================
-   6. 최종합격관리
+   4. 최종합격관리
    ========================================================================= */
 function renderFinalHires() {
   const list = applicantsCache.filter(a => a.status === "최종합격");
@@ -1274,7 +1363,7 @@ function renderFinalHires() {
 }
 
 /* =========================================================================
-   7. 계약관리
+   5. 계약관리
    ========================================================================= */
 function renderContracts() {
   const rows = contractsCache.length ? contractsCache.map(c => `
@@ -1368,7 +1457,7 @@ async function removeContract(id) {
 }
 
 /* =========================================================================
-   8. 채용분석
+   6. 채용분석
    ========================================================================= */
 function renderAnalytics() {
   const total = applicantsCache.length;
@@ -1417,7 +1506,7 @@ function renderAnalytics() {
 }
 
 /* =========================================================================
-   9. 알림관리
+   7. 알림관리
    ========================================================================= */
 function renderNotifications() {
   const items = notificationsCache.length ? notificationsCache.map(n => `
@@ -1461,7 +1550,7 @@ async function deleteNotification(id) {
 }
 
 /* =========================================================================
-   10. 시스템관리
+   8. 시스템관리
    ========================================================================= */
 function renderSystem() {
   const s = settingsCache || {};
@@ -1558,10 +1647,7 @@ contentEl.addEventListener("click", e => {
     case "open-applicant-modal": openApplicantModal(); break;
     case "edit-applicant":       openApplicantModal(id); break;
     case "remove-applicant":     removeApplicant(id); break;
-
-    case "start-screening":      updateApplicantStatus(id, "서류전형중"); break;
-    case "pass-screening":       updateApplicantStatus(id, "면접예정"); break;
-    case "fail-screening":       updateApplicantStatus(id, "불합격"); break;
+    case "view-resume":          viewResume(id); break;
 
     case "interview-done":       updateApplicantStatus(id, "면접완료"); break;
     case "interview-pass":       updateApplicantStatus(id, "최종합격"); break;
@@ -1588,12 +1674,6 @@ contentEl.addEventListener("click", e => {
 
     case "close-modal":          closeModal(); break;
   }
-});
-contentEl.addEventListener("change", e => {
-  const dateEl = e.target.closest('[data-action="set-interview-date"]');
-  if (dateEl) { setInterviewDate(dateEl.dataset.id, dateEl.value); return; }
-  const timeEl = e.target.closest('[data-action="set-interview-time"]');
-  if (timeEl) { setInterviewTime(timeEl.dataset.id, timeEl.value); return; }
 });
 contentEl.addEventListener("input", e => {
   if (e.target.closest("#evalForm")) {
@@ -1638,7 +1718,7 @@ function setupListeners() {
 
   onSnapshot(colApplicants, snap => {
     applicantsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    applicantsCache.sort((a, b) => (b.appliedAt?.toMillis?.() || 0) - (a.appliedAt?.toMillis?.() || 0));
+    applicantsCache.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
     rerender();
   }, err => console.error("applicants 구독 오류:", err));
 
