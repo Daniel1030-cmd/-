@@ -266,6 +266,90 @@ td.actions{
 @media (max-width:900px){
     .cards{grid-template-columns:repeat(2,1fr);}
 }
+
+/* ===== 면접 평가서 자동화 ===== */
+.eval-header-bar{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:15px;
+}
+.eval-back-btn{
+    background:none;
+    border:1px solid #ddd;
+    border-radius:6px;
+    padding:7px 14px;
+    cursor:pointer;
+    font-size:13px;
+    color:#374151;
+}
+.eval-back-btn:hover{background:#f3f4f6;}
+.eval-candidate-card{
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:14px 16px;
+    margin-bottom:18px;
+    font-size:14px;
+    color:#374151;
+}
+.eval-candidate-card b{color:#111827;}
+.eval-layout{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    align-items:start;
+}
+@media (max-width:1100px){
+    .eval-layout{grid-template-columns:1fr;}
+}
+.eval-comp-block{
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:14px;
+    margin-bottom:12px;
+    background:#fafafa;
+}
+.eval-comp-block .comp-title-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:8px;
+}
+.eval-comp-block .comp-title-row input{
+    flex:1;
+}
+.eval-add-block-btn{
+    width:100%;
+    padding:10px;
+    border:1px dashed #9ca3af;
+    background:#fff;
+    border-radius:8px;
+    color:#6b7280;
+    cursor:pointer;
+    font-size:13px;
+    margin-bottom:10px;
+}
+.eval-add-block-btn:hover{background:#f3f4f6;}
+.eval-preview{
+    background:#fef9c3;
+    border:1px solid #fde047;
+    border-radius:6px;
+    padding:20px;
+    font-size:14px;
+    line-height:1.7;
+    white-space:pre-wrap;
+    min-height:200px;
+    box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+.eval-preview-actions{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+    flex-wrap:wrap;
+}
+.badge-eval-done{
+    background:#0d9488;
+}
 </style>
 </head>
 <body>
@@ -384,6 +468,13 @@ let applicantSearchTerm = "";
 let applicantFilterJob = "";
 let applicantFilterStatus = "";
 
+/* 면접 평가서(템플릿 기반 자동화) 작성 화면 상태 */
+let evaluationApplicantId = null;
+let evalDraft = null;
+let evalIdSeq = 0;
+function uid() { evalIdSeq += 1; return "c" + evalIdSeq + "_" + Date.now(); }
+const CIRCLED_NUMS = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩","⑪","⑫","⑬","⑭","⑮"];
+
 const contentEl = document.getElementById("content");
 
 /* ===== 공용 유틸 ===== */
@@ -454,6 +545,7 @@ function rerender() {
     case "analytics":   renderAnalytics(); break;
     case "notifications": renderNotifications(); break;
     case "system":      renderSystem(); break;
+    case "evaluationForm": renderEvaluationForm(); break;
   }
 }
 function switchView(view) {
@@ -750,9 +842,13 @@ function renderInterviews() {
     <tr>
       <td>${esc(a.name)}</td>
       <td>${esc(a.jobTitle || "-")}</td>
-      <td><input type="date" value="${a.interviewDate || ""}" data-action="set-interview-date" data-id="${a.id}" ${a.status === "면접완료" ? "disabled" : ""}></td>
-      <td>${badge(a.status)}</td>
+      <td>
+        <input type="date" value="${a.interviewDate || ""}" data-action="set-interview-date" data-id="${a.id}" ${a.status === "면접완료" ? "disabled" : ""}>
+        <input type="time" value="${a.interviewTime || ""}" data-action="set-interview-time" data-id="${a.id}" style="margin-top:4px;" ${a.status === "면접완료" ? "disabled" : ""}>
+      </td>
+      <td>${badge(a.status)} ${a.evaluation ? '<br><span class="badge badge-eval-done" style="margin-top:4px;">평가서 작성됨</span>' : ""}</td>
       <td class="actions">
+        <button class="btn btn-secondary btn-sm" data-action="open-evaluation" data-id="${a.id}">${a.evaluation ? "평가서 수정" : "평가서 작성"}</button>
         ${a.status === "면접예정"
           ? `<button class="btn btn-primary btn-sm" data-action="interview-done" data-id="${a.id}">면접완료</button>`
           : `<button class="btn btn-success btn-sm" data-action="interview-pass" data-id="${a.id}">최종합격</button>
@@ -764,7 +860,7 @@ function renderInterviews() {
     <div class="section">
       <h2 style="margin-bottom:15px;">면접관리</h2>
       <table>
-        <thead><tr><th>성명</th><th>지원직무</th><th>면접일</th><th>상태</th><th>관리</th></tr></thead>
+        <thead><tr><th>성명</th><th>지원직무</th><th>면접일시</th><th>상태</th><th>관리</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>`;
@@ -772,6 +868,247 @@ function renderInterviews() {
 async function setInterviewDate(id, value) {
   try { await updateDoc(doc(db, "applicants", id), { interviewDate: value }); }
   catch (err) { alert("면접일 저장 중 오류: " + err.message); }
+}
+async function setInterviewTime(id, value) {
+  try { await updateDoc(doc(db, "applicants", id), { interviewTime: value }); }
+  catch (err) { alert("면접시간 저장 중 오류: " + err.message); }
+}
+
+/* =========================================================================
+   5-2. 면접 평가서 자동화 (템플릿 기반)
+   -------------------------------------------------------------------------
+   면접관이 항목별로 짧게 입력하면, 정해진 양식(①②③... 번호 + 섹션 구분)에
+   맞춰 평가서 본문을 자동으로 조립해줍니다. 외부 AI API 없이 동작하므로
+   추가 비용/백엔드 설정이 필요 없습니다.
+   ========================================================================= */
+function initEvalDraft(applicant) {
+  const existing = applicant && applicant.evaluation;
+  if (existing && existing.competencies && existing.competencies.length) {
+    evalDraft = {
+      competencies: existing.competencies.map(c => ({ id: uid(), title: c.title || "", itemsText: c.itemsText || "" })),
+      personality: existing.personality || "",
+      strengths: existing.strengths || "",
+      risks: existing.risks || "",
+      comment: existing.comment || "",
+      recommendation: existing.recommendation || "채용추천"
+    };
+  } else {
+    evalDraft = {
+      competencies: [
+        { id: uid(), title: "직무 역량", itemsText: "" },
+        { id: uid(), title: "부가 역량", itemsText: "" }
+      ],
+      personality: "",
+      strengths: "",
+      risks: "",
+      comment: "",
+      recommendation: "채용추천"
+    };
+  }
+}
+function openEvaluationView(id) {
+  evaluationApplicantId = id;
+  const applicant = applicantsCache.find(a => a.id === id);
+  initEvalDraft(applicant);
+  currentView = "evaluationForm";
+  rerender();
+}
+function numberedList(text) {
+  const lines = (text || "").split("\n").map(s => s.trim()).filter(Boolean);
+  if (!lines.length) return "";
+  return lines.map((line, i) => (CIRCLED_NUMS[i] || (i + 1) + ".") + " " + line).join("\n");
+}
+function buildEvaluationReport(applicant, draft) {
+  const out = [];
+  const timeLabel = [applicant.interviewDate, applicant.interviewTime].filter(Boolean).join(" ");
+  out.push(`${applicant.name || "후보자"}(${applicant.jobTitle || "-"})${timeLabel ? " - " + timeLabel : ""}`);
+
+  let n = 1;
+  draft.competencies.forEach(c => {
+    const body = numberedList(c.itemsText);
+    if (!c.title.trim() && !body) return;
+    out.push("");
+    out.push(`${n}. ${c.title.trim() || "역량"} 역량`);
+    if (body) out.push(body);
+    n++;
+  });
+  if (draft.personality && draft.personality.trim()) {
+    out.push(""); out.push(`${n}. 성격 및 업무 태도`); out.push(numberedList(draft.personality)); n++;
+  }
+  if (draft.strengths && draft.strengths.trim()) {
+    out.push(""); out.push(`${n}. 주요 장점`); out.push(numberedList(draft.strengths)); n++;
+  }
+  if (draft.risks && draft.risks.trim()) {
+    out.push(""); out.push(`${n}. 주요 단점 및 채용 리스크`); out.push(numberedList(draft.risks)); n++;
+  }
+  out.push("");
+  out.push(`[종합의견] ${draft.comment && draft.comment.trim() ? draft.comment.trim() : "-"}`);
+  out.push(`[추천여부] ${draft.recommendation || "-"}`);
+  return out.join("\n");
+}
+function renderEvaluationForm() {
+  const applicant = applicantsCache.find(a => a.id === evaluationApplicantId);
+  if (!applicant) {
+    contentEl.innerHTML = `<div class="section"><p>지원자 정보를 찾을 수 없습니다.</p>
+      <button type="button" class="btn btn-secondary" data-action="back-to-interviews" style="margin-top:10px;">← 면접관리로</button></div>`;
+    return;
+  }
+  if (!evalDraft) initEvalDraft(applicant);
+
+  const compBlocksHtml = evalDraft.competencies.map(c => `
+    <div class="eval-comp-block">
+      <div class="comp-title-row">
+        <input type="text" placeholder="역량 항목명 (예: 직무 역량, 부가 역량)" data-comp-title="${c.id}" value="${esc(c.title)}">
+        <button type="button" class="btn btn-danger btn-sm" data-action="remove-comp-block" data-id="${c.id}">삭제</button>
+      </div>
+      <textarea rows="4" placeholder="한 줄에 한 항목씩 입력하세요. 자동으로 ①②③... 번호가 붙습니다." data-comp-items="${c.id}">${esc(c.itemsText)}</textarea>
+    </div>`).join("");
+
+  contentEl.innerHTML = `
+    <div class="section">
+      <div class="eval-header-bar">
+        <button type="button" class="eval-back-btn" data-action="back-to-interviews">← 면접관리로</button>
+        <h2>면접 평가서 작성 (템플릿 기반 자동화)</h2>
+      </div>
+      <div class="eval-candidate-card">
+        <b>${esc(applicant.name)}</b> · ${esc(applicant.jobTitle || "-")} · 면접일시: ${applicant.interviewDate || "-"} ${esc(applicant.interviewTime || "")}
+      </div>
+
+      <form id="evalForm">
+        <div class="eval-layout">
+          <div>
+            <h3 style="margin-bottom:10px;font-size:15px;">핵심 역량 평가</h3>
+            ${compBlocksHtml}
+            <button type="button" class="eval-add-block-btn" data-action="add-comp-block">+ 역량 항목 추가</button>
+
+            <div class="form-group">
+              <label>성격 및 업무 태도 (한 줄에 한 항목)</label>
+              <textarea name="personality" rows="3">${esc(evalDraft.personality)}</textarea>
+            </div>
+            <div class="form-group">
+              <label>주요 장점 (한 줄에 한 항목)</label>
+              <textarea name="strengths" rows="3">${esc(evalDraft.strengths)}</textarea>
+            </div>
+            <div class="form-group">
+              <label>주요 단점 및 채용 리스크 (한 줄에 한 항목)</label>
+              <textarea name="risks" rows="3">${esc(evalDraft.risks)}</textarea>
+            </div>
+            <div class="form-group">
+              <label>종합의견</label>
+              <textarea name="comment" rows="3">${esc(evalDraft.comment)}</textarea>
+            </div>
+            <div class="form-group">
+              <label>추천여부</label>
+              <select name="recommendation">
+                <option value="채용추천" ${evalDraft.recommendation === "채용추천" ? "selected" : ""}>채용추천</option>
+                <option value="보류" ${evalDraft.recommendation === "보류" ? "selected" : ""}>보류</option>
+                <option value="비추천" ${evalDraft.recommendation === "비추천" ? "selected" : ""}>비추천</option>
+              </select>
+            </div>
+            <button type="button" class="btn btn-primary" data-action="save-evaluation">평가서 저장</button>
+          </div>
+
+          <div class="eval-preview-wrap">
+            <h3 style="margin-bottom:10px;font-size:15px;">자동 생성 미리보기</h3>
+            <div class="eval-preview" id="evalPreview"></div>
+            <div class="eval-preview-actions">
+              <button type="button" class="btn btn-secondary btn-sm" data-action="copy-evaluation">복사</button>
+              <button type="button" class="btn btn-secondary btn-sm" data-action="print-evaluation">인쇄 / PDF</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>`;
+
+  updateEvalPreview();
+}
+function syncDraftFromDOM() {
+  const form = document.getElementById("evalForm");
+  if (!form || !evalDraft) return;
+  evalDraft.competencies.forEach(c => {
+    const titleEl = form.querySelector(`[data-comp-title="${c.id}"]`);
+    const itemsEl = form.querySelector(`[data-comp-items="${c.id}"]`);
+    if (titleEl) c.title = titleEl.value;
+    if (itemsEl) c.itemsText = itemsEl.value;
+  });
+  const fields = ["personality", "strengths", "risks", "comment", "recommendation"];
+  fields.forEach(name => {
+    const el = form.querySelector(`[name="${name}"]`);
+    if (el) evalDraft[name] = el.value;
+  });
+}
+function updateEvalPreview() {
+  const applicant = applicantsCache.find(a => a.id === evaluationApplicantId);
+  const previewEl = document.getElementById("evalPreview");
+  if (!applicant || !previewEl || !evalDraft) return;
+  previewEl.textContent = buildEvaluationReport(applicant, evalDraft);
+}
+function addCompetencyBlock() {
+  syncDraftFromDOM();
+  evalDraft.competencies.push({ id: uid(), title: "", itemsText: "" });
+  renderEvaluationForm();
+}
+function removeCompetencyBlock(id) {
+  syncDraftFromDOM();
+  if (evalDraft.competencies.length <= 1) {
+    alert("최소 1개의 역량 항목은 남아있어야 합니다.");
+    return;
+  }
+  evalDraft.competencies = evalDraft.competencies.filter(c => c.id !== id);
+  renderEvaluationForm();
+}
+async function saveEvaluation() {
+  syncDraftFromDOM();
+  const applicant = applicantsCache.find(a => a.id === evaluationApplicantId);
+  if (!applicant) return;
+  const reportText = buildEvaluationReport(applicant, evalDraft);
+  try {
+    await updateDoc(doc(db, "applicants", applicant.id), {
+      evaluation: {
+        competencies: evalDraft.competencies.map(c => ({ title: c.title, itemsText: c.itemsText })),
+        personality: evalDraft.personality,
+        strengths: evalDraft.strengths,
+        risks: evalDraft.risks,
+        comment: evalDraft.comment,
+        recommendation: evalDraft.recommendation,
+        reportText,
+        updatedAt: serverTimestamp()
+      }
+    });
+    if (settingsCache.autoNotify !== false) {
+      createNotification(`${applicant.name}님의 면접 평가서가 저장되었습니다.`, "evaluation");
+    }
+    alert("평가서가 저장되었습니다.");
+  } catch (err) {
+    alert("저장 중 오류가 발생했습니다: " + err.message);
+  }
+}
+async function copyEvaluation() {
+  syncDraftFromDOM();
+  const applicant = applicantsCache.find(a => a.id === evaluationApplicantId);
+  if (!applicant) return;
+  const text = buildEvaluationReport(applicant, evalDraft);
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("클립보드에 복사되었습니다.");
+  } catch (e) {
+    alert("자동 복사에 실패했습니다. 미리보기 영역을 직접 선택해 복사해주세요.");
+  }
+}
+function printEvaluation() {
+  syncDraftFromDOM();
+  const applicant = applicantsCache.find(a => a.id === evaluationApplicantId);
+  if (!applicant) return;
+  const text = buildEvaluationReport(applicant, evalDraft);
+  const w = window.open("", "_blank");
+  if (!w) { alert("팝업이 차단되었습니다. 팝업 차단을 해제한 후 다시 시도해주세요."); return; }
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>면접 평가서 - ${esc(applicant.name)}</title></head>
+    <body style="font-family:'Malgun Gothic',sans-serif;padding:30px;">
+      <pre style="white-space:pre-wrap;font-size:14px;line-height:1.7;">${esc(text)}</pre>
+    </body></html>`);
+  w.document.close();
+  w.focus();
+  w.print();
 }
 
 /* =========================================================================
@@ -1107,13 +1444,28 @@ contentEl.addEventListener("click", e => {
     case "open-admin-modal":     openAdminModal(); break;
     case "remove-admin":         removeAdmin(id); break;
 
+    case "open-evaluation":      openEvaluationView(id); break;
+    case "back-to-interviews":   evaluationApplicantId = null; evalDraft = null; switchView("interviews"); break;
+    case "add-comp-block":       addCompetencyBlock(); break;
+    case "remove-comp-block":    removeCompetencyBlock(id); break;
+    case "save-evaluation":      saveEvaluation(); break;
+    case "copy-evaluation":      copyEvaluation(); break;
+    case "print-evaluation":     printEvaluation(); break;
+
     case "close-modal":          closeModal(); break;
   }
 });
 contentEl.addEventListener("change", e => {
-  const el = e.target.closest('[data-action="set-interview-date"]');
-  if (!el) return;
-  setInterviewDate(el.dataset.id, el.value);
+  const dateEl = e.target.closest('[data-action="set-interview-date"]');
+  if (dateEl) { setInterviewDate(dateEl.dataset.id, dateEl.value); return; }
+  const timeEl = e.target.closest('[data-action="set-interview-time"]');
+  if (timeEl) { setInterviewTime(timeEl.dataset.id, timeEl.value); return; }
+});
+contentEl.addEventListener("input", e => {
+  if (e.target.closest("#evalForm")) {
+    syncDraftFromDOM();
+    updateEvalPreview();
+  }
 });
 
 /* =========================================================================
