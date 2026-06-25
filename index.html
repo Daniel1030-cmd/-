@@ -353,14 +353,7 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .bar-count  { width: 30px; text-align: right; font-size: 13px; font-weight: 700; color: var(--slate-700); }
 
 /* ══════════════════════════════════════════════════
-   이력서 인라인 뷰어  v4.0  ― 완전 재설계
-   핵심 전략:
-   1) dataURL → Blob 변환 시 청크 분할 처리 (스택오버플로 방지)
-   2) PDF: iOS는 Google Docs 프록시 우선, 실패 시 Blob iframe
-   3) 이미지: 직접 Blob URL → <img>
-   4) 기타: 다운로드/공유만 제공
-   5) 오버레이 레이어는 position:fixed로 뷰포트 100% 점유
-   6) iOS body scroll-lock 완전 처리 (scrollY 복원 포함)
+   이력서 인라인 뷰어  v5.0  ― PDF.js 캔버스 렌더링
    ══════════════════════════════════════════════════ */
 @keyframes rv-in {
   from { opacity:0; transform:translateY(100%); }
@@ -426,7 +419,7 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   display: flex;
   flex-direction: column;
 }
-/* PDF iframe */
+/* PDF iframe (폴백용) */
 #rv-pdf-frame {
   width: 100%;
   height: 100%;
@@ -434,6 +427,25 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   border: none;
   display: block;
   background: #fff;
+}
+/* PDF.js 캔버스 페이지 컨테이너 */
+#rv-pdf-pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 10px;
+  background: #525659;
+  min-height: 100%;
+  box-sizing: border-box;
+  width: 100%;
+}
+#rv-pdf-pages canvas {
+  display: block;
+  background: #fff;
+  box-shadow: 0 2px 14px rgba(0,0,0,.45);
+  border-radius: 2px;
+  max-width: 100%;
 }
 /* 이미지 컨테이너 */
 #rv-img-wrap {
@@ -683,34 +695,26 @@ function closeModal(){ const ov=document.getElementById("modalOverlay"); if(ov)o
 function readFile(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(file); }); }
 
 /* ════════════════════════════════════════════════════════════════════
-   이력서 뷰어  v4.0  ―  완전 재설계
-   ════════════════════════════════════════════════════════════════════
+   이력서 뷰어  v5.0  ―  PDF.js 캔버스 렌더링 기반 재설계
 
-   ▸ 환경별 동작 매트릭스
-   ┌────────────────────┬─────────────────────────────────────────────┐
-   │ 환경               │ 전략                                        │
-   ├────────────────────┼─────────────────────────────────────────────┤
-   │ iOS Safari ≥15     │ PDF: Blob URL iframe  │ 이미지: Blob img    │
-   │                    │ 저장: Web Share API (files)                 │
-   │ iOS Safari <15     │ PDF: Google Docs 프록시 iframe              │
-   │                    │ 이미지: Blob img  │ 저장: Web Share(url)   │
-   │ iOS WKWebView      │ PDF: Google Docs 프록시 iframe              │
-   │                    │ 저장: Web Share API (url fallback)          │
-   │ Android Chrome/    │ PDF: Blob URL iframe  │ 이미지: Blob img    │
-   │ Samsung/WebView    │ 저장: Blob URL a[download]                  │
-   │ PC Chrome/Edge/FF  │ 새 탭 Blob URL 미리보기 (PDF/이미지)        │
-   │ PC Safari          │ 새 탭 Blob URL 미리보기                     │
-   │ PC 팝업 차단       │ a[download] 자동 폴백                       │
-   │ DOC/DOCX/기타      │ 모든 환경: 인라인 안내 + 저장               │
-   └────────────────────┴─────────────────────────────────────────────┘
+   ▸ 변경 배경 (모바일 흰 화면 버그 수정)
+   기존 v4는 PDF를 <iframe src="blob:...">로 그대로 주입했습니다.
+   이 방식은 "브라우저의 내장 PDF 플러그인"이 iframe 안에서 PDF를
+   렌더링해 줄 때만 동작합니다. 데스크탑 Chrome/Edge/Firefox는 이런
+   플러그인이 있지만, 모바일에서는 사실상 거의 항상 없습니다.
+     - Android Chrome / 삼성인터넷 / WebView 계열: iframe 안에서
+       PDF 뷰어가 활성화되지 않아 빈(흰) 페이지만 표시됨
+     - iOS Safari: 일부 버전/환경에서 동일하게 빈 화면 발생
+     - 카카오톡·네이버 등 인앱 브라우저(WKWebView): 거의 항상 실패
+   → 결과적으로 "모바일에서는 이력서가 안 보이고 흰 화면만 나옴"
 
-   핵심 개선사항 (v3 → v4):
-   ① atob() 스택오버플로 방지: 청크 분할 방식으로 Blob 변환
-   ② iOS 14 이하: Blob iframe 대신 Google Docs 뷰어 프록시 사용
-   ③ iOS scroll-lock: scrollY 저장 후 position:fixed + top 처리
-   ④ 뷰어 로딩 스피너: iframe onload 이전까지 표시
-   ⑤ PDF iframe 로드 실패 시 Google Docs 프록시로 자동 재시도
-   ⑥ 이미지 로드 오류 시 에러 UI 표시
+   ▸ 해결책
+   PDF.js(Mozilla)를 이용해 PDF의 각 페이지를 직접 <canvas>에 그려서
+   화면에 표시합니다. 이 방식은 브라우저의 PDF 뷰어 기능과 전혀
+   무관하게 동작하므로, 안드로이드/아이폰/인앱브라우저 등 어떤
+   환경에서도 동일하게 렌더링됩니다.
+   PDF.js는 동적 import()로 필요할 때만 불러오며, 로드에 실패하면
+   기존 iframe 방식으로 자동 폴백합니다(완전히 막히는 일은 없음).
    ════════════════════════════════════════════════════════════════════ */
 
 /* ── 환경 감지 ── */
@@ -752,6 +756,22 @@ const ENV = (() => {
 
   return { isIOS, isAndroid, iosVersion, isWKWebView, isSamsung, isMobile, hasWebShare, hasWebShareFiles };
 })();
+
+/* ── PDF.js 동적 로더 (CDN, 실패해도 앱 전체에 영향 없음) ── */
+const PDFJS_VERSION = "5.4.149";
+const PDFJS_BASE = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/`;
+let _pdfjsLibPromise = null;
+function loadPdfJs() {
+  if (!_pdfjsLibPromise) {
+    _pdfjsLibPromise = import(/* @vite-ignore */ PDFJS_BASE + "pdf.min.mjs")
+      .then(mod => {
+        mod.GlobalWorkerOptions.workerSrc = PDFJS_BASE + "pdf.worker.min.mjs";
+        return mod;
+      })
+      .catch(err => { _pdfjsLibPromise = null; throw err; });
+  }
+  return _pdfjsLibPromise;
+}
 
 /* ── dataURL → Blob 변환  (청크 처리, 스택오버플로 방지) ── */
 function dataUrlToBlob(dataUrl, fallbackMime = "application/octet-stream") {
@@ -952,18 +972,57 @@ function openInlineViewer(blob, mime, fileName, rawDataUrl) {
   }
 }
 
-/* PDF 렌더링 */
-function _renderPdf(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl) {
-  /*
-   * 전략:
-   * iOS 15+ 및 Android: Blob URL을 <iframe src>에 직접 주입
-   *   → iOS 15+: Safari는 현재 페이지 컨텍스트의 Blob URL iframe을 렌더링함
-   *   → Android Chrome/WebView: 동일하게 동작
-   * iOS 14 이하 / WKWebView: Blob URL iframe이 흰 화면 → Google Docs 프록시 사용
-   *   → 단, Google Docs는 외부 공개 URL만 지원하므로, data:application/pdf로 폴백
-   *   → 최후 수단: base64 데이터를 모바일에서 직접 열람하는 별도 HTML 페이지
-   */
+/* PDF 렌더링 — PDF.js 우선, 실패 시 iframe 폴백 */
+async function _renderPdf(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl) {
+  try {
+    const pdfjsLib = await loadPdfJs();
+    await _renderPdfWithPdfJs(bodyEl, loadingEl, blob, pdfjsLib);
+    return;
+  } catch (err) {
+    console.warn("[PDF.js] 로드/렌더링 실패, iframe 방식으로 폴백:", err);
+  }
+  _renderPdfIframeFallback(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl);
+}
 
+/* PDF.js로 각 페이지를 캔버스에 직접 그려서 표시
+   (브라우저의 내장 PDF 플러그인에 의존하지 않으므로 모든 모바일
+    브라우저·인앱 웹뷰에서 동일하게 동작합니다) */
+async function _renderPdfWithPdfJs(bodyEl, loadingEl, blob, pdfjsLib) {
+  const arrayBuffer = await blob.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+  const wrap = document.createElement("div");
+  wrap.id = "rv-pdf-pages";
+  bodyEl.appendChild(wrap);
+
+  const outputScale  = window.devicePixelRatio || 1;
+  const targetWidth  = Math.max(280, (bodyEl.clientWidth || window.innerWidth) - 20);
+
+  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+    const page = await pdf.getPage(pageNum);
+    const baseViewport = page.getViewport({ scale: 1 });
+    const scale = targetWidth / baseViewport.width;
+    const viewport = page.getViewport({ scale });
+
+    const canvas = document.createElement("canvas");
+    canvas.width  = Math.floor(viewport.width * outputScale);
+    canvas.height = Math.floor(viewport.height * outputScale);
+    canvas.style.width  = Math.floor(viewport.width) + "px";
+    canvas.style.height = Math.floor(viewport.height) + "px";
+    wrap.appendChild(canvas);
+
+    const ctx = canvas.getContext("2d");
+    const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
+    await page.render({ canvasContext: ctx, viewport, transform }).promise;
+
+    if (pageNum === 1) loadingEl.style.display = "none";
+  }
+
+  if (pdf.numPages === 0) loadingEl.style.display = "none";
+}
+
+/* 기존 iframe 방식 (PDF.js 로드/렌더링 실패 시에만 사용하는 최후 폴백) */
+function _renderPdfIframeFallback(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl) {
   const useGoogleProxy = ENV.isIOS && (ENV.iosVersion > 0 && ENV.iosVersion < 15);
   const useDirectBlob  = !useGoogleProxy; // iOS15+, Android, PC 모두
 
@@ -992,8 +1051,6 @@ function _renderPdf(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl) {
 
   } else {
     // ── iOS 14 이하: base64 data URI를 새 HTML로 감싸서 iframe에 주입 ──
-    // Google Docs 외부 URL 방식은 인트라넷/localhost에서 불가하므로
-    // srcdoc 방식으로 object 태그 내에 data:url 삽입
     const pdfDataUrl = rawDataUrl || "";
     const srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8">
       <style>*{margin:0;padding:0;}html,body{width:100%;height:100%;overflow:hidden;}
