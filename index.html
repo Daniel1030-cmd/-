@@ -20,19 +20,44 @@ body{
     color:white;
     display:flex;
     align-items:center;
+    justify-content:space-between;
     padding:0 30px;
     font-size:24px;
     font-weight:bold;
 }
+.header-left{
+    display:flex;
+    align-items:center;
+}
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:13px;
+    font-weight:400;
+}
+.menu-toggle{
+    display:none;
+    background:none;
+    border:none;
+    color:#fff;
+    font-size:24px;
+    line-height:1;
+    cursor:pointer;
+    margin-right:16px;
+    padding:4px 6px;
+}
 .container{
     display:flex;
     height:calc(100vh - 70px);
+    position:relative;
 }
 .sidebar{
     width:260px;
     background:#111827;
     color:white;
     overflow-y:auto;
+    flex-shrink:0;
 }
 .sidebar h3{
     padding:20px;
@@ -54,10 +79,21 @@ body{
 .sidebar ul li.active{
     background:#2563eb;
 }
+.sidebar-backdrop{
+    display:none;
+    position:fixed;
+    top:70px;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,.45);
+    z-index:998;
+}
+.sidebar-backdrop.show{
+    display:block;
+}
 .content{
     flex:1;
     padding:20px;
     overflow-y:auto;
+    min-width:0;
 }
 .cards{
     display:grid;
@@ -81,9 +117,11 @@ body{
     border-radius:10px;
     padding:20px;
     box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    overflow-x:auto;
 }
 table{
     width:100%;
+    min-width:560px;
     border-collapse:collapse;
 }
 table th,
@@ -350,13 +388,102 @@ td.actions{
 .badge-eval-done{
     background:#0d9488;
 }
+
+/* ===== 로그인 화면 ===== */
+.login-screen{
+    position:fixed;
+    top:0;left:0;right:0;bottom:0;
+    background:#111827;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:2000;
+    padding:20px;
+}
+.login-box{
+    background:#fff;
+    border-radius:12px;
+    padding:32px;
+    width:380px;
+    max-width:100%;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+.login-box h2{
+    font-size:20px;
+    color:#111827;
+    margin-bottom:6px;
+}
+.login-box p{
+    font-size:13px;
+    color:#6b7280;
+    margin-bottom:20px;
+}
+.login-error{
+    color:#dc2626;
+    font-size:13px;
+    margin-top:8px;
+    display:none;
+}
+
+/* ===== 모바일 반응형 ===== */
+@media (max-width:768px){
+    .menu-toggle{display:block;}
+    .sidebar{
+        position:fixed;
+        top:70px;left:0;
+        height:calc(100vh - 70px);
+        z-index:999;
+        transform:translateX(-100%);
+        transition:transform .25s ease;
+        box-shadow:2px 0 12px rgba(0,0,0,.3);
+    }
+    .sidebar.open{
+        transform:translateX(0);
+    }
+    .header{padding:0 16px;font-size:19px;}
+    .content{padding:14px;}
+}
+@media (max-width:480px){
+    .cards{grid-template-columns:1fr;}
+    .header{font-size:17px;}
+    .header-right{font-size:12px;}
+    .modal{padding:18px;}
+    .toolbar{flex-direction:column;align-items:stretch;}
+    .toolbar .btn{width:100%;}
+    .filter-bar input,
+    .filter-bar select{flex:1 1 100%;}
+    .btn{padding:9px 14px;}
+    .btn-sm{padding:7px 11px;}
+    table th, table td{padding:8px 6px;font-size:13px;}
+}
 </style>
 </head>
 <body>
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <h2>채용관리시스템 로그인</h2>
+    <p>관리자 계정으로 로그인해주세요.</p>
+    <form id="loginForm">
+      <div class="form-group"><label>이메일</label><input type="email" name="email" required autocomplete="username"></div>
+      <div class="form-group"><label>비밀번호</label><input type="password" name="password" required autocomplete="current-password"></div>
+      <div class="login-error" id="loginError"></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;">로그인</button>
+    </form>
+  </div>
+</div>
+
 <div class="header">
-채용관리시스템 (ATS)
+  <div class="header-left">
+    <button type="button" class="menu-toggle" id="menuToggle" aria-label="메뉴 열기">☰</button>
+    <span>채용관리시스템 (ATS)</span>
+  </div>
+  <div class="header-right">
+    <span id="authUserLabel"></span>
+    <button type="button" class="btn btn-secondary btn-sm" id="logoutBtn" style="display:none;">로그아웃</button>
+  </div>
 </div>
 <div class="container">
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 <div class="sidebar">
 <h3 data-view="dashboard" class="active">📊 대시보드</h3>
 <ul>
@@ -399,12 +526,18 @@ td.actions{
      설치 후 아래 import 구문의 URL 부분만
        import { initializeApp } from "firebase/app";
      형태로 바꿔주면 동일하게 동작합니다.
+   - 로그인(Firebase Authentication)을 켜야 정상 동작합니다. Firebase 콘솔에서
+     Authentication > Sign-in method > 이메일/비밀번호를 활성화하고,
+     Authentication > Users 에서 로그인용 계정을 1개 이상 만들어주세요.
    - 운영 배포 전 Firestore 콘솔에서 보안 규칙을 반드시 설정하세요.
-     (하단 "Firestore 보안 규칙 예시" 주석 참고)
+     (하단 "Firestore 보안 규칙" 주석 참고 — 로그인 기능과 함께 적용해야 합니다)
    ========================================================================= */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAnalytics, isSupported as isAnalyticsSupported } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+import {
+  getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   getFirestore, collection, doc,
   addDoc, updateDoc, deleteDoc, setDoc,
@@ -424,6 +557,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 // Analytics는 일부 환경(로컬 file://, 차단된 네트워크 등)에서 초기화에 실패할 수 있어
 // 전체 앱 동작에 영향이 없도록 별도로 감싸서 처리합니다.
@@ -1469,10 +1603,27 @@ contentEl.addEventListener("input", e => {
 });
 
 /* =========================================================================
+   모바일 사이드바(햄버거 메뉴) 토글
+   ========================================================================= */
+const sidebarEl = document.querySelector(".sidebar");
+const sidebarBackdropEl = document.getElementById("sidebarBackdrop");
+const menuToggleEl = document.getElementById("menuToggle");
+function toggleSidebar(open) {
+  const willOpen = open !== undefined ? open : !sidebarEl.classList.contains("open");
+  sidebarEl.classList.toggle("open", willOpen);
+  sidebarBackdropEl.classList.toggle("show", willOpen);
+}
+menuToggleEl.addEventListener("click", () => toggleSidebar());
+sidebarBackdropEl.addEventListener("click", () => toggleSidebar(false));
+
+/* =========================================================================
    사이드바 네비게이션
    ========================================================================= */
 document.querySelectorAll(".sidebar [data-view]").forEach(el => {
-  el.addEventListener("click", () => switchView(el.dataset.view));
+  el.addEventListener("click", () => {
+    switchView(el.dataset.view);
+    toggleSidebar(false); // 모바일에서는 메뉴 선택 후 자동으로 닫힘
+  });
 });
 
 /* =========================================================================
@@ -1514,20 +1665,66 @@ function setupListeners() {
   }, err => console.error("settings 구독 오류:", err));
 }
 
-setupListeners();
-switchView("dashboard");
+/* =========================================================================
+   로그인 화면 / 인증 상태 처리
+   -------------------------------------------------------------------------
+   Firestore 보안 규칙을 "로그인한 사용자만 허용"으로 설정했기 때문에,
+   로그인 전에는 Firestore 구독을 시작하지 않습니다(에러 방지).
+   Firebase 콘솔 > Authentication > Sign-in method 에서 이메일/비밀번호
+   제공업체를 켜고, Authentication > Users 에서 로그인용 계정을 1개 이상
+   만들어주세요.
+   ========================================================================= */
+const loginScreenEl = document.getElementById("loginScreen");
+const loginFormEl = document.getElementById("loginForm");
+const loginErrorEl = document.getElementById("loginError");
+const authUserLabelEl = document.getElementById("authUserLabel");
+const logoutBtnEl = document.getElementById("logoutBtn");
+let listenersStarted = false;
+
+loginFormEl.addEventListener("submit", async e => {
+  e.preventDefault();
+  loginErrorEl.style.display = "none";
+  const fd = new FormData(e.target);
+  try {
+    await signInWithEmailAndPassword(auth, fd.get("email").trim(), fd.get("password"));
+  } catch (err) {
+    loginErrorEl.textContent = "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인해주세요.";
+    loginErrorEl.style.display = "block";
+  }
+});
+logoutBtnEl.addEventListener("click", () => signOut(auth));
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    loginScreenEl.style.display = "none";
+    authUserLabelEl.textContent = user.email || "";
+    logoutBtnEl.style.display = "inline-block";
+    if (!listenersStarted) {
+      listenersStarted = true;
+      setupListeners();
+      switchView("dashboard");
+    }
+  } else {
+    loginScreenEl.style.display = "flex";
+    authUserLabelEl.textContent = "";
+    logoutBtnEl.style.display = "none";
+    loginFormEl.reset();
+  }
+});
 
 /* =========================================================================
-   Firestore 보안 규칙 예시 (Firebase 콘솔 > Firestore Database > 규칙)
+   Firestore 보안 규칙 (Firebase 콘솔 > Firestore Database > 규칙)
    -------------------------------------------------------------------------
-   개발/테스트 중에는 아래처럼 열어둘 수 있지만, 운영 배포 전에는
-   반드시 Firebase Authentication과 연동해 관리자만 쓰기 가능하도록 제한하세요.
+   이제 위에서 로그인 기능을 구현했으므로, 아래 규칙을 그대로 적용하면
+   "로그인한 사용자만 읽기/쓰기 가능"하게 안전하게 동작합니다.
+   (로그인 기능이 없는 상태에서 이 규칙만 적용하면 모든 요청이
+    permission-denied 오류로 막히니 반드시 로그인 기능과 함께 적용하세요.)
 
    rules_version = '2';
    service cloud.firestore {
      match /databases/{database}/documents {
        match /{document=**} {
-         allow read, write: if request.auth != null; // 로그인한 사용자만 허용 (예시)
+         allow read, write: if request.auth != null;
        }
      }
    }
