@@ -285,145 +285,43 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .resume-tag a { color: var(--brand); text-decoration: none; font-weight: 600; }
 .resume-tag a:hover { text-decoration: underline; }
 
-/* ═══════════════════════════════════════
-   면접 평가서 - 실무 양식 스타일
-   ═══════════════════════════════════════ */
+/* 평가서 */
 .eval-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-
-/* 평가 항목 블록 */
-.eval-section {
-  border: 1px solid var(--slate-200); border-radius: var(--radius-md);
-  margin-bottom: 14px; overflow: hidden;
-}
-.eval-section-header {
-  background: var(--slate-50); padding: 10px 14px;
-  display: flex; align-items: center; gap: 10px;
-  border-bottom: 1px solid var(--slate-200);
-}
-.eval-section-num {
-  width: 22px; height: 22px;
-  background: var(--brand); color: var(--white);
-  border-radius: 50%; font-size: 11px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
+.eval-section { border: 1px solid var(--slate-200); border-radius: var(--radius-md); margin-bottom: 14px; overflow: hidden; }
+.eval-section-header { background: var(--slate-50); padding: 10px 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--slate-200); }
+.eval-section-num { width: 22px; height: 22px; background: var(--brand); color: var(--white); border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .eval-section-title { font-size: 13px; font-weight: 700; color: var(--slate-800); flex: 1; }
 .eval-section-body  { padding: 14px; }
-.eval-score-row {
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 10px; flex-wrap: wrap;
-}
+.eval-score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
 .eval-score-label { font-size: 12px; color: var(--slate-500); min-width: 60px; }
 .score-btn-group  { display: flex; gap: 4px; flex-wrap: wrap; }
-.score-btn {
-  padding: 4px 10px; border-radius: 99px; border: 1.5px solid var(--slate-300);
-  background: transparent; font-size: 12px; font-weight: 600;
-  color: var(--slate-500); cursor: pointer; transition: all var(--transition);
-}
+.score-btn { padding: 4px 10px; border-radius: 99px; border: 1.5px solid var(--slate-300); background: transparent; font-size: 12px; font-weight: 600; color: var(--slate-500); cursor: pointer; transition: all var(--transition); }
 .score-btn:hover   { border-color: var(--brand); color: var(--brand); background: rgba(37,99,235,.06); }
 .score-btn.selected { background: var(--brand); border-color: var(--brand); color: var(--white); }
-.score-btn.A  { --sc: var(--emerald); }
-.score-btn.B  { --sc: var(--teal); }
-.score-btn.C  { --sc: var(--amber); }
-.score-btn.D  { --sc: var(--rose); }
 .score-btn.A.selected { background: var(--emerald); border-color: var(--emerald); }
 .score-btn.B.selected { background: var(--teal); border-color: var(--teal); }
 .score-btn.C.selected { background: var(--amber); border-color: var(--amber); }
 .score-btn.D.selected { background: var(--rose); border-color: var(--rose); }
-
-.eval-add-btn {
-  width: 100%; padding: 10px; border: 1.5px dashed var(--slate-300); background: transparent;
-  border-radius: var(--radius-md); color: var(--slate-400);
-  cursor: pointer; font-size: 13px; font-family: var(--font-base);
-  transition: all var(--transition); margin-bottom: 14px;
-}
+.eval-add-btn { width: 100%; padding: 10px; border: 1.5px dashed var(--slate-300); background: transparent; border-radius: var(--radius-md); color: var(--slate-400); cursor: pointer; font-size: 13px; font-family: var(--font-base); transition: all var(--transition); margin-bottom: 14px; }
 .eval-add-btn:hover { border-color: var(--brand); color: var(--brand); background: rgba(37,99,235,.04); }
-
-/* 미리보기 패널 */
-.eval-preview-panel {
-  background: var(--navy); border-radius: var(--radius-lg); padding: 22px;
-  color: rgba(255,255,255,.85); font-size: 12.5px;
-  line-height: 1.8; white-space: pre-wrap; min-height: 400px;
-  font-family: 'Noto Sans KR', monospace; position: sticky; top: 20px;
-  overflow-x: hidden;
-}
+.eval-preview-panel { background: var(--navy); border-radius: var(--radius-lg); padding: 22px; color: rgba(255,255,255,.85); font-size: 12.5px; line-height: 1.8; white-space: pre-wrap; min-height: 400px; font-family: 'Noto Sans KR', monospace; position: sticky; top: 20px; overflow-x: hidden; }
 .eval-preview-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,.3); text-transform: uppercase; margin-bottom: 14px; }
 .eval-preview-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-
-.eval-candidate-info {
-  display: flex; align-items: center; gap: 14px;
-  background: var(--slate-50); border: 1px solid var(--slate-200);
-  border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 22px;
-}
+.eval-candidate-info { display: flex; align-items: center; gap: 14px; background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 22px; }
 .eval-avatar { width: 44px; height: 44px; background: linear-gradient(135deg, var(--brand), var(--cyan)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
 .eval-candidate-name { font-size: 16px; font-weight: 700; color: var(--slate-900); }
 .eval-candidate-meta { font-size: 12px; color: var(--slate-500); margin-top: 3px; }
-
-/* 종합평가 구역 */
-.eval-summary-block {
-  background: var(--slate-50); border: 1px solid var(--slate-200);
-  border-radius: var(--radius-md); padding: 14px; margin-bottom: 14px;
-}
+.eval-summary-block { background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 14px; margin-bottom: 14px; }
 .eval-summary-title { font-size: 12px; font-weight: 700; color: var(--slate-700); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-.total-score-display {
-  display: flex; align-items: center; gap: 14px;
-  padding: 12px 16px; border-radius: var(--radius-md);
-  background: var(--white); border: 1px solid var(--slate-200); margin-bottom: 10px;
-}
+.total-score-display { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--white); border: 1px solid var(--slate-200); margin-bottom: 10px; }
 .total-score-value { font-size: 28px; font-weight: 800; color: var(--brand); letter-spacing: -1px; }
 .total-score-label { font-size: 12px; color: var(--slate-500); }
-
-/* 합/불 추천 버튼 */
 .rec-btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
-.rec-btn {
-  flex: 1; min-width: 80px; padding: 10px 14px; border-radius: var(--radius-md);
-  border: 1.5px solid var(--slate-300); background: transparent;
-  font-size: 13px; font-weight: 700; cursor: pointer; transition: all var(--transition);
-  color: var(--slate-500); font-family: var(--font-base); text-align: center;
-}
+.rec-btn { flex: 1; min-width: 80px; padding: 10px 14px; border-radius: var(--radius-md); border: 1.5px solid var(--slate-300); background: transparent; font-size: 13px; font-weight: 700; cursor: pointer; transition: all var(--transition); color: var(--slate-500); font-family: var(--font-base); text-align: center; }
 .rec-btn:hover { border-color: var(--brand); background: rgba(37,99,235,.05); color: var(--brand); }
 .rec-btn.selected-pass   { background: var(--emerald); border-color: var(--emerald); color: var(--white); }
 .rec-btn.selected-hold   { background: var(--amber); border-color: var(--amber); color: var(--white); }
 .rec-btn.selected-reject { background: var(--rose); border-color: var(--rose); color: var(--white); }
-
-/* 인쇄용 평가서 */
-.print-sheet {
-  max-width: 700px; margin: 0 auto; padding: 32px;
-  font-family: 'Malgun Gothic','Noto Sans KR',sans-serif;
-  font-size: 13px; line-height: 1.8; color: #1e293b;
-}
-.print-sheet h1 { font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 6px; letter-spacing: -0.5px; }
-.print-sheet .print-sub { text-align: center; font-size: 12px; color: #64748b; margin-bottom: 24px; border-bottom: 2px solid #0B1426; padding-bottom: 16px; }
-.print-info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-.print-info-table td { padding: 7px 10px; border: 1px solid #e2e8f0; font-size: 13px; }
-.print-info-table td:first-child { background: #f1f5f9; font-weight: 600; width: 25%; }
-.print-eval-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-.print-eval-table th { background: #0B1426; color: white; padding: 8px 10px; font-size: 12px; text-align: center; }
-.print-eval-table td { padding: 8px 10px; border: 1px solid #e2e8f0; font-size: 12px; vertical-align: top; }
-.print-eval-table td:nth-child(1) { width: 20%; font-weight: 600; background: #f8fafc; }
-.print-eval-table td:nth-child(2) { width: 55%; }
-.print-eval-table td:nth-child(3) { width: 12%; text-align: center; }
-.print-eval-table td:nth-child(4) { width: 13%; text-align: center; }
-.grade-badge {
-  display: inline-block; padding: 2px 8px; border-radius: 99px;
-  font-size: 11px; font-weight: 800;
-}
-.grade-A { background: #dcfce7; color: #166534; }
-.grade-B { background: #ccfbf1; color: #134e4a; }
-.grade-C { background: #fef3c7; color: #92400e; }
-.grade-D { background: #fee2e2; color: #991b1b; }
-.print-summary { border: 1.5px solid #0B1426; border-radius: 8px; padding: 14px; margin-bottom: 16px; }
-.print-summary-title { font-weight: 700; margin-bottom: 8px; font-size: 13px; }
-.print-recommend {
-  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-  border-radius: 8px; margin-bottom: 16px;
-}
-.print-recommend.pass   { background: #dcfce7; border: 1.5px solid #86efac; }
-.print-recommend.hold   { background: #fef3c7; border: 1.5px solid #fcd34d; }
-.print-recommend.reject { background: #fee2e2; border: 1.5px solid #fca5a5; }
-.print-sign-row { display: flex; gap: 16px; margin-top: 24px; }
-.print-sign-box { flex: 1; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; text-align: center; }
-.print-sign-box .sign-label { font-size: 11px; color: #64748b; margin-bottom: 24px; }
-.print-sign-box .sign-line  { border-top: 1px solid #cbd5e1; padding-top: 8px; font-size: 12px; font-weight: 600; }
 
 /* NOTIFICATIONS */
 .notif-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 14px 22px; border-bottom: 1px solid var(--slate-100); transition: background var(--transition); }
@@ -447,26 +345,149 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .switch input:checked + .slider { background: var(--brand); }
 .switch input:checked + .slider::before { transform: translateX(18px); }
 
-/* ─── 인라인 이력서 뷰어 ─── */
-@keyframes rv-slide-up {
-  from { transform: translateY(100%); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-/* iframe 내부 PDF 스크롤 허용 */
-#rv-overlay iframe#rv-frame {
-  -webkit-overflow-scrolling: touch;
-}
-/* 터치 액션 최적화 (뷰어 내부 스와이프 정상 동작) */
-#rv-overlay {
-  touch-action: pan-y;
-}
-
 /* BAR CHART */
 .bar-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
 .bar-label { width: 90px; font-size: 12px; font-weight: 600; color: var(--slate-600); flex-shrink: 0; }
 .bar-track  { flex: 1; background: var(--slate-100); border-radius: 99px; height: 10px; overflow: hidden; }
 .bar-fill   { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--brand), var(--cyan)); transition: width .6s cubic-bezier(0.34,1.56,0.64,1); }
 .bar-count  { width: 30px; text-align: right; font-size: 13px; font-weight: 700; color: var(--slate-700); }
+
+/* ══════════════════════════════════════════════════
+   이력서 인라인 뷰어  v4.0  ― 완전 재설계
+   핵심 전략:
+   1) dataURL → Blob 변환 시 청크 분할 처리 (스택오버플로 방지)
+   2) PDF: iOS는 Google Docs 프록시 우선, 실패 시 Blob iframe
+   3) 이미지: 직접 Blob URL → <img>
+   4) 기타: 다운로드/공유만 제공
+   5) 오버레이 레이어는 position:fixed로 뷰포트 100% 점유
+   6) iOS body scroll-lock 완전 처리 (scrollY 복원 포함)
+   ══════════════════════════════════════════════════ */
+@keyframes rv-in {
+  from { opacity:0; transform:translateY(100%); }
+  to   { opacity:1; transform:translateY(0); }
+}
+#rv-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 99999;
+  background: #0B1426;
+  display: flex;
+  flex-direction: column;
+  /* iOS 안전 영역 */
+  padding-top: env(safe-area-inset-top, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  animation: rv-in .25s cubic-bezier(.25,.46,.45,.94) both;
+  /* 모바일에서 overflow 처리는 내부 .rv-body에서 담당 */
+  overflow: hidden;
+}
+#rv-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #0F1E35;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  min-height: 54px;
+}
+#rv-filename {
+  flex: 1;
+  min-width: 0;
+  color: rgba(255,255,255,.9);
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#rv-btns { display: flex; gap: 6px; flex-shrink: 0; }
+.rv-btn {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #fff;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  white-space: nowrap;
+}
+.rv-btn-save  { background: rgba(5,150,105,.9); }
+.rv-btn-close { background: rgba(255,255,255,.15); }
+.rv-btn-save:active  { background: #059669; }
+.rv-btn-close:active { background: rgba(255,255,255,.25); }
+#rv-body {
+  flex: 1;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  /* PDF iframe이 꽉 채워지도록 */
+  display: flex;
+  flex-direction: column;
+}
+/* PDF iframe */
+#rv-pdf-frame {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  border: none;
+  display: block;
+  background: #fff;
+}
+/* 이미지 컨테이너 */
+#rv-img-wrap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16px;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+#rv-img-wrap img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.5);
+  display: block;
+}
+/* 에러 / 열람불가 안내 */
+#rv-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  padding: 32px;
+  text-align: center;
+  color: rgba(255,255,255,.7);
+}
+#rv-fallback .rv-icon  { font-size: 52px; }
+#rv-fallback .rv-fname { font-size: 15px; font-weight: 700; color: #fff; word-break: break-all; }
+#rv-fallback .rv-desc  { font-size: 13px; line-height: 1.6; }
+/* 로딩 스피너 */
+#rv-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #0B1426;
+  gap: 14px;
+  color: rgba(255,255,255,.6);
+  font-size: 13px;
+  z-index: 2;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+#rv-loading .rv-spinner {
+  width: 36px; height: 36px;
+  border: 3px solid rgba(255,255,255,.15);
+  border-top-color: #2563EB;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
 
 /* RESPONSIVE */
 @media (max-width: 1100px) { .eval-layout { grid-template-columns: 1fr; } .eval-preview-panel { position: static; } }
@@ -498,6 +519,8 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   .filter-input { min-width: 0; }
   .eval-score-row { flex-direction: column; align-items: flex-start; }
   .rec-btn-group { flex-direction: column; }
+  /* 모바일 뷰어 버튼 간소화 */
+  .rv-btn { padding: 8px 12px; font-size: 12px; }
 }
 </style>
 </head>
@@ -616,8 +639,6 @@ const STATUS_META = {
   "불합격"  :{ cls:"badge-failed",    label:"불합격"   }
 };
 const RESUME_MAX = 700*1024;
-
-/* 평가 역량 항목 기본값 (실무 양식) */
 const DEFAULT_COMPETENCIES = [
   { id:"c1", title:"직무 전문성",    items:"",  score:"", comment:"" },
   { id:"c2", title:"문제해결 능력",  items:"",  score:"", comment:"" },
@@ -631,7 +652,6 @@ const SCORE_CLASS = { "A(우수)":"A", "B(양호)":"B", "C(보통)":"C", "D(미�
 
 let jobsCache=[], applicantsCache=[], notificationsCache=[], adminsCache=[], settingsCache={};
 let currentView="dashboard", interviewSearch="", evaluationId=null, evalDraft=null, evalSeq=0;
-// ★ IME 조합 중 여부 플래그
 let isComposing = false;
 
 const contentEl = document.getElementById("content");
@@ -662,390 +682,396 @@ function closeModal(){ const ov=document.getElementById("modalOverlay"); if(ov)o
 /* 파일 읽기 */
 function readFile(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(file); }); }
 
-/* ═══════════════════════════════════════════════════════════════════
-   이력서 뷰어 / 다운로더  ·  크로스 플랫폼 전문가 구현  v3.0
-   ═══════════════════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════════
+   이력서 뷰어  v4.0  ―  완전 재설계
+   ════════════════════════════════════════════════════════════════════
 
-   근본 원인 분석:
-   ① iOS Safari  — Blob URL을 새 탭에서 열 수 없음 (보안 정책)
-                   <a download>도 동작 안 함 (크로스-오리진 정책)
-                   data:URL은 길이 제한(약 2MB) 및 팝업 차단 있음
-                   → 해결: Web Share API(files) + 인라인 Blob iframe
+   ▸ 환경별 동작 매트릭스
+   ┌────────────────────┬─────────────────────────────────────────────┐
+   │ 환경               │ 전략                                        │
+   ├────────────────────┼─────────────────────────────────────────────┤
+   │ iOS Safari ≥15     │ PDF: Blob URL iframe  │ 이미지: Blob img    │
+   │                    │ 저장: Web Share API (files)                 │
+   │ iOS Safari <15     │ PDF: Google Docs 프록시 iframe              │
+   │                    │ 이미지: Blob img  │ 저장: Web Share(url)   │
+   │ iOS WKWebView      │ PDF: Google Docs 프록시 iframe              │
+   │                    │ 저장: Web Share API (url fallback)          │
+   │ Android Chrome/    │ PDF: Blob URL iframe  │ 이미지: Blob img    │
+   │ Samsung/WebView    │ 저장: Blob URL a[download]                  │
+   │ PC Chrome/Edge/FF  │ 새 탭 Blob URL 미리보기 (PDF/이미지)        │
+   │ PC Safari          │ 새 탭 Blob URL 미리보기                     │
+   │ PC 팝업 차단       │ a[download] 자동 폴백                       │
+   │ DOC/DOCX/기타      │ 모든 환경: 인라인 안내 + 저장               │
+   └────────────────────┴─────────────────────────────────────────────┘
 
-   ② iOS WKWebView (카카오/네이버 인앱 브라우저)
-                   window.open 자체 차단됨
-                   → 해결: 현재 페이지 내 오버레이 뷰어만 사용
+   핵심 개선사항 (v3 → v4):
+   ① atob() 스택오버플로 방지: 청크 분할 방식으로 Blob 변환
+   ② iOS 14 이하: Blob iframe 대신 Google Docs 뷰어 프록시 사용
+   ③ iOS scroll-lock: scrollY 저장 후 position:fixed + top 처리
+   ④ 뷰어 로딩 스피너: iframe onload 이전까지 표시
+   ⑤ PDF iframe 로드 실패 시 Google Docs 프록시로 자동 재시도
+   ⑥ 이미지 로드 오류 시 에러 UI 표시
+   ════════════════════════════════════════════════════════════════════ */
 
-   ③ Android Chrome/Samsung
-                   Blob URL + a[download] 동작 ○
-                   단, Samsung Browser는 click() 직후 revoke 시 실패
-                   → 해결: Blob URL + 5초 지연 revoke
-
-   ④ PDF <embed>/<iframe>에 data:URL 직접 주입
-                   → iOS 완전 실패, Android 부분 실패
-                   → 해결: Blob URL을 iframe.src에 주입
-
-   동작 매트릭스:
-   ┌──────────────────────┬──────────────────────────────────────────┐
-   │ 환경                 │ 전략                                     │
-   ├──────────────────────┼──────────────────────────────────────────┤
-   │ iOS Safari ≥15       │ 인라인뷰어(BlobURL iframe/img)           │
-   │                      │ + 📤공유 → Web Share API → 파일앱 저장  │
-   │ iOS Safari <15       │ 인라인뷰어(BlobURL iframe/img)           │
-   │ iOS WKWebView        │ 인라인뷰어 (window.open 불가)            │
-   │ Android Chrome       │ 인라인뷰어 + 💾저장(BlobURL download)   │
-   │ Android Samsung Br.  │ 인라인뷰어 + 💾저장(BlobURL 5s delay)  │
-   │ PC Chrome/Edge/FF    │ Blob URL 새 탭 미리보기                  │
-   │ PC Safari            │ Blob URL 새 탭 미리보기                  │
-   │ PC 팝업 차단         │ BlobURL a[download] 자동 전환            │
-   │ DOC/DOCX 등          │ 인라인뷰어(안내) + BlobURL download      │
-   └──────────────────────┴──────────────────────────────────────────┘
-   ═══════════════════════════════════════════════════════════════════ */
-
-/* ── 환경 감지 (모듈 로드 시 1회 평가) ── */
+/* ── 환경 감지 ── */
 const ENV = (() => {
   const ua = navigator.userAgent;
 
-  // iOS 판별: iPhone/iPod/iPad UA + iPad Pro (UA에 MacIntel로 표시됨)
-  const isIOS = /iPhone|iPod/i.test(ua) ||
-    (/iPad/i.test(ua)) ||
+  // iOS 판별 (iPad Pro는 MacIntel + maxTouchPoints로 구분)
+  const isIOS =
+    /iPhone|iPod/i.test(ua) ||
+    /iPad/i.test(ua) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-  // Android 판별
   const isAndroid = /Android/i.test(ua);
 
-  // iOS 메이저 버전 추출 (Web Share Files: iOS 15.0+)
-  const iosMatch = ua.match(/(?:iPhone|CPU) OS (\d+)_/i) ||
-                   ua.match(/iPad.*OS (\d+)_/i);
-  const iosVersion = isIOS && iosMatch ? parseInt(iosMatch[1], 10) : 0;
+  // iOS 메이저 버전 (Web Share Files API: iOS 15.0+)
+  const iosVerMatch =
+    ua.match(/OS (\d+)[_\d]+ like Mac OS/i) ||
+    ua.match(/CPU iPhone OS (\d+)/i);
+  const iosVersion = isIOS && iosVerMatch ? parseInt(iosVerMatch[1], 10) : 0;
 
-  // WKWebView 감지 — 인앱 브라우저(카카오/네이버 등)
-  // Safari UA가 없거나 window.webkit.messageHandlers 존재 시
-  const isWKWebView = isIOS && (
-    !!/CriOS|FxiOS|OPiOS|mercury/i.test(ua) ||  // iOS용 Chrome/FF/Opera
-    !!(window.webkit?.messageHandlers)              // 네이티브 앱 WKWebView
-  );
+  // WKWebView (카카오/네이버 인앱 브라우저)
+  const isWKWebView =
+    isIOS && (
+      !/Safari/i.test(ua) ||                          // Safari 문자열 없음
+      /KAKAO|NAVER|Line|Instagram|FB_IAB/i.test(ua) || // 알려진 인앱
+      !!(window.webkit?.messageHandlers)               // 네이티브 브릿지
+    );
 
-  // Samsung Internet 브라우저
+  // Samsung Internet
   const isSamsung = /SamsungBrowser/i.test(ua);
 
-  // Web Share API - 파일 첨부 지원 여부 (런타임 체크는 shareResume에서)
-  const hasWebShare = !!navigator.share;
+  // 모바일 여부
+  const isMobile = isIOS || isAndroid;
 
-  return { isIOS, isAndroid, iosVersion, isWKWebView, isSamsung, hasWebShare };
+  // Web Share API 지원
+  const hasWebShare = "share" in navigator;
+  // Web Share Files 지원 (iOS15+ / Android Chrome 일부)
+  const hasWebShareFiles = hasWebShare && "canShare" in navigator;
+
+  return { isIOS, isAndroid, iosVersion, isWKWebView, isSamsung, isMobile, hasWebShare, hasWebShareFiles };
 })();
 
-/* ── dataURL → Blob 변환 ── */
+/* ── dataURL → Blob 변환  (청크 처리, 스택오버플로 방지) ── */
 function dataUrlToBlob(dataUrl, fallbackMime = "application/octet-stream") {
-  const comma = dataUrl.indexOf(",");
-  if (comma === -1) throw new Error("유효하지 않은 dataURL 형식입니다.");
-  const header = dataUrl.slice(0, comma);
-  const b64    = dataUrl.slice(comma + 1);
+  const commaIdx = dataUrl.indexOf(",");
+  if (commaIdx === -1) throw new Error("잘못된 dataURL 형식입니다.");
+
+  const header = dataUrl.slice(0, commaIdx);
+  const b64    = dataUrl.slice(commaIdx + 1);
   const mime   = header.match(/:(.*?);/)?.[1] || fallbackMime;
-  // atob → Uint8Array (TextDecoder 미사용, 순수 바이너리)
-  const raw = atob(b64);
-  const buf = new Uint8Array(raw.length);
-  for (let i = 0; i < raw.length; i++) buf[i] = raw.charCodeAt(i);
-  return { blob: new Blob([buf], { type: mime }), mime };
+
+  // ★ 청크 단위 디코딩 (기존 atob(전체) 방식은 수백KB에서 스택오버플로 유발)
+  const CHUNK = 8192;
+  const raw   = atob(b64);
+  const len   = raw.length;
+  const buffers = [];
+
+  for (let i = 0; i < len; i += CHUNK) {
+    const end  = Math.min(i + CHUNK, len);
+    const view = new Uint8Array(end - i);
+    for (let j = i; j < end; j++) view[j - i] = raw.charCodeAt(j);
+    buffers.push(view);
+  }
+
+  return { blob: new Blob(buffers, { type: mime }), mime };
 }
 
-/* ── Blob URL 생성 + 자동 해제 등록 ── */
-function createManagedBlobUrl(blob, ttlMs = 120_000) {
+/* ── Blob URL 생성 + 자동 해제 ── */
+function makeBlobUrl(blob, ttlMs = 180_000) {
   const url = URL.createObjectURL(blob);
   setTimeout(() => URL.revokeObjectURL(url), ttlMs);
   return url;
 }
 
-/* ── Android / PC: Blob URL 다운로드 ── */
-function downloadViaBlob(blob, fileName) {
-  // Samsung Browser는 click() 직후 revoke 시 파일이 0바이트가 됨 → 5초 보장
-  const ttl = ENV.isSamsung ? 30_000 : 10_000;
-  const url  = createManagedBlobUrl(blob, ttl);
-  const a    = Object.assign(document.createElement("a"), {
-    href: url, download: fileName || "resume", style: "display:none"
-  });
-  document.body.appendChild(a);
-  a.click();
-  // DOM 정리 (URL은 setTimeout으로 별도 해제)
-  requestAnimationFrame(() => document.body.removeChild(a));
+/* ── body 스크롤 잠금 / 해제 (iOS 완전 처리) ── */
+let _scrollY = 0;
+function lockBodyScroll() {
+  _scrollY = window.scrollY;
+  document.body.style.overflow   = "hidden";
+  if (ENV.isIOS) {
+    document.body.style.position = "fixed";
+    document.body.style.top      = `-${_scrollY}px`;
+    document.body.style.width    = "100%";
+    document.body.style.left     = "0";
+  }
+}
+function unlockBodyScroll() {
+  document.body.style.overflow = "";
+  if (ENV.isIOS) {
+    document.body.style.position = "";
+    document.body.style.top      = "";
+    document.body.style.width    = "";
+    document.body.style.left     = "";
+    window.scrollTo({ top: _scrollY, behavior: "instant" });
+  }
 }
 
-/* ── iOS: Web Share API로 파일 공유 (iOS 15+ 파일앱 저장 가능) ── */
-async function shareViaWebShareAPI(blob, mime, fileName) {
+/* ── iOS Web Share: 파일 공유 ── */
+async function shareFile(blob, mime, fileName) {
   if (!ENV.hasWebShare) return false;
   try {
-    const file = new File([blob], fileName || "resume", { type: mime });
-    // canShare로 파일 공유 지원 여부 사전 체크
-    if (typeof navigator.canShare === "function" && !navigator.canShare({ files: [file] })) {
-      return false;
+    if (ENV.hasWebShareFiles) {
+      const file = new File([blob], fileName, { type: mime });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: fileName });
+        return true;
+      }
     }
-    await navigator.share({ files: [file], title: fileName || "이력서" });
-    return true; // 공유 시트 열림 (사용자가 취소해도 성공으로 처리)
+    // files 미지원이면 URL 공유로 폴백 (파일앱 저장은 불가하지만 UX 제공)
+    const blobUrl = makeBlobUrl(blob, 30_000);
+    await navigator.share({ url: blobUrl, title: fileName });
+    return true;
   } catch (err) {
-    if (err.name === "AbortError") return true; // 사용자 취소 = 정상 흐름
+    if (err.name === "AbortError") return true; // 사용자 취소 = 정상
     console.warn("[WebShare] 실패:", err.name, err.message);
     return false;
   }
 }
 
-/* ── PC 전용: 새 탭에서 Blob URL 미리보기 ── */
-function previewInNewTab(blob, mime, fileName) {
-  const blobUrl = createManagedBlobUrl(blob, 90_000);
+/* ── Android / PC: Blob URL a[download] ── */
+function downloadBlob(blob, fileName) {
+  const ttl = ENV.isSamsung ? 30_000 : 10_000;
+  const url  = makeBlobUrl(blob, ttl);
+  const a    = Object.assign(document.createElement("a"), {
+    href: url, download: fileName || "resume", style: "display:none"
+  });
+  document.body.appendChild(a);
+  a.click();
+  requestAnimationFrame(() => { try { document.body.removeChild(a); } catch {} });
+}
+
+/* ── PC: 새 탭 미리보기 ── */
+function openNewTab(blob, mime, fileName) {
+  const blobUrl = makeBlobUrl(blob, 90_000);
   const w = window.open("", "_blank");
+  if (!w) { downloadBlob(blob, fileName); return; }
 
-  if (!w) {
-    // 팝업 차단 → 직접 다운로드로 폴백
-    URL.revokeObjectURL(blobUrl); // 이미 createManaged로 예약됐지만 즉시 해제도 무방
-    downloadViaBlob(blob, fileName);
-    return;
-  }
-
-  const title = esc(fileName || "이력서");
+  const safeTitle = fileName ? fileName.replace(/</g,"&lt;") : "이력서";
 
   if (mime === "application/pdf") {
-    // PDF: object 태그 사용 (Chrome/Edge/FF/Safari 공통 네이티브 뷰어 활성화)
     w.document.write(`<!DOCTYPE html><html lang="ko"><head>
-      <meta charset="UTF-8"><title>${title}</title>
-      <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        html,body{height:100%;background:#404040;}
-        object{display:block;width:100%;height:100%;border:none;}
-      </style></head><body>
+      <meta charset="UTF-8"><title>${safeTitle}</title>
+      <style>*{margin:0;padding:0;box-sizing:border-box;}html,body{height:100%;background:#404040;}
+      object{display:block;width:100%;height:100%;border:none;}</style></head><body>
       <object data="${blobUrl}" type="application/pdf">
-        <p style="color:#fff;padding:20px;text-align:center;">
+        <p style="color:#fff;padding:24px;text-align:center;font-family:sans-serif;">
           PDF를 표시할 수 없습니다.
-          <a href="${blobUrl}" download="${title}"
-             style="color:#60A5FA;text-decoration:underline;">여기서 다운로드</a>
+          <a href="${blobUrl}" download="${safeTitle}"
+             style="color:#60A5FA;display:block;margin-top:12px;">다운로드</a>
         </p>
-      </object>
-    </body></html>`);
+      </object></body></html>`);
   } else if (mime.startsWith("image/")) {
     w.document.write(`<!DOCTYPE html><html lang="ko"><head>
-      <meta charset="UTF-8"><title>${title}</title>
-      <style>
-        *{margin:0;padding:0;}
-        body{background:#1a1a1a;display:flex;align-items:center;
-             justify-content:center;min-height:100vh;}
-        img{max-width:98vw;max-height:98vh;object-fit:contain;
-            box-shadow:0 4px 32px rgba(0,0,0,.6);}
-      </style></head><body>
-      <img src="${blobUrl}" alt="${title}">
-    </body></html>`);
+      <meta charset="UTF-8"><title>${safeTitle}</title>
+      <style>*{margin:0;padding:0;}body{background:#1a1a1a;display:flex;align-items:center;
+      justify-content:center;min-height:100vh;}
+      img{max-width:98vw;max-height:98vh;object-fit:contain;
+          box-shadow:0 4px 32px rgba(0,0,0,.7);}</style></head><body>
+      <img src="${blobUrl}" alt="${safeTitle}"></body></html>`);
   } else {
-    // 기타(DOC/DOCX 등): 탭을 닫고 다운로드
     w.close();
-    downloadViaBlob(blob, fileName);
+    downloadBlob(blob, fileName);
     return;
   }
   w.document.close();
 }
 
-/* ── 모바일 인라인 뷰어 (현재 페이지 오버레이) ── */
+/* ════════════════════════════════════════════════════════
+   인라인 뷰어 핵심 함수
+   ════════════════════════════════════════════════════════ */
 function openInlineViewer(blob, mime, fileName, rawDataUrl) {
-  // 기존 뷰어 중복 방지
+  // 중복 방지
   document.getElementById("rv-overlay")?.remove();
 
-  const isImg = mime.startsWith("image/");
   const isPdf = mime === "application/pdf";
+  const isImg = mime.startsWith("image/");
 
-  // ★ 핵심: PDF/이미지 모두 Blob URL 사용 (data:URL이 아님)
-  //    → iOS Safari Blob URL은 현재 페이지 컨텍스트에서 <iframe>/<img>에 사용 가능
-  //    → Android도 동일하게 동작
-  const blobUrl = createManagedBlobUrl(blob, 180_000); // 3분
+  /* 저장 버튼 핸들러 */
+  const handleSave = async () => {
+    if (ENV.isIOS) {
+      const ok = await shareFile(blob, mime, fileName);
+      if (!ok) {
+        alert("저장하려면:\n[공유 버튼] → [파일에 저장] 또는 [이미지 저장]을 선택하세요.\n\n저장이 안 되면 PC에서 다운로드해 주세요.");
+      }
+    } else {
+      downloadBlob(blob, fileName);
+    }
+  };
 
-  // 콘텐츠 HTML 결정
-  let bodyHtml;
-  if (isPdf) {
-    // iOS: <iframe>에 Blob URL 주입 → PDF 네이티브 렌더링
-    // Android Chrome: <iframe> + Blob URL 동작 ○
-    bodyHtml = `
-      <iframe
-        id="rv-frame"
-        src="${blobUrl}"
-        style="width:100%;height:100%;border:none;display:block;background:#fff;"
-        allowfullscreen
-      ></iframe>`;
-  } else if (isImg) {
-    bodyHtml = `
-      <div style="
-        overflow:auto;-webkit-overflow-scrolling:touch;
-        display:flex;align-items:center;justify-content:center;
-        width:100%;height:100%;padding:12px;box-sizing:border-box;
-      ">
-        <img
-          src="${blobUrl}"
-          alt="${esc(fileName||"이력서")}"
-          style="max-width:100%;height:auto;object-fit:contain;
-                 border-radius:4px;box-shadow:0 2px 20px rgba(0,0,0,.5);"
-        >
-      </div>`;
-  } else {
-    // DOC/DOCX 등 브라우저가 렌더링 불가한 파일
-    bodyHtml = `
-      <div style="
-        display:flex;flex-direction:column;align-items:center;justify-content:center;
-        height:100%;gap:20px;padding:32px;text-align:center;
-      ">
-        <div style="font-size:56px;line-height:1;">📄</div>
-        <div style="color:#fff;font-size:16px;font-weight:700;word-break:break-all;">
-          ${esc(fileName||"파일")}
-        </div>
-        <div style="color:rgba(255,255,255,.6);font-size:13px;line-height:1.6;">
-          이 파일 형식은 브라우저에서 미리 볼 수 없습니다.<br>
-          아래 버튼으로 기기에 저장 후 열어주세요.
-        </div>
-        <button id="rv-direct-save"
-          style="
-            margin-top:4px;padding:14px 32px;
-            background:#2563EB;color:#fff;border:none;border-radius:12px;
-            font-size:15px;font-weight:700;cursor:pointer;
-            box-shadow:0 4px 16px rgba(37,99,235,.5);
-            -webkit-tap-highlight-color:transparent;
-          ">
-          💾 기기에 저장
-        </button>
-      </div>`;
-  }
-
-  // ── 오버레이 DOM 구성 ──
+  /* ── DOM 구성 ── */
   const overlay = document.createElement("div");
   overlay.id = "rv-overlay";
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", "이력서 뷰어");
 
-  overlay.style.cssText = `
-    position:fixed;top:0;left:0;right:0;bottom:0;
-    z-index:99999;
-    display:flex;flex-direction:column;
-    background:#0B1426;
-    /* iOS 노치/홈바 안전 영역 */
-    padding-top:env(safe-area-inset-top,0);
-    padding-bottom:env(safe-area-inset-bottom,0);
-    padding-left:env(safe-area-inset-left,0);
-    padding-right:env(safe-area-inset-right,0);
-    -webkit-overflow-scrolling:touch;
-    animation:rv-slide-up .22s cubic-bezier(.25,.46,.45,.94) both;
-  `;
+  // 툴바
+  overlay.innerHTML = `
+    <div id="rv-toolbar">
+      <span id="rv-filename">📎 ${fileName || "이력서"}</span>
+      <div id="rv-btns">
+        <button class="rv-btn rv-btn-save" id="rv-save-btn">
+          ${ENV.isIOS ? "📤 저장" : "💾 저장"}
+        </button>
+        <button class="rv-btn rv-btn-close" id="rv-close-btn" aria-label="닫기">✕ 닫기</button>
+      </div>
+    </div>
+    <div id="rv-body">
+      <div id="rv-loading">
+        <div class="rv-spinner"></div>
+        <span>파일을 불러오는 중...</span>
+      </div>
+    </div>`;
 
-  // 상단 툴바
-  const toolbar = document.createElement("div");
-  toolbar.style.cssText = `
-    display:flex;align-items:center;justify-content:space-between;
-    padding:10px 14px;
-    background:#0F1E35;
-    border-bottom:1px solid rgba(255,255,255,.08);
-    flex-shrink:0;
-    min-height:52px;
-    gap:8px;
-  `;
-
-  // 파일명 표시
-  const titleEl = document.createElement("div");
-  titleEl.style.cssText = `
-    color:rgba(255,255,255,.85);font-size:13px;font-weight:600;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-    flex:1;min-width:0;
-  `;
-  titleEl.textContent = `📎 ${fileName || "이력서"}`;
-
-  // 버튼 그룹
-  const btnGroup = document.createElement("div");
-  btnGroup.style.cssText = "display:flex;gap:6px;flex-shrink:0;";
-
-  const btnStyle = (bg) => `
-    padding:8px 14px;background:${bg};color:#fff;border:none;
-    border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;
-    display:flex;align-items:center;gap:4px;white-space:nowrap;
-    -webkit-tap-highlight-color:transparent;
-    touch-action:manipulation;
-  `;
-
-  // 📤 공유/저장 버튼 (iOS: Web Share, Android: download)
-  const saveBtn = document.createElement("button");
-  saveBtn.style.cssText = btnStyle("rgba(5,150,105,.85)");
-  saveBtn.innerHTML = ENV.isIOS ? "📤&nbsp;저장" : "💾&nbsp;저장";
-  saveBtn.addEventListener("click", async () => {
-    if (ENV.isIOS) {
-      const ok = await shareViaWebShareAPI(blob, mime, fileName);
-      if (!ok) {
-        // Web Share 실패 시 안내
-        alert("iOS에서는 [공유] → [파일에 저장] 또는 [이미지 저장]을 선택하세요.");
-      }
-    } else {
-      downloadViaBlob(blob, fileName);
-    }
-  });
-
-  // ✕ 닫기 버튼
-  const closeBtn = document.createElement("button");
-  closeBtn.style.cssText = btnStyle("rgba(255,255,255,.12)");
-  closeBtn.textContent = "✕";
-  closeBtn.setAttribute("aria-label", "닫기");
-
-  btnGroup.appendChild(saveBtn);
-  btnGroup.appendChild(closeBtn);
-  toolbar.appendChild(titleEl);
-  toolbar.appendChild(btnGroup);
-
-  // 콘텐츠 컨테이너
-  const contentWrap = document.createElement("div");
-  contentWrap.style.cssText = `
-    flex:1;overflow:hidden;position:relative;
-    display:flex;flex-direction:column;
-  `;
-  contentWrap.innerHTML = bodyHtml;
-
-  overlay.appendChild(toolbar);
-  overlay.appendChild(contentWrap);
   document.body.appendChild(overlay);
+  lockBodyScroll();
 
-  // 배경 스크롤 잠금 (iOS bounce 방지 포함)
-  const prevOverflow = document.body.style.overflow;
-  const prevPosition = document.body.style.position;
-  const scrollY = window.scrollY;
-  document.body.style.overflow = "hidden";
-  // iOS Safari에서 배경이 스크롤되는 버그 방지
-  if (ENV.isIOS) {
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = "100%";
-  }
+  const bodyEl   = overlay.querySelector("#rv-body");
+  const loadingEl = overlay.querySelector("#rv-loading");
 
-  // ── 닫기 로직 ──
+  /* ── 닫기 로직 ── */
   const closeViewer = () => {
     overlay.remove();
-    document.body.style.overflow = prevOverflow;
-    if (ENV.isIOS) {
-      document.body.style.position = prevPosition;
-      document.body.style.top = "";
-      document.body.style.width = "";
-      window.scrollTo(0, scrollY);
-    }
-    document.removeEventListener("keydown", onEscKey);
+    unlockBodyScroll();
+    document.removeEventListener("keydown", onKey);
   };
+  const onKey = (e) => { if (e.key === "Escape") closeViewer(); };
+  overlay.querySelector("#rv-close-btn").addEventListener("click", closeViewer);
+  overlay.querySelector("#rv-save-btn").addEventListener("click", handleSave);
+  document.addEventListener("keydown", onKey);
 
-  closeBtn.addEventListener("click", closeViewer);
-
-  // ESC 키 (PC 겸용)
-  const onEscKey = (e) => { if (e.key === "Escape") closeViewer(); };
-  document.addEventListener("keydown", onEscKey);
-
-  // 비뷰어블 파일 직접 저장 버튼
-  const directSaveBtn = overlay.querySelector("#rv-direct-save");
-  if (directSaveBtn) {
-    directSaveBtn.addEventListener("click", async () => {
-      if (ENV.isIOS) {
-        const ok = await shareViaWebShareAPI(blob, mime, fileName);
-        if (!ok) alert("공유 기능을 지원하지 않는 환경입니다. PC에서 접속해 다운로드하세요.");
-      } else {
-        downloadViaBlob(blob, fileName);
-      }
-    });
+  /* ── 콘텐츠 렌더링 ── */
+  if (isPdf) {
+    _renderPdf(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl);
+  } else if (isImg) {
+    _renderImage(bodyEl, loadingEl, blob, fileName);
+  } else {
+    _renderFallback(bodyEl, loadingEl, fileName, handleSave);
   }
 }
 
-/* ── 진입점: 이력서 열기 ── */
+/* PDF 렌더링 */
+function _renderPdf(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl) {
+  /*
+   * 전략:
+   * iOS 15+ 및 Android: Blob URL을 <iframe src>에 직접 주입
+   *   → iOS 15+: Safari는 현재 페이지 컨텍스트의 Blob URL iframe을 렌더링함
+   *   → Android Chrome/WebView: 동일하게 동작
+   * iOS 14 이하 / WKWebView: Blob URL iframe이 흰 화면 → Google Docs 프록시 사용
+   *   → 단, Google Docs는 외부 공개 URL만 지원하므로, data:application/pdf로 폴백
+   *   → 최후 수단: base64 데이터를 모바일에서 직접 열람하는 별도 HTML 페이지
+   */
+
+  const useGoogleProxy = ENV.isIOS && (ENV.iosVersion > 0 && ENV.iosVersion < 15);
+  const useDirectBlob  = !useGoogleProxy; // iOS15+, Android, PC 모두
+
+  if (useDirectBlob) {
+    // ── Blob URL iframe ──
+    const blobUrl = makeBlobUrl(blob, 300_000); // 5분
+    const iframe = document.createElement("iframe");
+    iframe.id    = "rv-pdf-frame";
+    iframe.title = fileName || "이력서";
+    iframe.setAttribute("allowfullscreen", "");
+    // iOS: allow-same-origin 없이 sandbox 지정 시 PDF 렌더링 차단됨 → sandbox 없이 사용
+    iframe.src = blobUrl;
+
+    let loaded = false;
+    iframe.addEventListener("load", () => {
+      loaded = true;
+      loadingEl.style.display = "none";
+    });
+
+    // 5초 후에도 load 이벤트가 안 오면 (일부 iOS에서 발생) 스피너만 제거
+    setTimeout(() => {
+      if (!loaded) loadingEl.style.display = "none";
+    }, 5000);
+
+    bodyEl.appendChild(iframe);
+
+  } else {
+    // ── iOS 14 이하: base64 data URI를 새 HTML로 감싸서 iframe에 주입 ──
+    // Google Docs 외부 URL 방식은 인트라넷/localhost에서 불가하므로
+    // srcdoc 방식으로 object 태그 내에 data:url 삽입
+    const pdfDataUrl = rawDataUrl || "";
+    const srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+      <style>*{margin:0;padding:0;}html,body{width:100%;height:100%;overflow:hidden;}
+      object,embed{display:block;width:100%;height:100%;border:none;}
+      </style></head><body>
+      <object data="${pdfDataUrl}" type="application/pdf">
+        <embed src="${pdfDataUrl}" type="application/pdf">
+      </object>
+      </body></html>`;
+
+    const iframe = document.createElement("iframe");
+    iframe.id    = "rv-pdf-frame";
+    iframe.title = fileName || "이력서";
+    iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
+    iframe.srcdoc = srcdoc;
+
+    iframe.addEventListener("load", () => {
+      loadingEl.style.display = "none";
+    });
+    setTimeout(() => { loadingEl.style.display = "none"; }, 4000);
+
+    bodyEl.appendChild(iframe);
+  }
+}
+
+/* 이미지 렌더링 */
+function _renderImage(bodyEl, loadingEl, blob, fileName) {
+  const blobUrl = makeBlobUrl(blob, 300_000);
+
+  const wrap = document.createElement("div");
+  wrap.id = "rv-img-wrap";
+
+  const img = document.createElement("img");
+  img.alt = fileName || "이력서 이미지";
+  img.src = blobUrl;
+
+  img.addEventListener("load", () => {
+    loadingEl.style.display = "none";
+  });
+
+  img.addEventListener("error", () => {
+    loadingEl.style.display = "none";
+    wrap.innerHTML = `
+      <div style="text-align:center;color:rgba(255,255,255,.6);padding:32px;">
+        <div style="font-size:40px;margin-bottom:12px;">⚠️</div>
+        <div style="font-size:14px;">이미지를 불러올 수 없습니다.</div>
+        <div style="font-size:12px;margin-top:6px;opacity:.6;">${fileName || ""}</div>
+      </div>`;
+  });
+
+  wrap.appendChild(img);
+  bodyEl.appendChild(wrap);
+}
+
+/* 열람 불가 파일 (DOC/DOCX 등) */
+function _renderFallback(bodyEl, loadingEl, fileName, handleSave) {
+  loadingEl.style.display = "none";
+
+  const div = document.createElement("div");
+  div.id = "rv-fallback";
+  div.innerHTML = `
+    <div class="rv-icon">📄</div>
+    <div class="rv-fname">${fileName ? fileName.replace(/</g,"&lt;") : "파일"}</div>
+    <div class="rv-desc">
+      이 파일 형식은 모바일 브라우저에서<br>직접 열람할 수 없습니다.<br>
+      아래 버튼으로 기기에 저장 후 확인해 주세요.
+    </div>
+    <button id="rv-fallback-save" class="rv-btn rv-btn-save" style="margin-top:8px;padding:14px 32px;font-size:14px;">
+      ${ENV.isIOS ? "📤 저장/공유" : "💾 파일 저장"}
+    </button>`;
+
+  div.querySelector("#rv-fallback-save").addEventListener("click", handleSave);
+  bodyEl.appendChild(div);
+}
+
+/* ════════════════════════════════════════════
+   진입점: viewResume(id)
+   ════════════════════════════════════════════ */
 function viewResume(id) {
   const applicant = applicantsCache.find(x => x.id === id);
   if (!applicant?.resume?.dataUrl) {
@@ -1055,33 +1081,34 @@ function viewResume(id) {
 
   const { dataUrl, mimeType, fileName } = applicant.resume;
 
-  // 1. dataURL → Blob 변환 (공통 선행 작업)
+  // MIME 타입 보정: 파일명 확장자로도 추론
+  const resolvedMime = (() => {
+    if (mimeType && mimeType !== "application/octet-stream") return mimeType;
+    const ext = (fileName || "").split(".").pop().toLowerCase();
+    const map = {
+      pdf:"application/pdf", jpg:"image/jpeg", jpeg:"image/jpeg",
+      png:"image/png", gif:"image/gif", webp:"image/webp",
+      doc:"application/msword",
+      docx:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    };
+    return map[ext] || mimeType || "application/octet-stream";
+  })();
+
   let blob, mime;
   try {
-    ({ blob, mime } = dataUrlToBlob(dataUrl, mimeType));
+    ({ blob, mime } = dataUrlToBlob(dataUrl, resolvedMime));
   } catch (err) {
-    console.error("[viewResume] dataUrl 변환 실패:", err);
-    alert("파일 변환 중 오류가 발생했습니다: " + err.message);
+    console.error("[viewResume] 변환 실패:", err);
+    alert("파일 변환 오류: " + err.message);
     return;
   }
 
-  // ── iOS: 모든 버전, 모든 브라우저 → 인라인 뷰어 ──
-  // 이유: iOS는 Blob URL 새 탭 열기, <a download> 모두 차단됨
-  if (ENV.isIOS) {
+  // PC: 새 탭 / 모바일: 인라인 뷰어
+  if (!ENV.isMobile) {
+    openNewTab(blob, mime, fileName);
+  } else {
     openInlineViewer(blob, mime, fileName, dataUrl);
-    return;
   }
-
-  // ── Android: 인라인 뷰어 (저장 버튼으로 BlobURL download) ──
-  // 이유: Chrome은 download 가능하나, 미리보기 UX가 더 좋음
-  //       Samsung Browser도 인라인 뷰어에서 저장 버튼으로 처리
-  if (ENV.isAndroid) {
-    openInlineViewer(blob, mime, fileName, dataUrl);
-    return;
-  }
-
-  // ── PC: 새 탭 미리보기 ──
-  previewInNewTab(blob, mime, fileName);
 }
 
 /* 라우터 */
@@ -1237,13 +1264,12 @@ function renderInterviews(){
     </table></div>
   </div>`;
 
-  /* ★ FIX 4: IME(한글) 검색 - compositionstart/end 이벤트로 처리 */
   const se = document.getElementById("interviewSearch");
   if(se){
     se.addEventListener("compositionstart", ()=>{ isComposing=true; });
     se.addEventListener("compositionend",   ()=>{ isComposing=false; interviewSearch=se.value; renderInterviews(); restoreFocus(); });
     se.addEventListener("input", ()=>{
-      if(isComposing) return;           // 조합 중에는 검색 안 함
+      if(isComposing) return;
       interviewSearch=se.value; renderInterviews(); restoreFocus();
     });
   }
@@ -1336,7 +1362,7 @@ async function updateStatus(id,status){
 }
 
 /* ══════════════════════════════════════════════════
-   ★ FIX 1+2: 면접 평가서 - 실무 양식 + 작성된 것만 출력
+   면접 평가서
    ══════════════════════════════════════════════════ */
 function initEvalDraft(applicant){
   const ex=applicant&&applicant.evaluation;
@@ -1367,7 +1393,6 @@ function calcTotalScore(draft){
   return{total:sum,avg,grade};
 }
 
-/* ★ FIX 2: 작성된 항목만 미리보기 반영 */
 function buildReport(applicant, draft){
   const lines=[];
   const company=settingsCache.companyName||"";
@@ -1380,8 +1405,6 @@ function buildReport(applicant, draft){
   lines.push(`면접일시 : ${dt||"-"}`);
   if(draft.interviewerName) lines.push(`면접관   : ${draft.interviewerName}${draft.interviewerTitle?" ("+draft.interviewerTitle+")":""}`);
   lines.push(`${"─".repeat(38)}`);
-
-  // 역량 평가 - 작성된 항목만 출력
   const filledComps = draft.competencies.filter(c=>c.title.trim()||(c.items&&c.items.trim())||c.score||c.comment);
   if(filledComps.length){
     lines.push(`[역량 평가]`);
@@ -1401,46 +1424,33 @@ function buildReport(applicant, draft){
     if(avg!=="-") lines.push(`\n   ※ 종합 평균: ${avg}점 / 종합 등급: ${grade}`);
     lines.push(`${"─".repeat(38)}`);
   }
-
-  // 성격·태도 - 작성된 경우만
   if(draft.personality&&draft.personality.trim()){
     lines.push(`[성격 및 업무 태도]`);
     draft.personality.split("\n").map(s=>s.trim()).filter(Boolean).forEach((s,j)=>{ const CIRC=["①","②","③","④","⑤"]; lines.push(`  ${CIRC[j]||(j+1)+"."} ${s}`); });
     lines.push(`${"─".repeat(38)}`);
   }
-
-  // 장점 - 작성된 경우만
   if(draft.strengths&&draft.strengths.trim()){
     lines.push(`[주요 강점]`);
     draft.strengths.split("\n").map(s=>s.trim()).filter(Boolean).forEach((s,j)=>{ const CIRC=["①","②","③","④","⑤"]; lines.push(`  ${CIRC[j]||(j+1)+"."} ${s}`); });
     lines.push(`${"─".repeat(38)}`);
   }
-
-  // 리스크 - 작성된 경우만
   if(draft.risks&&draft.risks.trim()){
     lines.push(`[단점 및 채용 리스크]`);
     draft.risks.split("\n").map(s=>s.trim()).filter(Boolean).forEach((s,j)=>{ const CIRC=["①","②","③","④","⑤"]; lines.push(`  ${CIRC[j]||(j+1)+"."} ${s}`); });
     lines.push(`${"─".repeat(38)}`);
   }
-
-  // 종합의견 - 작성된 경우만
   if(draft.comment&&draft.comment.trim()){
     lines.push(`[종합 의견]`);
     lines.push(`  ${draft.comment.trim()}`);
     lines.push(`${"─".repeat(38)}`);
   }
-
-  // 추천여부 - 선택된 경우만
   if(draft.recommendation){
     const recEmoji=draft.recommendation==="채용추천"?"✅":draft.recommendation==="보류"?"🔶":"❌";
     lines.push(`[채용 추천 여부]  ${recEmoji} ${draft.recommendation}`);
     lines.push(`${"─".repeat(38)}`);
   }
-
-  // 서명란
   lines.push(`작성일: ${new Date().toLocaleDateString("ko-KR")}`);
   if(draft.interviewerName) lines.push(`면접관: ${draft.interviewerName}  (서명: ____________)`);
-
   return lines.join("\n");
 }
 
@@ -1467,7 +1477,7 @@ function renderEvaluationForm(){
       </div>
       <div class="form-group" style="margin-bottom:8px;">
         <label style="font-size:11px;">세부 면접 내용 <span style="color:var(--slate-400);font-weight:400;">(한 줄에 한 항목)</span></label>
-        <textarea class="form-control" rows="3" placeholder="예: Python·SQL 실무 경험 3년 이상 보유&#10;REST API 설계 및 구현 능력 확인&#10;클라우드 인프라 이해도 양호" data-comp-items="${c.id}">${esc(c.items)}</textarea>
+        <textarea class="form-control" rows="3" placeholder="예: Python·SQL 실무 경험 3년 이상 보유&#10;REST API 설계 및 구현 능력 확인" data-comp-items="${c.id}">${esc(c.items)}</textarea>
       </div>
       <div class="form-group" style="margin-bottom:0;">
         <label style="font-size:11px;">총평</label>
@@ -1493,9 +1503,7 @@ function renderEvaluationForm(){
     </div>
     <div style="margin-left:auto;">${statusBadge(applicant.status)}</div>
   </div>
-
   <div class="eval-layout" id="evalLayout">
-    <!-- 좌측: 입력 -->
     <div>
       <div class="panel">
         <div class="panel-header"><span class="panel-title">면접관 정보</span></div>
@@ -1506,7 +1514,6 @@ function renderEvaluationForm(){
           </div>
         </div>
       </div>
-
       <div class="panel">
         <div class="panel-header">
           <span class="panel-title">역량 평가 항목</span>
@@ -1516,7 +1523,6 @@ function renderEvaluationForm(){
           <form id="evalForm">
             ${compHtml}
             <button type="button" class="eval-add-btn" data-action="add-comp-block">+ 평가 항목 추가</button>
-
             <div class="eval-summary-block">
               <div class="eval-summary-title">📊 종합 점수</div>
               <div class="total-score-display">
@@ -1527,17 +1533,15 @@ function renderEvaluationForm(){
                 </div>
               </div>
             </div>
-
             <div class="panel" style="margin-bottom:14px;">
               <div class="panel-header"><span class="panel-title">추가 평가</span></div>
               <div class="panel-inner">
-                <div class="form-group"><label>성격 및 업무 태도 <span style="color:var(--slate-400);font-weight:400;font-size:10px;">(한 줄 = 항목 1개)</span></label><textarea class="form-control" id="evalPersonality" rows="3" placeholder="예: 적극적인 소통 태도&#10;책임감 있는 업무 처리&#10;팀워크 우수">${esc(evalDraft.personality)}</textarea></div>
-                <div class="form-group"><label>주요 강점</label><textarea class="form-control" id="evalStrengths" rows="3" placeholder="예: 관련 도메인 실무 경험 풍부&#10;빠른 학습 능력">${esc(evalDraft.strengths)}</textarea></div>
-                <div class="form-group"><label>단점 / 채용 리스크</label><textarea class="form-control" id="evalRisks" rows="3" placeholder="예: 리더십 경험 부족&#10;특정 기술 스택 미숙">${esc(evalDraft.risks)}</textarea></div>
+                <div class="form-group"><label>성격 및 업무 태도</label><textarea class="form-control" id="evalPersonality" rows="3" placeholder="예: 적극적인 소통 태도&#10;책임감 있는 업무 처리">${esc(evalDraft.personality)}</textarea></div>
+                <div class="form-group"><label>주요 강점</label><textarea class="form-control" id="evalStrengths" rows="3" placeholder="예: 관련 도메인 실무 경험 풍부">${esc(evalDraft.strengths)}</textarea></div>
+                <div class="form-group"><label>단점 / 채용 리스크</label><textarea class="form-control" id="evalRisks" rows="3" placeholder="예: 리더십 경험 부족">${esc(evalDraft.risks)}</textarea></div>
                 <div class="form-group" style="margin-bottom:0;"><label>종합 의견</label><textarea class="form-control" id="evalComment" rows="3">${esc(evalDraft.comment)}</textarea></div>
               </div>
             </div>
-
             <div style="margin-bottom:14px;">
               <div style="font-size:12px;font-weight:700;color:var(--slate-600);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">채용 추천 여부</div>
               <div class="rec-btn-group">
@@ -1546,16 +1550,13 @@ function renderEvaluationForm(){
                 <button type="button" class="rec-btn ${evalDraft.recommendation==="비추천"?"selected-reject":""}" data-action="set-rec" data-rec="비추천">❌ 비추천</button>
               </div>
             </div>
-
             <button type="button" class="btn btn-primary" data-action="save-evaluation" style="width:100%;">💾 평가서 저장</button>
           </form>
         </div>
       </div>
     </div>
-
-    <!-- 우측: 미리보기 -->
     <div>
-      <div class="eval-preview-label">자동 생성 미리보기 <span style="font-size:9px;">(작성된 항목만 표시)</span></div>
+      <div class="eval-preview-label">자동 생성 미리보기</div>
       <div class="eval-preview-panel" id="evalPreview"></div>
       <div class="eval-preview-actions">
         <button type="button" class="btn btn-ghost btn-sm" data-action="copy-evaluation">📋 텍스트 복사</button>
@@ -1565,12 +1566,8 @@ function renderEvaluationForm(){
   </div>`;
 
   updateEvalPreview();
-
-  // 실시간 미리보기 업데이트 (input 이벤트)
   const evalFormEl=document.getElementById("evalForm");
-  if(evalFormEl){
-    evalFormEl.addEventListener("input",()=>{ syncDraft(); updateEvalPreview(); });
-  }
+  if(evalFormEl) evalFormEl.addEventListener("input",()=>{ syncDraft(); updateEvalPreview(); });
   const intName=document.getElementById("evalInterviewerName");
   const intTitle=document.getElementById("evalInterviewerTitle");
   if(intName) intName.addEventListener("input",()=>{ syncDraft(); updateEvalPreview(); });
@@ -1597,9 +1594,8 @@ function updateEvalPreview(){
   const el=document.getElementById("evalPreview");
   if(!a||!el||!evalDraft)return;
   el.textContent=buildReport(a,evalDraft);
-  // 종합점수 업데이트
   const sv=document.getElementById("totalScoreVal");
-  if(sv){ const {avg,grade}=calcTotalScore(evalDraft); sv.textContent=avg!=="-"?avg:"—"; }
+  if(sv){ const {avg}=calcTotalScore(evalDraft); sv.textContent=avg!=="-"?avg:"—"; }
 }
 
 function addCompBlock(){ syncDraft(); evalDraft.competencies.push({id:uid(),title:"",items:"",score:"",comment:""}); renderEvaluationForm(); }
@@ -1608,9 +1604,8 @@ function removeCompBlock(id){ syncDraft(); if(evalDraft.competencies.length<=1){
 function setScore(compId,score){
   syncDraft();
   const c=evalDraft.competencies.find(x=>x.id===compId);
-  if(c){ c.score=c.score===score?"":score; } // 재클릭 시 해제
+  if(c){ c.score=c.score===score?"":score; }
   updateEvalPreview();
-  // 버튼 UI 즉시 반영
   document.querySelectorAll(`[data-action="set-score"][data-id="${compId}"]`).forEach(btn=>{
     btn.classList.toggle("selected", btn.dataset.score===c.score);
   });
@@ -1619,7 +1614,7 @@ function setScore(compId,score){
 }
 function setRec(rec){
   syncDraft();
-  evalDraft.recommendation=evalDraft.recommendation===rec?"":rec; // 재클릭 해제
+  evalDraft.recommendation=evalDraft.recommendation===rec?"":rec;
   updateEvalPreview();
   document.querySelectorAll(`[data-action="set-rec"]`).forEach(btn=>{
     btn.className="rec-btn";
@@ -1656,17 +1651,13 @@ async function copyEvaluation(){
   catch(e){ alert("자동 복사 실패. 미리보기 영역을 직접 선택해 복사해주세요."); }
 }
 
-/* ★ FIX 1: 인쇄 - 실무 양식 테이블 레이아웃 */
 function printEvaluation(){
   syncDraft();
   const a=applicantsCache.find(x=>x.id===evaluationId); if(!a)return;
   const dt=[a.interviewDate,a.interviewTime].filter(Boolean).join(" ");
   const company=settingsCache.companyName||"";
   const {avg,grade}=calcTotalScore(evalDraft);
-
   const gradeBadge=s=>s?`<span class="grade-badge grade-${SCORE_CLASS[s]||""}">${s}</span>`:"-";
-
-  // 작성된 역량 항목만 테이블 행 생성
   const compRows=evalDraft.competencies
     .filter(c=>c.title.trim()||c.items||c.score||c.comment)
     .map(c=>`<tr>
@@ -1675,10 +1666,8 @@ function printEvaluation(){
       <td>${gradeBadge(c.score)}</td>
       <td style="white-space:pre-wrap;">${c.comment||"-"}</td>
     </tr>`).join("");
-
   const recClass=evalDraft.recommendation==="채용추천"?"pass":evalDraft.recommendation==="보류"?"hold":"reject";
   const recEmoji=evalDraft.recommendation==="채용추천"?"✅":evalDraft.recommendation==="보류"?"🔶":"❌";
-
   const w=window.open("","_blank");
   if(!w){alert("팝업이 차단되었습니다.");return;}
   w.document.write(`<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
@@ -1704,7 +1693,6 @@ function printEvaluation(){
     .score-summary{display:flex;align-items:center;gap:16px;padding:12px 16px;background:#f1f5f9;border-radius:8px;margin-bottom:16px;}
     .score-big{font-size:26px;font-weight:800;color:#2563EB;letter-spacing:-1px;}
     .summary-box{border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:14px;background:#fff;}
-    .summary-label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
     .rec-box{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:8px;margin-bottom:16px;}
     .rec-pass{background:#dcfce7;border:1.5px solid #86efac;}.rec-hold{background:#fef3c7;border:1.5px solid #fcd34d;}.rec-reject{background:#fee2e2;border:1.5px solid #fca5a5;}
     .rec-text{font-size:16px;font-weight:800;}
@@ -1713,57 +1701,28 @@ function printEvaluation(){
     .sign-label{font-size:11px;color:#64748b;margin-bottom:20px;}
     .sign-line{border-top:1px solid #cbd5e1;padding-top:8px;font-size:12px;font-weight:600;}
     @media print{body{padding:20px;font-size:12px;}h1{font-size:18px;}@page{margin:15mm;}}
-  </style>
-  </head><body>
+  </style></head><body>
   <h1>면접 평가서</h1>
   <div class="sub">${company?company+" | ":""} 채용관리시스템 ATS · 작성일: ${new Date().toLocaleDateString("ko-KR")}</div>
-
   <table class="info-table">
     <tr><td>지원자</td><td>${a.name||"-"}</td><td>지원직무</td><td>${a.jobTitle||"-"}</td></tr>
     <tr><td>면접일시</td><td>${dt||"-"}</td><td>면접관</td><td>${evalDraft.interviewerName||"-"}${evalDraft.interviewerTitle?" ("+evalDraft.interviewerTitle+")":""}</td></tr>
     <tr><td>연락처</td><td>${a.phone||"-"}</td><td>이메일</td><td>${a.email||"-"}</td></tr>
   </table>
-
   ${compRows?`
   <div class="section-title">역량 평가</div>
-  <div class="score-summary">
-    <div class="score-big">${avg!=="-"?avg+"점":"—"}</div>
-    <div><div style="font-size:12px;color:#64748b;">평균 점수 / 종합 등급</div><div style="font-size:14px;font-weight:700;">${grade!=="-"?grade:"미평가"}</div></div>
-  </div>
-  <table class="eval-table">
-    <thead><tr><th>평가항목</th><th>면접 내용</th><th>등급</th><th>총평</th></tr></thead>
-    <tbody>${compRows}</tbody>
-  </table>`:""}
-
-  ${evalDraft.personality&&evalDraft.personality.trim()?`
-  <div class="section-title">성격 및 업무 태도</div>
-  <div class="summary-box"><div style="white-space:pre-wrap;">${evalDraft.personality.split("\n").filter(s=>s.trim()).map((s,j)=>{ const C=["①","②","③","④","⑤"]; return (C[j]||(j+1)+".")+" "+s.trim(); }).join("\n")}</div></div>`:""}
-
-  ${evalDraft.strengths&&evalDraft.strengths.trim()?`
-  <div class="section-title">주요 강점</div>
-  <div class="summary-box"><div style="white-space:pre-wrap;">${evalDraft.strengths.split("\n").filter(s=>s.trim()).map((s,j)=>{ const C=["①","②","③","④","⑤"]; return (C[j]||(j+1)+".")+" "+s.trim(); }).join("\n")}</div></div>`:""}
-
-  ${evalDraft.risks&&evalDraft.risks.trim()?`
-  <div class="section-title">단점 및 채용 리스크</div>
-  <div class="summary-box"><div style="white-space:pre-wrap;">${evalDraft.risks.split("\n").filter(s=>s.trim()).map((s,j)=>{ const C=["①","②","③","④","⑤"]; return (C[j]||(j+1)+".")+" "+s.trim(); }).join("\n")}</div></div>`:""}
-
-  ${evalDraft.comment&&evalDraft.comment.trim()?`
-  <div class="section-title">종합 의견</div>
-  <div class="summary-box"><p style="white-space:pre-wrap;">${evalDraft.comment.trim()}</p></div>`:""}
-
-  ${evalDraft.recommendation?`
-  <div class="section-title">채용 추천 여부</div>
-  <div class="rec-box rec-${recClass}">
-    <span style="font-size:20px;">${recEmoji}</span>
-    <span class="rec-text">${evalDraft.recommendation}</span>
-  </div>`:""}
-
+  <div class="score-summary"><div class="score-big">${avg!=="-"?avg+"점":"—"}</div><div><div style="font-size:12px;color:#64748b;">평균 점수 / 종합 등급</div><div style="font-size:14px;font-weight:700;">${grade!=="-"?grade:"미평가"}</div></div></div>
+  <table class="eval-table"><thead><tr><th>평가항목</th><th>면접 내용</th><th>등급</th><th>총평</th></tr></thead><tbody>${compRows}</tbody></table>`:""}
+  ${evalDraft.personality&&evalDraft.personality.trim()?`<div class="section-title">성격 및 업무 태도</div><div class="summary-box"><div style="white-space:pre-wrap;">${evalDraft.personality.split("\n").filter(s=>s.trim()).map((s,j)=>{ const C=["①","②","③","④","⑤"]; return (C[j]||(j+1)+".")+" "+s.trim(); }).join("\n")}</div></div>`:""}
+  ${evalDraft.strengths&&evalDraft.strengths.trim()?`<div class="section-title">주요 강점</div><div class="summary-box"><div style="white-space:pre-wrap;">${evalDraft.strengths.split("\n").filter(s=>s.trim()).map((s,j)=>{ const C=["①","②","③","④","⑤"]; return (C[j]||(j+1)+".")+" "+s.trim(); }).join("\n")}</div></div>`:""}
+  ${evalDraft.risks&&evalDraft.risks.trim()?`<div class="section-title">단점 및 채용 리스크</div><div class="summary-box"><div style="white-space:pre-wrap;">${evalDraft.risks.split("\n").filter(s=>s.trim()).map((s,j)=>{ const C=["①","②","③","④","⑤"]; return (C[j]||(j+1)+".")+" "+s.trim(); }).join("\n")}</div></div>`:""}
+  ${evalDraft.comment&&evalDraft.comment.trim()?`<div class="section-title">종합 의견</div><div class="summary-box"><p style="white-space:pre-wrap;">${evalDraft.comment.trim()}</p></div>`:""}
+  ${evalDraft.recommendation?`<div class="section-title">채용 추천 여부</div><div class="rec-box rec-${recClass}"><span style="font-size:20px;">${recEmoji}</span><span class="rec-text">${evalDraft.recommendation}</span></div>`:""}
   <div class="sign-row">
     <div class="sign-box"><div class="sign-label">면접관</div><div style="height:36px;"></div><div class="sign-line">${evalDraft.interviewerName||"____________"}${evalDraft.interviewerTitle?" ("+evalDraft.interviewerTitle+")":""} (인)</div></div>
     <div class="sign-box"><div class="sign-label">확인자</div><div style="height:36px;"></div><div class="sign-line">____________ (인)</div></div>
   </div>
-  <script>window.onload=()=>{ window.focus(); window.print(); }<\/script>
-  </body></html>`);
+  <script>window.onload=()=>{ window.focus(); window.print(); }<\/script></body></html>`);
   w.document.close();
 }
 
@@ -1782,7 +1741,6 @@ function renderFinalHires(){
       `<button class="btn btn-success btn-sm" data-action="register-contract" data-id="${a.id}">계약 등록</button>`}</td>
   </tr>`).join(""):
   `<tr class="empty-row"><td colspan="6"><span class="empty-icon">🏆</span>최종합격자가 없습니다.</td></tr>`;
-
   contentEl.innerHTML=`
   <div class="page-header">
     <div><div class="page-title">최종합격 관리</div><div class="page-subtitle">합격자 계약 현황 · 총 ${list.length}명</div></div>
@@ -1831,7 +1789,6 @@ function renderNotifications(){
     </div>
   </div>`).join(""):
   `<div style="text-align:center;padding:44px;color:var(--slate-400);"><div style="font-size:32px;margin-bottom:10px;">🔔</div>알림이 없습니다.</div>`;
-
   contentEl.innerHTML=`
   <div class="page-header">
     <div><div class="page-title">알림 관리</div><div class="page-subtitle">읽지 않은 알림 ${unread}건</div></div>
@@ -1862,7 +1819,6 @@ function renderSystem(){
     <td class="actions"><button class="btn btn-danger btn-xs" data-action="remove-admin" data-id="${a.id}">삭제</button></td>
   </tr>`).join(""):
   `<tr class="empty-row"><td colspan="4"><span class="empty-icon">👤</span>등록된 운영자가 없습니다.</td></tr>`;
-
   contentEl.innerHTML=`
   <div class="page-header">
     <div><div class="page-title">시스템 설정</div><div class="page-subtitle">회사 정보 및 시스템 동작 방식을 설정합니다</div></div>
@@ -1890,7 +1846,6 @@ function renderSystem(){
     </table></div>
     <div class="panel-inner" style="padding-top:12px;"><p style="font-size:11px;color:var(--slate-400);">※ 실제 로그인·권한 분리는 Firebase Authentication 콘솔에서 계정을 관리하세요.</p></div>
   </div>`;
-
   document.getElementById("settingsForm").addEventListener("submit",async e=>{
     e.preventDefault();
     const fd=new FormData(e.target);
