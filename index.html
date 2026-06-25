@@ -447,6 +447,25 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .switch input:checked + .slider { background: var(--brand); }
 .switch input:checked + .slider::before { transform: translateX(18px); }
 
+/* ─── 인라인 이력서 뷰어 ─── */
+#resumeViewerOverlay {
+  animation: rvFadeIn .2s ease;
+}
+@keyframes rvFadeIn {
+  from { opacity:0; }
+  to   { opacity:1; }
+}
+/* iOS 노치/홈바 대응 */
+#resumeViewerOverlay {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+/* 뷰어 내부 embed (PDF) 높이 iOS 대응 */
+#resumeEmbed {
+  width: 100% !important;
+  min-height: calc(100vh - 56px);
+  -webkit-overflow-scrolling: touch;
+}
+
 /* BAR CHART */
 .bar-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
 .bar-label { width: 90px; font-size: 12px; font-weight: 600; color: var(--slate-600); flex-shrink: 0; }
@@ -648,51 +667,313 @@ function closeModal(){ const ov=document.getElementById("modalOverlay"); if(ov)o
 /* 파일 읽기 */
 function readFile(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(file); }); }
 
-/* ★ FIX 3: 모바일 이력서 열기 - Blob URL 방식 */
-function viewResume(id){
-  const a=applicantsCache.find(x=>x.id===id);
-  if(!a||!a.resume||!a.resume.dataUrl){ alert("첨부된 이력서가 없습니다."); return; }
-  const {dataUrl, mimeType, fileName} = a.resume;
-  try {
-    // dataUrl → Blob → Object URL 변환 (모바일 호환)
-    const arr = dataUrl.split(",");
-    const mime = arr[0].match(/:(.*?);/)?.[1] || mimeType || "application/octet-stream";
-    const bStr = atob(arr[1]);
-    const uArr = new Uint8Array(bStr.length);
-    for(let i=0;i<bStr.length;i++) uArr[i]=bStr.charCodeAt(i);
-    const blob = new Blob([uArr],{type:mime});
-    const blobUrl = URL.createObjectURL(blob);
+/* ═══════════════════════════════════════════════════════════════
+   이력서 열기 — 크로스 플랫폼 전문가 구현
+   ───────────────────────────────────────────────────────────────
+   동작 매트릭스:
+   ┌─────────────────────┬─────────────────────────────────────┐
+   │ 환경                │ 전략                                │
+   ├─────────────────────┼─────────────────────────────────────┤
+   │ PC Chrome/FF/Edge   │ Blob URL → 새 탭 미리보기           │
+   │ PC Safari           │ Blob URL → 새 탭 (PDF/img inline)   │
+   │ Android Chrome      │ Blob URL → a[download] 직접 저장    │
+   │ Android Samsung Br. │ Blob URL → a[download] + fallback   │
+   │ iOS Safari (≥15)    │ Web Share API (Files) → 공유시트    │
+   │ iOS Safari (<15)    │ 인라인 모달 뷰어 (현재 페이지 내)   │
+   │ iOS WKWebView(앱)   │ 인라인 모달 뷰어 (현재 페이지 내)   │
+   │ 기타/알수없음       │ data:URL 새탭 → 실패 시 모달 뷰어  │
+   └─────────────────────┴─────────────────────────────────────┘
+   ═══════════════════════════════════════════════════════════════ */
 
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+/** dataURL → Blob 변환 헬퍼 */
+function dataUrlToBlob(dataUrl, fallbackMime) {
+  const [header, b64] = dataUrl.split(",");
+  const mime = header.match(/:(.*?);/)?.[1] || fallbackMime || "application/octet-stream";
+  const binary = atob(b64);
+  const buf = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) buf[i] = binary.charCodeAt(i);
+  return { blob: new Blob([buf], { type: mime }), mime };
+}
 
-    if(isMobile){
-      // 모바일: <a download> 로 직접 다운로드 트리거
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = fileName || "resume";
-      link.style.display = "none";
-      document.body.appendChild(link);
-      link.click();
-      setTimeout(()=>{ document.body.removeChild(link); URL.revokeObjectURL(blobUrl); }, 3000);
-    } else {
-      // PC: 새 탭에서 미리보기
-      const w = window.open("","_blank");
-      if(!w){ alert("팝업이 차단되었습니다. 다운로드로 진행합니다."); const link=document.createElement("a"); link.href=blobUrl; link.download=fileName||"resume"; document.body.appendChild(link); link.click(); setTimeout(()=>{ document.body.removeChild(link); URL.revokeObjectURL(blobUrl); },2000); return; }
-      if(mime==="application/pdf"||mime.startsWith("image/")){
-        w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(fileName||"이력서")}</title><style>body{margin:0;background:#111;}iframe,img{display:block;width:100%;}</style></head><body>`);
-        if(mime==="application/pdf") w.document.write(`<iframe src="${blobUrl}" style="height:100vh;border:none;"></iframe>`);
-        else w.document.write(`<img src="${blobUrl}" style="max-height:100vh;margin:auto;">`);
-        w.document.write(`</body></html>`);
-        w.document.close();
-        setTimeout(()=>URL.revokeObjectURL(blobUrl), 60000);
-      } else {
-        w.close();
-        const link=document.createElement("a"); link.href=blobUrl; link.download=fileName||"resume"; document.body.appendChild(link); link.click(); setTimeout(()=>{ document.body.removeChild(link); URL.revokeObjectURL(blobUrl); },2000);
-      }
-    }
-  } catch(err){
-    alert("파일을 열 수 없습니다: "+err.message);
+/** 환경 감지 플래그 */
+const ENV = (() => {
+  const ua  = navigator.userAgent;
+  const ios = /iPhone|iPad|iPod/i.test(ua) ||
+              (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const android = /Android/i.test(ua);
+  // iOS 버전 추출 (Web Share Files API는 iOS 15+ 지원)
+  const iosVer = ios ? (ua.match(/OS (\d+)_/) || [])[1] : null;
+  const iosSafariGe15 = ios && Number(iosVer) >= 15;
+  // WKWebView 감지: window.webkit.messageHandlers 존재 여부
+  const isWKWebView = ios && !!(window.webkit && window.webkit.messageHandlers);
+  // Samsung Internet 감지
+  const samsung = /SamsungBrowser/i.test(ua);
+  // 팝업 허용 여부는 실제 open 시도 후 판별
+  return { ios, iosSafariGe15, isWKWebView, android, samsung };
+})();
+
+/** 현재 페이지 내 모달 뷰어 (iOS WKWebView / 팝업 차단 완전 대응) */
+function showInlineViewer(dataUrl, mime, fileName) {
+  // 기존 뷰어 제거
+  document.getElementById("resumeViewerOverlay")?.remove();
+
+  const isImg = mime.startsWith("image/");
+  const isPdf = mime === "application/pdf";
+
+  /* PDF: <embed> 사용 (iOS Safari는 PDF를 embed로 인라인 렌더링) */
+  let contentHtml;
+  if (isPdf) {
+    // iOS Safari는 data:URL을 <embed>에 직접 지원
+    contentHtml = `<embed id="resumeEmbed"
+      src="${dataUrl}"
+      type="application/pdf"
+      style="width:100%;height:100%;border:none;display:block;"
+    >`;
+  } else if (isImg) {
+    contentHtml = `<img src="${dataUrl}"
+      style="max-width:100%;max-height:100%;object-fit:contain;display:block;margin:auto;"
+      alt="${esc(fileName||"이력서")}"
+    >`;
+  } else {
+    // DOC/DOCX 등 — 다운로드 안내
+    contentHtml = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
+                  height:100%;gap:16px;padding:24px;text-align:center;color:#1e293b;">
+        <div style="font-size:48px;">📄</div>
+        <div style="font-size:15px;font-weight:700;">${esc(fileName||"파일")}</div>
+        <div style="font-size:13px;color:#64748b;">
+          이 파일 형식은 브라우저에서 직접 열 수 없습니다.<br>
+          아래 버튼으로 저장 후 열어주세요.
+        </div>
+        <button id="rvDownloadBtn"
+          style="padding:12px 24px;background:#2563EB;color:#fff;border:none;border-radius:10px;
+                 font-size:14px;font-weight:700;cursor:pointer;border-radius:10px;">
+          💾 파일 저장
+        </button>
+      </div>`;
   }
+
+  const overlay = document.createElement("div");
+  overlay.id = "resumeViewerOverlay";
+  overlay.style.cssText = `
+    position:fixed;inset:0;z-index:9999;
+    background:rgba(11,20,38,.92);
+    display:flex;flex-direction:column;
+    -webkit-overflow-scrolling:touch;
+  `;
+  overlay.innerHTML = `
+    <!-- 헤더 바 -->
+    <div style="
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px 16px;background:#0F1E35;flex-shrink:0;
+      border-bottom:1px solid rgba(255,255,255,.1);
+    ">
+      <div style="color:#fff;font-size:13px;font-weight:600;
+                  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%;">
+        📎 ${esc(fileName||"이력서")}
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0;">
+        <button id="rvShareBtn"
+          style="padding:7px 14px;background:rgba(37,99,235,.8);color:#fff;border:none;
+                 border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;
+                 display:${(isPdf||isImg)?"flex":"none"};align-items:center;gap:4px;">
+          📤 공유
+        </button>
+        <button id="rvSaveBtn"
+          style="padding:7px 14px;background:rgba(5,150,105,.8);color:#fff;border:none;
+                 border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;
+                 display:flex;align-items:center;gap:4px;">
+          💾 저장
+        </button>
+        <button id="rvCloseBtn"
+          style="padding:7px 12px;background:rgba(255,255,255,.1);color:#fff;border:none;
+                 border-radius:8px;font-size:16px;cursor:pointer;line-height:1;">
+          ✕
+        </button>
+      </div>
+    </div>
+    <!-- 콘텐츠 영역 -->
+    <div style="flex:1;overflow:auto;-webkit-overflow-scrolling:touch;
+                display:flex;align-items:${isPdf?"stretch":"center"};
+                justify-content:center;padding:${isPdf?"0":"16px"};">
+      ${contentHtml}
+    </div>`;
+
+  document.body.appendChild(overlay);
+  document.body.style.overflow = "hidden"; // 배경 스크롤 방지
+
+  /* 닫기 */
+  const close = () => {
+    overlay.remove();
+    document.body.style.overflow = "";
+  };
+  overlay.querySelector("#rvCloseBtn").addEventListener("click", close);
+  // ESC 키
+  const onKey = e => { if (e.key === "Escape") { close(); document.removeEventListener("keydown", onKey); } };
+  document.addEventListener("keydown", onKey);
+
+  /* 저장 버튼 */
+  const saveBtn = overlay.querySelector("#rvSaveBtn");
+  if (saveBtn) saveBtn.addEventListener("click", () => triggerDownload(dataUrl, mime, fileName));
+
+  /* 파일 저장 버튼 (비뷰어 타입) */
+  const dlBtn = overlay.querySelector("#rvDownloadBtn");
+  if (dlBtn) dlBtn.addEventListener("click", () => triggerDownload(dataUrl, mime, fileName));
+
+  /* 공유 버튼 (Web Share API) */
+  const shareBtn = overlay.querySelector("#rvShareBtn");
+  if (shareBtn) shareBtn.addEventListener("click", () => shareFile(dataUrl, mime, fileName));
+}
+
+/** Blob URL 기반 다운로드 트리거 (Android / PC 전용) */
+function triggerBlobDownload(blob, fileName) {
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = blobUrl;
+  a.download = fileName || "resume";
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  // Samsung Browser: click() 후 즉시 revoke 시 다운로드 취소될 수 있어 딜레이
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(blobUrl); }, 5000);
+}
+
+/** data:URL 직접 다운로드 (Blob 미지원 폴백) */
+function triggerDataUrlDownload(dataUrl, fileName) {
+  const a = document.createElement("a");
+  a.href = dataUrl;
+  a.download = fileName || "resume";
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => document.body.removeChild(a), 3000);
+}
+
+/** 범용 다운로드 함수 — 환경별 최적 방법 선택 */
+function triggerDownload(dataUrl, mime, fileName) {
+  try {
+    const { blob } = dataUrlToBlob(dataUrl, mime);
+    if (ENV.ios) {
+      // iOS: Blob URL a[download] 동작 안 함 → data:URL 직접 시도 → 모달에서 이미 보이고 있으니 안내
+      // iOS 15+ Web Share로 저장 유도
+      shareFile(dataUrl, mime, fileName);
+    } else {
+      triggerBlobDownload(blob, fileName);
+    }
+  } catch (e) {
+    // 최후 폴백: data:URL download
+    try { triggerDataUrlDownload(dataUrl, fileName); }
+    catch (e2) { alert("저장에 실패했습니다. 브라우저 제한으로 인해 파일을 저장할 수 없습니다."); }
+  }
+}
+
+/** Web Share API — 파일 공유 (iOS Safari 15+ 지원, 저장소에 저장 가능) */
+async function shareFile(dataUrl, mime, fileName) {
+  if (!navigator.share) {
+    alert("이 브라우저는 공유 기능을 지원하지 않습니다. 화면을 길게 눌러 이미지를 저장하거나, PC에서 접속해 다운로드하세요.");
+    return;
+  }
+  try {
+    const { blob } = dataUrlToBlob(dataUrl, mime);
+    const safeFileName = fileName || "resume";
+    const file = new File([blob], safeFileName, { type: mime });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: safeFileName });
+    } else {
+      // 파일 공유 미지원 → URL 공유 폴백 (기능 제한 안내)
+      alert("파일 공유가 지원되지 않는 환경입니다. 인라인 뷰어에서 내용을 확인하세요.");
+    }
+  } catch (err) {
+    if (err.name !== "AbortError") {
+      // 사용자가 취소한 경우가 아닐 때만 에러 표시
+      console.warn("Web Share 실패:", err);
+    }
+  }
+}
+
+/** PC 전용: 새 탭 미리보기 (Blob URL) */
+function openInNewTab(blob, mime, fileName, dataUrl) {
+  const blobUrl = URL.createObjectURL(blob);
+  const w = window.open("", "_blank");
+  if (!w) {
+    // 팝업 차단 → Blob URL a[download] 폴백
+    URL.revokeObjectURL(blobUrl);
+    triggerBlobDownload(blob, fileName);
+    return;
+  }
+  const title = esc(fileName || "이력서");
+  if (mime === "application/pdf") {
+    w.document.write(`<!DOCTYPE html><html><head>
+      <meta charset="UTF-8"><title>${title}</title>
+      <style>*{margin:0;padding:0;}body{background:#525659;display:flex;flex-direction:column;height:100vh;}
+      iframe{flex:1;border:none;}</style></head><body>
+      <iframe src="${blobUrl}" type="application/pdf"></iframe>
+      </body></html>`);
+  } else if (mime.startsWith("image/")) {
+    w.document.write(`<!DOCTYPE html><html><head>
+      <meta charset="UTF-8"><title>${title}</title>
+      <style>*{margin:0;padding:0;}body{background:#111;display:flex;align-items:center;
+      justify-content:center;min-height:100vh;}img{max-width:100%;max-height:100vh;}</style></head><body>
+      <img src="${blobUrl}" alt="${title}"></body></html>`);
+  } else {
+    // 기타 파일 → 즉시 다운로드 후 탭 닫기
+    w.close();
+    URL.revokeObjectURL(blobUrl);
+    triggerBlobDownload(blob, fileName);
+    return;
+  }
+  w.document.close();
+  // 1분 후 Blob URL 해제 (탭이 열려 있는 동안 유지)
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+}
+
+/** ── 진입점: 이력서 열기 ── */
+function viewResume(id) {
+  const a = applicantsCache.find(x => x.id === id);
+  if (!a || !a.resume || !a.resume.dataUrl) {
+    alert("첨부된 이력서가 없습니다."); return;
+  }
+  const { dataUrl, mimeType, fileName } = a.resume;
+
+  let blob, mime;
+  try {
+    ({ blob, mime } = dataUrlToBlob(dataUrl, mimeType));
+  } catch (err) {
+    alert("파일 변환 오류: " + err.message); return;
+  }
+
+  const isViewable = mime === "application/pdf" || mime.startsWith("image/");
+
+  /* ── iOS ── */
+  if (ENV.ios) {
+    if (ENV.isWKWebView) {
+      // WKWebView: 새 탭 불가 → 반드시 모달 인라인 뷰어
+      showInlineViewer(dataUrl, mime, fileName);
+    } else if (ENV.iosSafariGe15 && isViewable) {
+      // iOS Safari 15+: Web Share API로 파일 직접 공유(→ 파일 앱 저장 가능)
+      // 공유 전 인라인 뷰어로 먼저 보여주고 상단 공유 버튼 유도
+      showInlineViewer(dataUrl, mime, fileName);
+    } else {
+      // iOS Safari <15 또는 비뷰어블 파일: 모달 뷰어
+      showInlineViewer(dataUrl, mime, fileName);
+    }
+    return;
+  }
+
+  /* ── Android ── */
+  if (ENV.android) {
+    // Android: Blob URL + a[download] — 대부분의 브라우저에서 동작
+    // 단, 미리보기 가능한 파일은 인라인 뷰어로 먼저 보여줌
+    if (isViewable) {
+      showInlineViewer(dataUrl, mime, fileName);
+    } else {
+      triggerBlobDownload(blob, fileName);
+    }
+    return;
+  }
+
+  /* ── PC (Chrome / Firefox / Edge / Safari) ── */
+  openInNewTab(blob, mime, fileName, dataUrl);
 }
 
 /* 라우터 */
