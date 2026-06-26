@@ -1508,10 +1508,16 @@ function renderInterviews(){
     const actionBtns=
       a.status==="면접예정"?`<button class="btn btn-primary btn-sm" data-action="interview-done" data-id="${a.id}">면접완료</button>`:
       a.status==="면접완료"?`<button class="btn btn-success btn-sm" data-action="interview-pass" data-id="${a.id}">최종합격</button><button class="btn btn-danger btn-sm" data-action="interview-fail" data-id="${a.id}">불합격</button>`:"";
+    const ageTxt       = a.age       ? `${a.age}세`              : `-`;
+    const addressTxt   = a.address   ? esc(a.address)            : `-`;
+    const salaryTxt    = a.prevSalary? `${Number(a.prevSalary).toLocaleString()}만` : `-`;
     return `<tr>
       <td><div class="cell-name">${esc(a.name)}</div><div class="cell-sub">${esc(a.phone||"")}</div></td>
       <td>${esc(a.jobTitle||"-")}</td>
       <td>${esc(a.experience||"-")}</td>
+      <td class="center">${ageTxt}</td>
+      <td><div class="cell-name" style="font-size:12px;font-weight:500;">${addressTxt}</div></td>
+      <td class="center" style="white-space:nowrap;">${salaryTxt}</td>
       <td><div>${dtLabel}</div></td>
       <td>${resumeCell}</td>
       <td><div>${statusBadge(a.status)}</div>${evalBadge}</td>
@@ -1522,7 +1528,7 @@ function renderInterviews(){
         <button class="btn btn-danger btn-xs" data-action="remove-applicant" data-id="${a.id}">삭제</button>
       </td>
     </tr>`; }).join(""):
-    `<tr class="empty-row"><td colspan="7"><span class="empty-icon">🗓</span>${interviewSearch?"검색 결과가 없습니다.":"등록된 면접 대상자가 없습니다."}</td></tr>`;
+    `<tr class="empty-row"><td colspan="10"><span class="empty-icon">🗓</span>${interviewSearch?"검색 결과가 없습니다.":"등록된 면접 대상자가 없습니다."}</td></tr>`;
 
   contentEl.innerHTML=`
   <div class="page-header">
@@ -1534,7 +1540,7 @@ function renderInterviews(){
       <input class="filter-input" type="text" id="interviewSearch" placeholder="🔍  성명 · 직무 · 연락처 검색" value="${esc(interviewSearch)}">
     </div>
     <div class="panel-body"><table>
-      <thead><tr><th>성명</th><th>지원직무</th><th>경력</th><th>면접일시</th><th>이력서</th><th>상태</th><th>관리</th></tr></thead>
+      <thead><tr><th>성명</th><th>지원직무</th><th>경력</th><th style="text-align:center">나이</th><th>거주지</th><th style="text-align:center">직전연봉</th><th>면접일시</th><th>이력서</th><th>상태</th><th>관리</th></tr></thead>
       <tbody>${rows}</tbody>
     </table></div>
   </div>`;
