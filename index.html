@@ -250,6 +250,8 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .badge-active    { background: rgba(37,99,235,.12); color: var(--brand); }
 .badge-closed    { background: rgba(100,116,139,.1); color: var(--slate-500); }
 .badge-eval      { background: rgba(13,148,136,.12); color: var(--teal); }
+.badge-eval-done { background: rgba(5,150,105,.15); color: var(--emerald); cursor: pointer; }
+.badge-eval-done:hover { background: rgba(5,150,105,.28); }
 .badge-contract  { background: rgba(5,150,105,.12); color: var(--emerald); }
 
 /* MODAL */
@@ -265,6 +267,9 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   width: 500px; max-width: 100%; max-height: 90vh; overflow-y: auto;
   box-shadow: var(--shadow-lg); animation: slideUp .2s cubic-bezier(0.34,1.56,0.64,1);
 }
+.modal-wide {
+  width: 720px;
+}
 @keyframes slideUp { from { transform: translateY(20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
 .modal-head { padding: 22px 24px 0; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .modal-title { font-size: 17px; font-weight: 700; color: var(--slate-900); letter-spacing: -0.4px; }
@@ -272,6 +277,23 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .modal-close:hover { background: var(--slate-100); color: var(--slate-700); }
 .modal-body   { padding: 0 24px; }
 .modal-footer { padding: 20px 24px 24px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--slate-100); margin-top: 20px; }
+
+/* EVALUATION PREVIEW MODAL */
+.eval-modal-preview {
+  background: var(--navy);
+  border-radius: var(--radius-md);
+  padding: 22px;
+  color: rgba(255,255,255,.88);
+  font-size: 13px;
+  line-height: 1.85;
+  white-space: pre-wrap;
+  font-family: 'Noto Sans KR', monospace;
+  max-height: 60vh;
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+.eval-modal-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.eval-modal-meta .badge { font-size: 12px; padding: 4px 12px; }
 
 /* FORM */
 .form-group { margin-bottom: 15px; }
@@ -281,6 +303,7 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .form-control[readonly] { background: var(--slate-50); color: var(--slate-500); }
 .form-hint { font-size: 11px; color: var(--slate-400); margin-top: 5px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 .resume-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(37,99,235,.07); border: 1px solid rgba(37,99,235,.2); border-radius: var(--radius-sm); padding: 7px 12px; margin-top: 8px; font-size: 12px; color: var(--brand); }
 .resume-tag a { color: var(--brand); text-decoration: none; font-weight: 600; }
 .resume-tag a:hover { text-decoration: underline; }
@@ -353,7 +376,7 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .bar-count  { width: 30px; text-align: right; font-size: 13px; font-weight: 700; color: var(--slate-700); }
 
 /* ══════════════════════════════════════════════════
-   이력서 인라인 뷰어  v5.0  ― PDF.js 캔버스 렌더링
+   이력서 인라인 뷰어  v5.1  ― 핀치줌/더블탭 확대 추가
    ══════════════════════════════════════════════════ */
 @keyframes rv-in {
   from { opacity:0; transform:translateY(100%); }
@@ -366,11 +389,9 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   background: #0B1426;
   display: flex;
   flex-direction: column;
-  /* iOS 안전 영역 */
   padding-top: env(safe-area-inset-top, 0);
   padding-bottom: env(safe-area-inset-bottom, 0);
   animation: rv-in .25s cubic-bezier(.25,.46,.45,.94) both;
-  /* 모바일에서 overflow 처리는 내부 .rv-body에서 담당 */
   overflow: hidden;
 }
 #rv-toolbar {
@@ -394,6 +415,58 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   white-space: nowrap;
 }
 #rv-btns { display: flex; gap: 6px; flex-shrink: 0; }
+/* 확대/축소 컨트롤 바 */
+#rv-zoom-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: rgba(255,255,255,.05);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+#rv-zoom-label {
+  color: rgba(255,255,255,.55);
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 46px;
+  text-align: center;
+}
+.rv-zoom-btn {
+  width: 32px; height: 32px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 6px;
+  background: rgba(255,255,255,.1);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+.rv-zoom-btn:active { background: rgba(255,255,255,.22); }
+#rv-zoom-reset {
+  padding: 6px 12px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 6px;
+  background: rgba(255,255,255,.1);
+  color: rgba(255,255,255,.75);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+#rv-zoom-hint {
+  font-size: 10px;
+  color: rgba(255,255,255,.3);
+  margin-left: auto;
+  white-space: nowrap;
+}
 .rv-btn {
   padding: 9px 16px;
   border: none;
@@ -415,18 +488,24 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   position: relative;
-  /* PDF iframe이 꽉 채워지도록 */
   display: flex;
   flex-direction: column;
+  /* 핀치줌 때 body 자체가 zoom되지 않도록 */
+  touch-action: pan-x pan-y;
 }
-/* PDF iframe (폴백용) */
-#rv-pdf-frame {
+/* 핀치줌/이동 컨테이너 */
+#rv-transform-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  height: 100%;
-  flex: 1;
-  border: none;
-  display: block;
-  background: #fff;
+  min-height: 100%;
+  transform-origin: center top;
+  will-change: transform;
+  /* 부드러운 트랜지션은 버튼 클릭 시에만 */
+}
+#rv-transform-wrap.animated {
+  transition: transform .2s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 /* PDF.js 캔버스 페이지 컨테이너 */
 #rv-pdf-pages {
@@ -447,6 +526,15 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   border-radius: 2px;
   max-width: 100%;
 }
+/* PDF iframe */
+#rv-pdf-frame {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  border: none;
+  display: block;
+  background: #fff;
+}
 /* 이미지 컨테이너 */
 #rv-img-wrap {
   display: flex;
@@ -463,7 +551,7 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   box-shadow: 0 4px 24px rgba(0,0,0,.5);
   display: block;
 }
-/* 에러 / 열람불가 안내 */
+/* 에러 안내 */
 #rv-fallback {
   display: flex;
   flex-direction: column;
@@ -503,7 +591,7 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
 /* RESPONSIVE */
 @media (max-width: 1100px) { .eval-layout { grid-template-columns: 1fr; } .eval-preview-panel { position: static; } }
-@media (max-width: 900px)  { .stat-grid { grid-template-columns: repeat(2, 1fr); } .settings-grid { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
+@media (max-width: 900px)  { .stat-grid { grid-template-columns: repeat(2, 1fr); } .settings-grid { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } .form-row-3 { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 768px)  {
   :root { --sidebar-w: 0px; }
   .menu-toggle { display: block; }
@@ -517,6 +605,7 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   .notif-item { padding: 12px 16px; }
   .stat-grid  { gap: 12px; }
   .stat-value { font-size: 28px; }
+  #rv-zoom-hint { display: none; }
 }
 @media (max-width: 480px) {
   .stat-grid { grid-template-columns: 1fr 1fr; }
@@ -531,8 +620,9 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   .filter-input { min-width: 0; }
   .eval-score-row { flex-direction: column; align-items: flex-start; }
   .rec-btn-group { flex-direction: column; }
-  /* 모바일 뷰어 버튼 간소화 */
   .rv-btn { padding: 8px 12px; font-size: 12px; }
+  .form-row-3 { grid-template-columns: 1fr; }
+  #rv-zoom-bar { gap: 6px; padding: 7px 10px; }
 }
 </style>
 </head>
@@ -601,7 +691,7 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
       <li><a data-view="notifications"><span class="nav-icon">🔔</span> 알림<span class="nav-badge" id="unreadBadge" style="display:none">0</span></a></li>
       <li><a data-view="system"><span class="nav-icon">⚙️</span> 시스템 설정</a></li>
     </ul>
-    <div class="sidebar-footer">ATS v2.1 · Firebase 연동</div>
+    <div class="sidebar-footer">ATS v2.2 · Firebase 연동</div>
   </nav>
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
@@ -688,76 +778,56 @@ async function notify(message, type="info") {
 function getApplicantName(id){ const a=applicantsCache.find(x=>x.id===id); return a?a.name:"지원자"; }
 
 /* 모달 */
-function showModal(html){ closeModal(); const ov=document.createElement("div"); ov.className="modal-overlay"; ov.id="modalOverlay"; ov.innerHTML=`<div class="modal">${html}</div>`; ov.addEventListener("click",e=>{ if(e.target===ov)closeModal(); }); document.body.appendChild(ov); }
+function showModal(html, wide=false){
+  closeModal();
+  const ov=document.createElement("div");
+  ov.className="modal-overlay";
+  ov.id="modalOverlay";
+  ov.innerHTML=`<div class="modal${wide?" modal-wide":""}">${html}</div>`;
+  ov.addEventListener("click",e=>{ if(e.target===ov)closeModal(); });
+  document.body.appendChild(ov);
+}
 function closeModal(){ const ov=document.getElementById("modalOverlay"); if(ov)ov.remove(); }
 
 /* 파일 읽기 */
 function readFile(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(file); }); }
 
 /* ════════════════════════════════════════════════════════════════════
-   이력서 뷰어  v5.0  ―  PDF.js 캔버스 렌더링 기반 재설계
+   이력서 뷰어  v5.1  ─  PDF.js 캔버스 렌더링 + 핀치줌/버튼줌 기능
 
-   ▸ 변경 배경 (모바일 흰 화면 버그 수정)
-   기존 v4는 PDF를 <iframe src="blob:...">로 그대로 주입했습니다.
-   이 방식은 "브라우저의 내장 PDF 플러그인"이 iframe 안에서 PDF를
-   렌더링해 줄 때만 동작합니다. 데스크탑 Chrome/Edge/Firefox는 이런
-   플러그인이 있지만, 모바일에서는 사실상 거의 항상 없습니다.
-     - Android Chrome / 삼성인터넷 / WebView 계열: iframe 안에서
-       PDF 뷰어가 활성화되지 않아 빈(흰) 페이지만 표시됨
-     - iOS Safari: 일부 버전/환경에서 동일하게 빈 화면 발생
-     - 카카오톡·네이버 등 인앱 브라우저(WKWebView): 거의 항상 실패
-   → 결과적으로 "모바일에서는 이력서가 안 보이고 흰 화면만 나옴"
-
-   ▸ 해결책
-   PDF.js(Mozilla)를 이용해 PDF의 각 페이지를 직접 <canvas>에 그려서
-   화면에 표시합니다. 이 방식은 브라우저의 PDF 뷰어 기능과 전혀
-   무관하게 동작하므로, 안드로이드/아이폰/인앱브라우저 등 어떤
-   환경에서도 동일하게 렌더링됩니다.
-   PDF.js는 동적 import()로 필요할 때만 불러오며, 로드에 실패하면
-   기존 iframe 방식으로 자동 폴백합니다(완전히 막히는 일은 없음).
+   수정 사항 (v5.0 → v5.1):
+   ▸ 모바일에서 핀치투줌(두 손가락 확대/축소) 지원
+   ▸ 더블탭으로 확대/원래 크기 토글
+   ▸ 줌 컨트롤 바(−/+/100%) 버튼 추가
+   ▸ 확대 시 드래그 패닝 지원
    ════════════════════════════════════════════════════════════════════ */
 
 /* ── 환경 감지 ── */
 const ENV = (() => {
   const ua = navigator.userAgent;
-
-  // iOS 판별 (iPad Pro는 MacIntel + maxTouchPoints로 구분)
   const isIOS =
     /iPhone|iPod/i.test(ua) ||
     /iPad/i.test(ua) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
   const isAndroid = /Android/i.test(ua);
-
-  // iOS 메이저 버전 (Web Share Files API: iOS 15.0+)
   const iosVerMatch =
     ua.match(/OS (\d+)[_\d]+ like Mac OS/i) ||
     ua.match(/CPU iPhone OS (\d+)/i);
   const iosVersion = isIOS && iosVerMatch ? parseInt(iosVerMatch[1], 10) : 0;
-
-  // WKWebView (카카오/네이버 인앱 브라우저)
   const isWKWebView =
     isIOS && (
-      !/Safari/i.test(ua) ||                          // Safari 문자열 없음
-      /KAKAO|NAVER|Line|Instagram|FB_IAB/i.test(ua) || // 알려진 인앱
-      !!(window.webkit?.messageHandlers)               // 네이티브 브릿지
+      !/Safari/i.test(ua) ||
+      /KAKAO|NAVER|Line|Instagram|FB_IAB/i.test(ua) ||
+      !!(window.webkit?.messageHandlers)
     );
-
-  // Samsung Internet
   const isSamsung = /SamsungBrowser/i.test(ua);
-
-  // 모바일 여부
   const isMobile = isIOS || isAndroid;
-
-  // Web Share API 지원
   const hasWebShare = "share" in navigator;
-  // Web Share Files 지원 (iOS15+ / Android Chrome 일부)
   const hasWebShareFiles = hasWebShare && "canShare" in navigator;
-
   return { isIOS, isAndroid, iosVersion, isWKWebView, isSamsung, isMobile, hasWebShare, hasWebShareFiles };
 })();
 
-/* ── PDF.js 동적 로더 (CDN, 실패해도 앱 전체에 영향 없음) ── */
+/* ── PDF.js 동적 로더 ── */
 const PDFJS_VERSION = "5.4.149";
 const PDFJS_BASE = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/`;
 let _pdfjsLibPromise = null;
@@ -773,28 +843,23 @@ function loadPdfJs() {
   return _pdfjsLibPromise;
 }
 
-/* ── dataURL → Blob 변환  (청크 처리, 스택오버플로 방지) ── */
+/* ── dataURL → Blob 변환 ── */
 function dataUrlToBlob(dataUrl, fallbackMime = "application/octet-stream") {
   const commaIdx = dataUrl.indexOf(",");
   if (commaIdx === -1) throw new Error("잘못된 dataURL 형식입니다.");
-
   const header = dataUrl.slice(0, commaIdx);
   const b64    = dataUrl.slice(commaIdx + 1);
   const mime   = header.match(/:(.*?);/)?.[1] || fallbackMime;
-
-  // ★ 청크 단위 디코딩 (기존 atob(전체) 방식은 수백KB에서 스택오버플로 유발)
   const CHUNK = 8192;
   const raw   = atob(b64);
   const len   = raw.length;
   const buffers = [];
-
   for (let i = 0; i < len; i += CHUNK) {
     const end  = Math.min(i + CHUNK, len);
     const view = new Uint8Array(end - i);
     for (let j = i; j < end; j++) view[j - i] = raw.charCodeAt(j);
     buffers.push(view);
   }
-
   return { blob: new Blob(buffers, { type: mime }), mime };
 }
 
@@ -805,7 +870,7 @@ function makeBlobUrl(blob, ttlMs = 180_000) {
   return url;
 }
 
-/* ── body 스크롤 잠금 / 해제 (iOS 완전 처리) ── */
+/* ── body 스크롤 잠금 / 해제 ── */
 let _scrollY = 0;
 function lockBodyScroll() {
   _scrollY = window.scrollY;
@@ -828,7 +893,7 @@ function unlockBodyScroll() {
   }
 }
 
-/* ── iOS Web Share: 파일 공유 ── */
+/* ── iOS Web Share ── */
 async function shareFile(blob, mime, fileName) {
   if (!ENV.hasWebShare) return false;
   try {
@@ -839,12 +904,11 @@ async function shareFile(blob, mime, fileName) {
         return true;
       }
     }
-    // files 미지원이면 URL 공유로 폴백 (파일앱 저장은 불가하지만 UX 제공)
     const blobUrl = makeBlobUrl(blob, 30_000);
     await navigator.share({ url: blobUrl, title: fileName });
     return true;
   } catch (err) {
-    if (err.name === "AbortError") return true; // 사용자 취소 = 정상
+    if (err.name === "AbortError") return true;
     console.warn("[WebShare] 실패:", err.name, err.message);
     return false;
   }
@@ -867,9 +931,7 @@ function openNewTab(blob, mime, fileName) {
   const blobUrl = makeBlobUrl(blob, 90_000);
   const w = window.open("", "_blank");
   if (!w) { downloadBlob(blob, fileName); return; }
-
   const safeTitle = fileName ? fileName.replace(/</g,"&lt;") : "이력서";
-
   if (mime === "application/pdf") {
     w.document.write(`<!DOCTYPE html><html lang="ko"><head>
       <meta charset="UTF-8"><title>${safeTitle}</title>
@@ -899,16 +961,171 @@ function openNewTab(blob, mime, fileName) {
 }
 
 /* ════════════════════════════════════════════════════════
+   핀치줌 / 더블탭 / 버튼줌 컨트롤러
+   ════════════════════════════════════════════════════════ */
+function createZoomController(bodyEl, transformWrapEl, zoomLabelEl) {
+  const MIN_SCALE = 0.5;
+  const MAX_SCALE = 4.0;
+  const STEP      = 0.25;
+
+  let scale      = 1.0;
+  let translateX = 0;
+  let translateY = 0;
+
+  // 패닝용 상태
+  let isPanning    = false;
+  let panStartX    = 0;
+  let panStartY    = 0;
+  let panOriginTX  = 0;
+  let panOriginTY  = 0;
+
+  // 핀치용 상태
+  let isPinching    = false;
+  let pinchStartDist = 0;
+  let pinchStartScale = 1;
+  let pinchMidX    = 0;
+  let pinchMidY    = 0;
+  let pinchOriginTX = 0;
+  let pinchOriginTY = 0;
+
+  // 더블탭
+  let lastTapTime = 0;
+  let lastTapX    = 0;
+  let lastTapY    = 0;
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function applyTransform(animate = false) {
+    if (animate) {
+      transformWrapEl.classList.add("animated");
+      setTimeout(() => transformWrapEl.classList.remove("animated"), 220);
+    }
+    transformWrapEl.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+    if (zoomLabelEl) zoomLabelEl.textContent = Math.round(scale * 100) + "%";
+  }
+
+  function clampTranslate() {
+    if (scale <= 1.0) {
+      translateX = 0;
+      translateY = 0;
+      return;
+    }
+    const wrapW = transformWrapEl.offsetWidth  || window.innerWidth;
+    const wrapH = transformWrapEl.scrollHeight || window.innerHeight;
+    const maxTX = (wrapW  * (scale - 1)) / (2 * scale);
+    const maxTY = (wrapH  * (scale - 1)) / (2 * scale);
+    translateX = clamp(translateX, -maxTX, maxTX);
+    translateY = clamp(translateY, -maxTY, maxTY);
+  }
+
+  /* 버튼 줌 */
+  function zoomIn()    { scale = clamp(scale + STEP, MIN_SCALE, MAX_SCALE); clampTranslate(); applyTransform(true); }
+  function zoomOut()   { scale = clamp(scale - STEP, MIN_SCALE, MAX_SCALE); clampTranslate(); applyTransform(true); }
+  function zoomReset() { scale = 1.0; translateX = 0; translateY = 0; applyTransform(true); }
+
+  /* 핀치 거리 계산 */
+  function getTouchDist(t1, t2) {
+    return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+  }
+  function getTouchMid(t1, t2, container) {
+    const rect = container.getBoundingClientRect();
+    return {
+      x: (t1.clientX + t2.clientX) / 2 - rect.left,
+      y: (t1.clientY + t2.clientY) / 2 - rect.top
+    };
+  }
+
+  /* 터치 이벤트 */
+  bodyEl.addEventListener("touchstart", onTouchStart, { passive: false });
+  bodyEl.addEventListener("touchmove",  onTouchMove,  { passive: false });
+  bodyEl.addEventListener("touchend",   onTouchEnd,   { passive: false });
+
+  function onTouchStart(e) {
+    if (e.touches.length === 2) {
+      // 핀치 시작
+      isPinching = true;
+      isPanning  = false;
+      pinchStartDist  = getTouchDist(e.touches[0], e.touches[1]);
+      pinchStartScale = scale;
+      const mid = getTouchMid(e.touches[0], e.touches[1], bodyEl);
+      pinchMidX = mid.x;
+      pinchMidY = mid.y;
+      pinchOriginTX = translateX;
+      pinchOriginTY = translateY;
+      e.preventDefault();
+    } else if (e.touches.length === 1) {
+      // 더블탭 감지
+      const now = Date.now();
+      const tx  = e.touches[0].clientX;
+      const ty  = e.touches[0].clientY;
+      if (now - lastTapTime < 300 && Math.abs(tx - lastTapX) < 30 && Math.abs(ty - lastTapY) < 30) {
+        // 더블탭: 확대/초기화 토글
+        if (scale > 1.0) {
+          zoomReset();
+        } else {
+          scale = 2.0;
+          clampTranslate();
+          applyTransform(true);
+        }
+        lastTapTime = 0;
+        e.preventDefault();
+        return;
+      }
+      lastTapTime = now;
+      lastTapX    = tx;
+      lastTapY    = ty;
+
+      // 패닝 시작 (확대 상태일 때만)
+      if (scale > 1.01) {
+        isPanning   = true;
+        panStartX   = e.touches[0].clientX;
+        panStartY   = e.touches[0].clientY;
+        panOriginTX = translateX;
+        panOriginTY = translateY;
+      }
+    }
+  }
+
+  function onTouchMove(e) {
+    if (e.touches.length === 2 && isPinching) {
+      const dist     = getTouchDist(e.touches[0], e.touches[1]);
+      const newScale = clamp(pinchStartScale * (dist / pinchStartDist), MIN_SCALE, MAX_SCALE);
+      scale = newScale;
+      clampTranslate();
+      applyTransform(false);
+      e.preventDefault();
+    } else if (e.touches.length === 1 && isPanning && scale > 1.01) {
+      const dx = (e.touches[0].clientX - panStartX) / scale;
+      const dy = (e.touches[0].clientY - panStartY) / scale;
+      translateX = panOriginTX + dx;
+      translateY = panOriginTY + dy;
+      clampTranslate();
+      applyTransform(false);
+      e.preventDefault();
+    }
+  }
+
+  function onTouchEnd(e) {
+    if (e.touches.length < 2) isPinching = false;
+    if (e.touches.length === 0) {
+      isPanning = false;
+      // 축소되었으면 위치 초기화
+      if (scale <= 1.0) { translateX = 0; translateY = 0; applyTransform(false); }
+    }
+  }
+
+  return { zoomIn, zoomOut, zoomReset };
+}
+
+/* ════════════════════════════════════════════════════════
    인라인 뷰어 핵심 함수
    ════════════════════════════════════════════════════════ */
 function openInlineViewer(blob, mime, fileName, rawDataUrl) {
-  // 중복 방지
   document.getElementById("rv-overlay")?.remove();
 
   const isPdf = mime === "application/pdf";
   const isImg = mime.startsWith("image/");
 
-  /* 저장 버튼 핸들러 */
   const handleSave = async () => {
     if (ENV.isIOS) {
       const ok = await shareFile(blob, mime, fileName);
@@ -920,14 +1137,15 @@ function openInlineViewer(blob, mime, fileName, rawDataUrl) {
     }
   };
 
-  /* ── DOM 구성 ── */
   const overlay = document.createElement("div");
   overlay.id = "rv-overlay";
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", "이력서 뷰어");
 
-  // 툴바
+  // 줌 컨트롤 바는 PDF/이미지일 때만 표시
+  const showZoomBar = isPdf || isImg;
+
   overlay.innerHTML = `
     <div id="rv-toolbar">
       <span id="rv-filename">📎 ${fileName || "이력서"}</span>
@@ -938,6 +1156,14 @@ function openInlineViewer(blob, mime, fileName, rawDataUrl) {
         <button class="rv-btn rv-btn-close" id="rv-close-btn" aria-label="닫기">✕ 닫기</button>
       </div>
     </div>
+    ${showZoomBar ? `
+    <div id="rv-zoom-bar">
+      <button class="rv-zoom-btn" id="rv-zoom-out" aria-label="축소">−</button>
+      <span id="rv-zoom-label">100%</span>
+      <button class="rv-zoom-btn" id="rv-zoom-in" aria-label="확대">+</button>
+      <button id="rv-zoom-reset">초기화</button>
+      <span id="rv-zoom-hint">핀치로 확대 · 더블탭으로 2배</span>
+    </div>` : ""}
     <div id="rv-body">
       <div id="rv-loading">
         <div class="rv-spinner"></div>
@@ -948,10 +1174,11 @@ function openInlineViewer(blob, mime, fileName, rawDataUrl) {
   document.body.appendChild(overlay);
   lockBodyScroll();
 
-  const bodyEl   = overlay.querySelector("#rv-body");
+  const bodyEl    = overlay.querySelector("#rv-body");
   const loadingEl = overlay.querySelector("#rv-loading");
+  const zoomLabel = overlay.querySelector("#rv-zoom-label");
 
-  /* ── 닫기 로직 ── */
+  /* 닫기 */
   const closeViewer = () => {
     overlay.remove();
     unlockBodyScroll();
@@ -962,14 +1189,39 @@ function openInlineViewer(blob, mime, fileName, rawDataUrl) {
   overlay.querySelector("#rv-save-btn").addEventListener("click", handleSave);
   document.addEventListener("keydown", onKey);
 
-  /* ── 콘텐츠 렌더링 ── */
+  /* 콘텐츠 렌더링 */
   if (isPdf) {
-    _renderPdf(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl);
+    _renderPdf(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl).then(() => {
+      if (showZoomBar) _attachZoomControls(overlay, bodyEl, zoomLabel);
+    });
   } else if (isImg) {
     _renderImage(bodyEl, loadingEl, blob, fileName);
+    if (showZoomBar) {
+      // 이미지 로드 후 컨트롤 연결
+      setTimeout(() => _attachZoomControls(overlay, bodyEl, zoomLabel), 300);
+    }
   } else {
     _renderFallback(bodyEl, loadingEl, fileName, handleSave);
   }
+}
+
+/* 줌 컨트롤 버튼 연결 */
+function _attachZoomControls(overlay, bodyEl, zoomLabelEl) {
+  // 변환 래퍼 생성 (기존 자식들을 감쌈)
+  const existingChildren = Array.from(bodyEl.children).filter(c => c.id !== "rv-loading");
+  const wrap = document.createElement("div");
+  wrap.id = "rv-transform-wrap";
+  existingChildren.forEach(c => wrap.appendChild(c));
+  bodyEl.appendChild(wrap);
+
+  const ctrl = createZoomController(bodyEl, wrap, zoomLabelEl);
+
+  const btnIn    = overlay.querySelector("#rv-zoom-in");
+  const btnOut   = overlay.querySelector("#rv-zoom-out");
+  const btnReset = overlay.querySelector("#rv-zoom-reset");
+  if (btnIn)    btnIn.addEventListener("click",    () => ctrl.zoomIn());
+  if (btnOut)   btnOut.addEventListener("click",   () => ctrl.zoomOut());
+  if (btnReset) btnReset.addEventListener("click", () => ctrl.zoomReset());
 }
 
 /* PDF 렌더링 — PDF.js 우선, 실패 시 iframe 폴백 */
@@ -984,9 +1236,7 @@ async function _renderPdf(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl) {
   _renderPdfIframeFallback(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl);
 }
 
-/* PDF.js로 각 페이지를 캔버스에 직접 그려서 표시
-   (브라우저의 내장 PDF 플러그인에 의존하지 않으므로 모든 모바일
-    브라우저·인앱 웹뷰에서 동일하게 동작합니다) */
+/* PDF.js 캔버스 렌더링 */
 async function _renderPdfWithPdfJs(bodyEl, loadingEl, blob, pdfjsLib) {
   const arrayBuffer = await blob.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -1017,40 +1267,24 @@ async function _renderPdfWithPdfJs(bodyEl, loadingEl, blob, pdfjsLib) {
 
     if (pageNum === 1) loadingEl.style.display = "none";
   }
-
   if (pdf.numPages === 0) loadingEl.style.display = "none";
 }
 
-/* 기존 iframe 방식 (PDF.js 로드/렌더링 실패 시에만 사용하는 최후 폴백) */
+/* iframe 폴백 */
 function _renderPdfIframeFallback(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl) {
   const useGoogleProxy = ENV.isIOS && (ENV.iosVersion > 0 && ENV.iosVersion < 15);
-  const useDirectBlob  = !useGoogleProxy; // iOS15+, Android, PC 모두
-
-  if (useDirectBlob) {
-    // ── Blob URL iframe ──
-    const blobUrl = makeBlobUrl(blob, 300_000); // 5분
+  if (!useGoogleProxy) {
+    const blobUrl = makeBlobUrl(blob, 300_000);
     const iframe = document.createElement("iframe");
     iframe.id    = "rv-pdf-frame";
     iframe.title = fileName || "이력서";
     iframe.setAttribute("allowfullscreen", "");
-    // iOS: allow-same-origin 없이 sandbox 지정 시 PDF 렌더링 차단됨 → sandbox 없이 사용
     iframe.src = blobUrl;
-
     let loaded = false;
-    iframe.addEventListener("load", () => {
-      loaded = true;
-      loadingEl.style.display = "none";
-    });
-
-    // 5초 후에도 load 이벤트가 안 오면 (일부 iOS에서 발생) 스피너만 제거
-    setTimeout(() => {
-      if (!loaded) loadingEl.style.display = "none";
-    }, 5000);
-
+    iframe.addEventListener("load", () => { loaded = true; loadingEl.style.display = "none"; });
+    setTimeout(() => { if (!loaded) loadingEl.style.display = "none"; }, 5000);
     bodyEl.appendChild(iframe);
-
   } else {
-    // ── iOS 14 이하: base64 data URI를 새 HTML로 감싸서 iframe에 주입 ──
     const pdfDataUrl = rawDataUrl || "";
     const srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8">
       <style>*{margin:0;padding:0;}html,body{width:100%;height:100%;overflow:hidden;}
@@ -1058,20 +1292,14 @@ function _renderPdfIframeFallback(bodyEl, loadingEl, blob, mime, fileName, rawDa
       </style></head><body>
       <object data="${pdfDataUrl}" type="application/pdf">
         <embed src="${pdfDataUrl}" type="application/pdf">
-      </object>
-      </body></html>`;
-
+      </object></body></html>`;
     const iframe = document.createElement("iframe");
     iframe.id    = "rv-pdf-frame";
     iframe.title = fileName || "이력서";
     iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
     iframe.srcdoc = srcdoc;
-
-    iframe.addEventListener("load", () => {
-      loadingEl.style.display = "none";
-    });
+    iframe.addEventListener("load", () => { loadingEl.style.display = "none"; });
     setTimeout(() => { loadingEl.style.display = "none"; }, 4000);
-
     bodyEl.appendChild(iframe);
   }
 }
@@ -1079,18 +1307,12 @@ function _renderPdfIframeFallback(bodyEl, loadingEl, blob, mime, fileName, rawDa
 /* 이미지 렌더링 */
 function _renderImage(bodyEl, loadingEl, blob, fileName) {
   const blobUrl = makeBlobUrl(blob, 300_000);
-
   const wrap = document.createElement("div");
   wrap.id = "rv-img-wrap";
-
   const img = document.createElement("img");
   img.alt = fileName || "이력서 이미지";
   img.src = blobUrl;
-
-  img.addEventListener("load", () => {
-    loadingEl.style.display = "none";
-  });
-
+  img.addEventListener("load",  () => { loadingEl.style.display = "none"; });
   img.addEventListener("error", () => {
     loadingEl.style.display = "none";
     wrap.innerHTML = `
@@ -1100,15 +1322,13 @@ function _renderImage(bodyEl, loadingEl, blob, fileName) {
         <div style="font-size:12px;margin-top:6px;opacity:.6;">${fileName || ""}</div>
       </div>`;
   });
-
   wrap.appendChild(img);
   bodyEl.appendChild(wrap);
 }
 
-/* 열람 불가 파일 (DOC/DOCX 등) */
+/* 열람 불가 파일 */
 function _renderFallback(bodyEl, loadingEl, fileName, handleSave) {
   loadingEl.style.display = "none";
-
   const div = document.createElement("div");
   div.id = "rv-fallback";
   div.innerHTML = `
@@ -1121,7 +1341,6 @@ function _renderFallback(bodyEl, loadingEl, fileName, handleSave) {
     <button id="rv-fallback-save" class="rv-btn rv-btn-save" style="margin-top:8px;padding:14px 32px;font-size:14px;">
       ${ENV.isIOS ? "📤 저장/공유" : "💾 파일 저장"}
     </button>`;
-
   div.querySelector("#rv-fallback-save").addEventListener("click", handleSave);
   bodyEl.appendChild(div);
 }
@@ -1135,10 +1354,7 @@ function viewResume(id) {
     alert("첨부된 이력서가 없습니다.");
     return;
   }
-
   const { dataUrl, mimeType, fileName } = applicant.resume;
-
-  // MIME 타입 보정: 파일명 확장자로도 추론
   const resolvedMime = (() => {
     if (mimeType && mimeType !== "application/octet-stream") return mimeType;
     const ext = (fileName || "").split(".").pop().toLowerCase();
@@ -1150,7 +1366,6 @@ function viewResume(id) {
     };
     return map[ext] || mimeType || "application/octet-stream";
   })();
-
   let blob, mime;
   try {
     ({ blob, mime } = dataUrlToBlob(dataUrl, resolvedMime));
@@ -1159,8 +1374,6 @@ function viewResume(id) {
     alert("파일 변환 오류: " + err.message);
     return;
   }
-
-  // PC: 새 탭 / 모바일: 인라인 뷰어
   if (!ENV.isMobile) {
     openNewTab(blob, mime, fileName);
   } else {
@@ -1286,7 +1499,12 @@ function renderInterviews(){
     const resumeCell=a.resume&&a.resume.dataUrl
       ?`<a href="javascript:void(0)" data-action="view-resume" data-id="${a.id}" style="color:var(--brand);font-weight:600;">${esc(a.resume.fileName||"이력서")}</a>`
       :`<span style="color:var(--slate-300);">미첨부</span>`;
-    const evalBadge=a.evaluation?`<span class="badge badge-eval" style="margin-top:5px;display:inline-flex;">평가서</span>`:"";
+
+    /* ── [수정 2] 평가서 완료 여부에 따라 버튼 분기 ── */
+    const evalBadge = a.evaluation
+      ? `<span class="badge badge-eval-done" data-action="view-evaluation" data-id="${a.id}" style="margin-top:5px;display:inline-flex;cursor:pointer;" title="클릭하면 평가서를 확인합니다">✅ 평가완료</span>`
+      : "";
+
     const actionBtns=
       a.status==="면접예정"?`<button class="btn btn-primary btn-sm" data-action="interview-done" data-id="${a.id}">면접완료</button>`:
       a.status==="면접완료"?`<button class="btn btn-success btn-sm" data-action="interview-pass" data-id="${a.id}">최종합격</button><button class="btn btn-danger btn-sm" data-action="interview-fail" data-id="${a.id}">불합격</button>`:"";
@@ -1336,6 +1554,67 @@ function renderInterviews(){
   }
 }
 
+/* ── [수정 2] 완성된 평가서 모달로 바로보기 ── */
+function viewEvaluationModal(id) {
+  const a = applicantsCache.find(x => x.id === id);
+  if (!a || !a.evaluation) return;
+
+  const ev = a.evaluation;
+  const dt = [a.interviewDate, a.interviewTime].filter(Boolean).join(" ");
+
+  // buildReport 재현을 위해 evalDraft 형태로 변환
+  const draft = {
+    competencies: (ev.competencies || []).map(c => ({
+      id: uid(), title: c.title||"", items: c.items||"", score: c.score||"", comment: c.comment||""
+    })),
+    personality: ev.personality||"",
+    strengths:   ev.strengths||"",
+    risks:       ev.risks||"",
+    comment:     ev.comment||"",
+    recommendation: ev.recommendation||"",
+    interviewerName:  ev.interviewerName||"",
+    interviewerTitle: ev.interviewerTitle||""
+  };
+
+  const reportText = ev.reportText || buildReport(a, draft);
+  const updatedAt  = ev.updatedAt ? fmtDateTime(ev.updatedAt) : "-";
+
+  const recEmoji = ev.recommendation === "채용추천" ? "✅" : ev.recommendation === "보류" ? "🔶" : ev.recommendation === "비추천" ? "❌" : "";
+  const recBadge = ev.recommendation
+    ? `<span class="badge ${ev.recommendation==="채용추천"?"badge-passed":ev.recommendation==="보류"?"badge-scheduled":"badge-failed"}">${recEmoji} ${esc(ev.recommendation)}</span>`
+    : "";
+
+  showModal(`
+  <div class="modal-head">
+    <span class="modal-title">📋 면접 평가서 — ${esc(a.name)}</span>
+    <button class="modal-close" data-action="close-modal">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="eval-modal-meta">
+      ${statusBadge(a.status)}
+      ${recBadge}
+      <span style="font-size:12px;color:var(--slate-400);margin-left:auto;">작성일: ${updatedAt}</span>
+    </div>
+    <div class="eval-modal-preview" id="evalModalPreviewText">${esc(reportText)}</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button type="button" class="btn btn-ghost btn-sm" id="evalModalCopyBtn">📋 텍스트 복사</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-action="open-evaluation" data-id="${id}">✏️ 평가서 수정</button>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-action="close-modal">닫기</button>
+  </div>`, true);
+
+  document.getElementById("evalModalCopyBtn")?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(reportText);
+      alert("클립보드에 복사되었습니다.");
+    } catch(e) {
+      alert("자동 복사 실패. 직접 선택하여 복사해 주세요.");
+    }
+  });
+}
+
 function openApplicantModal(id){
   const a=id?applicantsCache.find(x=>x.id===id):null;
   const jobOpts=jobsCache.length
@@ -1354,6 +1633,14 @@ function openApplicantModal(id){
       <div class="form-group"><label>경력</label><input class="form-control" name="experience" placeholder="3년 / 신입" value="${a?esc(a.experience||""):""}"></div>
       <div class="form-group"><label>연락처</label><input class="form-control" name="phone" value="${a?esc(a.phone||""):""}"></div>
     </div>
+
+    <!-- [수정 1] 나이 / 직전연봉 / 거주지 추가 -->
+    <div class="form-row-3">
+      <div class="form-group"><label>나이</label><input class="form-control" name="age" type="number" min="0" placeholder="만 나이" value="${a?esc(a.age||""):""}"></div>
+      <div class="form-group"><label>직전연봉 (만원)</label><input class="form-control" name="prevSalary" type="number" min="0" placeholder="예: 4500" value="${a?esc(a.prevSalary||""):""}"></div>
+      <div class="form-group"><label>거주지</label><input class="form-control" name="address" placeholder="예: 서울 강남구" value="${a?esc(a.address||""):""}"></div>
+    </div>
+
     <div class="form-group"><label>이메일</label><input class="form-control" type="email" name="email" value="${a?esc(a.email||""):""}"></div>
     <div class="form-row">
       <div class="form-group"><label>면접 날짜</label><input class="form-control" type="date" name="interviewDate" value="${a?(a.interviewDate||""):""}"></div>
@@ -1386,6 +1673,10 @@ function openApplicantModal(id){
       name:fd.get("name").trim(), jobPostingId:jobId,
       jobTitle:job?job.title:(fd.get("jobTitleManual")||"").trim()||"-",
       experience:fd.get("experience").trim(), phone:fd.get("phone").trim(),
+      /* [수정 1] 신규 필드 */
+      age: fd.get("age") ? Number(fd.get("age")) : null,
+      prevSalary: fd.get("prevSalary") ? Number(fd.get("prevSalary")) : null,
+      address: fd.get("address").trim(),
       email:fd.get("email").trim(), interviewDate:fd.get("interviewDate")||"",
       interviewTime:fd.get("interviewTime")||"", notes:fd.get("notes").trim()
     };
@@ -1952,7 +2243,8 @@ contentEl.addEventListener("click",e=>{
     case"delete-notif":         deleteNotif(id); break;
     case"open-admin-modal":     openAdminModal(); break;
     case"remove-admin":         removeAdmin(id); break;
-    case"open-evaluation":      openEvaluationView(id); break;
+    case"open-evaluation":      closeModal(); openEvaluationView(id); break;  /* 모달에서 수정 버튼 클릭 시 모달 닫고 이동 */
+    case"view-evaluation":      viewEvaluationModal(id); break;               /* [수정 2] 완성된 평가서 바로보기 */
     case"back-to-interviews":   evaluationId=null; evalDraft=null; switchView("interviews"); break;
     case"add-comp-block":       addCompBlock(); break;
     case"remove-comp-block":    removeCompBlock(id); break;
