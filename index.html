@@ -2158,45 +2158,84 @@ function printEvaluation(){
    ══════════════════════ */
 function renderFinalHires(){
   const list=applicantsCache.filter(a=>a.status==="최종합격");
-  const rows=list.length?list.map(a=>`<tr>
+  const contractedCnt=list.filter(a=>a.contractCreated).length;
+  const rows=list.length?list.map(a=>{
+    const c=a.contract||{};
+    const startTxt  = c.startDate ? c.startDate : "-";
+    const salaryTxt = c.salary ? `${Number(c.salary).toLocaleString()}만` : "-";
+    const contractBtn = a.contractCreated
+      ? `<button class="btn btn-secondary btn-sm" data-action="register-contract" data-id="${a.id}">✎ 계약 수정</button>`
+      : `<button class="btn btn-success btn-sm" data-action="register-contract" data-id="${a.id}">계약 등록</button>`;
+    const contractStatus = a.contractCreated
+      ? `<span class="badge badge-contract">계약완료</span>`
+      : `<span class="badge badge-closed">미등록</span>`;
+    return `<tr>
     <td><div class="cell-name">${esc(a.name)}</div></td>
     <td>${esc(a.jobTitle||"-")}</td>
     <td>${esc(a.email||"-")}</td>
     <td>${esc(a.phone||"-")}</td>
     <td class="center">${a.interviewDate||"-"}</td>
-    <td class="center">${a.contractCreated?`<span class="badge badge-contract">계약완료</span>`:
-      `<button class="btn btn-success btn-sm" data-action="register-contract" data-id="${a.id}">계약 등록</button>`}</td>
-  </tr>`).join(""):
-  `<tr class="empty-row"><td colspan="6"><span class="empty-icon">🏆</span>최종합격자가 없습니다.</td></tr>`;
+    <td class="center">${startTxt}</td>
+    <td class="center" style="white-space:nowrap;">${salaryTxt}</td>
+    <td class="center">${contractStatus}</td>
+    <td class="actions">
+      ${contractBtn}
+      <button class="btn btn-ghost btn-sm" data-action="edit-applicant" data-id="${a.id}">정보수정</button>
+    </td>
+  </tr>`;}).join(""):
+  `<tr class="empty-row"><td colspan="9"><span class="empty-icon">🏆</span>최종합격자가 없습니다.</td></tr>`;
   contentEl.innerHTML=`
   <div class="page-header">
-    <div><div class="page-title">최종합격 관리</div><div class="page-subtitle">합격자 계약 현황 · 총 ${list.length}명</div></div>
+    <div><div class="page-title">최종합격 관리</div><div class="page-subtitle">합격자 계약 현황 · 총 ${list.length}명 · 계약완료 ${contractedCnt}명</div></div>
   </div>
   <div class="panel">
     <div class="panel-body"><table>
-      <thead><tr><th>성명</th><th>지원직무</th><th>이메일</th><th>연락처</th><th style="text-align:center">면접일</th><th style="text-align:center">계약</th></tr></thead>
+      <thead><tr><th>성명</th><th>지원직무</th><th>이메일</th><th>연락처</th><th style="text-align:center">면접일</th><th style="text-align:center">입사예정일</th><th style="text-align:center">연봉</th><th style="text-align:center">계약상태</th><th>관리</th></tr></thead>
       <tbody>${rows}</tbody>
     </table></div>
   </div>`;
 }
 function openContractSimpleModal(applicantId){
   const a=applicantsCache.find(x=>x.id===applicantId); if(!a)return;
+  const c=a.contract||{};
   showModal(`
-  <div class="modal-head"><span class="modal-title">계약 등록 — ${esc(a.name)}</span><button class="modal-close" data-action="close-modal">✕</button></div>
+  <div class="modal-head"><span class="modal-title">${a.contractCreated?"계약 정보 수정":"계약 등록"} — ${esc(a.name)}</span><button class="modal-close" data-action="close-modal">✕</button></div>
   <div class="modal-body"><form id="contractSimpleForm">
-    <div class="form-group"><label>입사예정일</label><input class="form-control" type="date" name="startDate"></div>
-    <div class="form-group"><label>직무</label><input class="form-control" name="position" value="${esc(a.jobTitle||"")}" readonly></div>
-    <div class="form-group"><label>연봉 (만원)</label><input class="form-control" type="number" name="salary" min="0" value="0"></div>
+    <div class="form-group"><label>입사예정일</label><input class="form-control" type="date" name="startDate" value="${esc(c.startDate||"")}"></div>
+    <div class="form-group"><label>직무</label><input class="form-control" name="position" value="${esc(c.position||a.jobTitle||"")}"></div>
+    <div class="form-group"><label>연봉 (만원)</label><input class="form-control" type="number" name="salary" min="0" value="${c.salary??0}"></div>
+    <div class="form-group"><label>비고</label><textarea class="form-control" name="memo" rows="2" placeholder="계약 관련 특이사항">${esc(c.memo||"")}</textarea></div>
     <div class="modal-footer" style="padding:0;border:none;margin-top:4px;">
       <button type="button" class="btn btn-secondary" data-action="close-modal">취소</button>
+      ${a.contractCreated?`<button type="button" class="btn btn-danger" id="cancelContractBtn">계약 취소</button>`:""}
       <button type="submit" class="btn btn-primary">저장</button>
     </div>
   </form></div>`);
   document.getElementById("contractSimpleForm").addEventListener("submit",async e=>{
     e.preventDefault();
-    try{ await updateDoc(doc(db,"applicants",a.id),{contractCreated:true}); notify(`${a.name}님의 계약이 등록되었습니다.`,"contract"); closeModal(); }
+    const fd=new FormData(e.target);
+    const contract={
+      startDate: fd.get("startDate")||"",
+      position:  fd.get("position").trim(),
+      salary:    Number(fd.get("salary"))||0,
+      memo:      fd.get("memo").trim(),
+      updatedAt: serverTimestamp()
+    };
+    try{
+      await updateDoc(doc(db,"applicants",a.id),{contractCreated:true,contract});
+      notify(`${a.name}님의 계약 정보가 ${a.contractCreated?"수정":"등록"}되었습니다.`,"contract");
+      closeModal();
+    }
     catch(err){ alert("저장 오류: "+err.message); }
   });
+  const cancelBtn=document.getElementById("cancelContractBtn");
+  if(cancelBtn){
+    cancelBtn.addEventListener("click",async()=>{
+      if(!confirm(`${a.name}님의 계약 등록을 취소하시겠습니까? (계약 상세정보는 유지되며 상태만 미등록으로 변경됩니다)`))return;
+      try{ await updateDoc(doc(db,"applicants",a.id),{contractCreated:false}); closeModal(); }
+      catch(err){ alert("취소 오류: "+err.message); }
+    });
+  }
 }
 
 /* ══════════════════════
