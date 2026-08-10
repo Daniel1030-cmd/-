@@ -1469,7 +1469,7 @@ function openProductModal(id){
     e.preventDefault();
     const fd=new FormData(e.target);
     const data={name:fd.get("name").trim(),category:fd.get("category"),specs:fd.get("specs").trim(),monthlyPrice:Number(fd.get("monthlyPrice"))||0,stock:Number(fd.get("stock"))||0,promoEnd:fd.get("promoEnd"),status:fd.get("status")};
-    try{ if(p) await updateDoc(doc(db,"serverProducts",p.id),data); else await addDoc(colProducts,{...data,createdAt:serverTimestamp()}); closeModal(); }
+    try{ if(p) await updateDoc(doc(db,"serverProducts",p.id),data); else await addDoc(colProducts,{...data,createdAt:serverTimestamp()}); alert("저장되었습니다."); }
     catch(err){ alert("저장 오류: "+err.message); }
   });
 }
@@ -1731,7 +1731,7 @@ function openCustomerModal(id){
     try{
       if(c){ data.status=fd.get("status"); await updateDoc(doc(db,"customers",c.id),data); }
       else{ await addDoc(colCustomers,{...data,attachment:data.attachment||null,status:"상담예정",createdAt:serverTimestamp(),contractCreated:false}); if(settingsCache.autoNotify!==false) notify(`${data.name}님(${data.company||"-"})이 신규 고객으로 등록되었습니다.`,"customer"); }
-      closeModal();
+      alert("저장되었습니다.");
     } catch(err){
       if(/longer than|exceeds|size/i.test(err.message||"")) alert("첨부 파일을 포함한 용량이 너무 큽니다. 더 작은 파일을 사용해주세요.");
       else alert("저장 오류: "+err.message);
@@ -2187,7 +2187,7 @@ function openContractSimpleModal(customerId){
     try{
       await updateDoc(doc(db,"customers",c.id),{contractCreated:true,contract});
       notify(`${c.name}님의 계약 정보가 ${c.contractCreated?"수정":"등록"}되었습니다.`,"contract");
-      closeModal();
+      alert("저장되었습니다.");
     }
     catch(err){ alert("저장 오류: "+err.message); }
   });
@@ -2297,7 +2297,7 @@ function openAdminModal(){
   document.getElementById("adminForm").addEventListener("submit",async e=>{
     e.preventDefault();
     const fd=new FormData(e.target);
-    try{ await addDoc(colAdmins,{name:fd.get("name").trim(),email:fd.get("email").trim(),role:fd.get("role").trim()}); closeModal(); }
+    try{ await addDoc(colAdmins,{name:fd.get("name").trim(),email:fd.get("email").trim(),role:fd.get("role").trim()}); alert("추가되었습니다."); e.target.reset(); }
     catch(err){ alert("저장 오류: "+err.message); }
   });
 }
