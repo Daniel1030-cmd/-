@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>채용관리시스템 (ATS)</title>
+<title>서버사업 고객관리시스템 (CRM)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -308,7 +308,7 @@ td.actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .resume-tag a { color: var(--brand); text-decoration: none; font-weight: 600; }
 .resume-tag a:hover { text-decoration: underline; }
 
-/* 평가서 */
+/* 상담기록서 */
 .eval-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .eval-section { border: 1px solid var(--slate-200); border-radius: var(--radius-md); margin-bottom: 14px; overflow: hidden; }
 .eval-section-header { background: var(--slate-50); padding: 10px 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--slate-200); }
@@ -394,7 +394,8 @@ th.sortable.active .sort-icon { opacity: 1; color: var(--brand); }
 .bar-count  { width: 30px; text-align: right; font-size: 13px; font-weight: 700; color: var(--slate-700); }
 
 /* ══════════════════════════════════════════════════
-   이력서 인라인 뷰어  v5.1  ― 핀치줌/더블탭 확대 추가
+   첨부파일 인라인 뷰어  v5.1  ― 핀치줌/더블탭 확대
+   (견적서·계약서·인프라구성도 등 고객 첨부파일 열람용)
    ══════════════════════════════════════════════════ */
 @keyframes rv-in {
   from { opacity:0; transform:translateY(100%); }
@@ -433,7 +434,6 @@ th.sortable.active .sort-icon { opacity: 1; color: var(--brand); }
   white-space: nowrap;
 }
 #rv-btns { display: flex; gap: 6px; flex-shrink: 0; }
-/* 확대/축소 컨트롤 바 */
 #rv-zoom-bar {
   flex-shrink: 0;
   display: flex;
@@ -508,10 +508,8 @@ th.sortable.active .sort-icon { opacity: 1; color: var(--brand); }
   position: relative;
   display: flex;
   flex-direction: column;
-  /* 핀치줌 때 body 자체가 zoom되지 않도록 */
   touch-action: pan-x pan-y;
 }
-/* 핀치줌/이동 컨테이너 */
 #rv-transform-wrap {
   display: flex;
   flex-direction: column;
@@ -520,12 +518,10 @@ th.sortable.active .sort-icon { opacity: 1; color: var(--brand); }
   min-height: 100%;
   transform-origin: center top;
   will-change: transform;
-  /* 부드러운 트랜지션은 버튼 클릭 시에만 */
 }
 #rv-transform-wrap.animated {
   transition: transform .2s cubic-bezier(0.25,0.46,0.45,0.94);
 }
-/* PDF.js 캔버스 페이지 컨테이너 */
 #rv-pdf-pages {
   display: flex;
   flex-direction: column;
@@ -544,7 +540,6 @@ th.sortable.active .sort-icon { opacity: 1; color: var(--brand); }
   border-radius: 2px;
   max-width: 100%;
 }
-/* PDF iframe */
 #rv-pdf-frame {
   width: 100%;
   height: 100%;
@@ -553,7 +548,6 @@ th.sortable.active .sort-icon { opacity: 1; color: var(--brand); }
   display: block;
   background: #fff;
 }
-/* 이미지 컨테이너 */
 #rv-img-wrap {
   display: flex;
   align-items: flex-start;
@@ -569,7 +563,6 @@ th.sortable.active .sort-icon { opacity: 1; color: var(--brand); }
   box-shadow: 0 4px 24px rgba(0,0,0,.5);
   display: block;
 }
-/* 에러 안내 */
 #rv-fallback {
   display: flex;
   flex-direction: column;
@@ -584,7 +577,6 @@ th.sortable.active .sort-icon { opacity: 1; color: var(--brand); }
 #rv-fallback .rv-icon  { font-size: 52px; }
 #rv-fallback .rv-fname { font-size: 15px; font-weight: 700; color: #fff; word-break: break-all; }
 #rv-fallback .rv-desc  { font-size: 13px; line-height: 1.6; }
-/* 로딩 스피너 */
 #rv-loading {
   position: absolute;
   inset: 0;
@@ -650,10 +642,10 @@ th.sortable.active .sort-icon { opacity: 1; color: var(--brand); }
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
-      <div class="login-logo-icon">🎯</div>
+      <div class="login-logo-icon">🖥️</div>
       <div>
-        <div class="login-logo-text">채용관리시스템</div>
-        <div class="login-logo-sub">ATS · Applicant Tracking System</div>
+        <div class="login-logo-text">서버사업 고객관리시스템</div>
+        <div class="login-logo-sub">CRM · Server Business Customer Management</div>
       </div>
     </div>
     <h2>관리자 로그인</h2>
@@ -678,10 +670,10 @@ th.sortable.active .sort-icon { opacity: 1; color: var(--brand); }
   <div class="header-left">
     <button class="menu-toggle" id="menuToggle" aria-label="메뉴">☰</button>
     <div class="header-brand">
-      <div class="header-icon">🎯</div>
+      <div class="header-icon">🖥️</div>
       <div>
-        <div class="header-title">채용관리시스템</div>
-        <div class="header-subtitle">ATS · Applicant Tracking</div>
+        <div class="header-title">서버사업 고객관리시스템</div>
+        <div class="header-subtitle">CRM · Customer &amp; Contract Management</div>
       </div>
     </div>
   </div>
@@ -698,18 +690,18 @@ th.sortable.active .sort-icon { opacity: 1; color: var(--brand); }
     <ul class="sidebar-nav">
       <li><a data-view="dashboard" class="active"><span class="nav-icon">📊</span> 대시보드</a></li>
     </ul>
-    <div class="sidebar-section-label">채용 관리</div>
+    <div class="sidebar-section-label">영업 관리</div>
     <ul class="sidebar-nav">
-      <li><a data-view="jobs"><span class="nav-icon">📋</span> 채용공고</a></li>
-      <li><a data-view="interviews"><span class="nav-icon">🗓</span> 면접관리</a></li>
-      <li><a data-view="finalHires"><span class="nav-icon">🏆</span> 최종합격</a></li>
+      <li><a data-view="products"><span class="nav-icon">🖧</span> 서버 상품</a></li>
+      <li><a data-view="customers"><span class="nav-icon">🗂</span> 고객 관리</a></li>
+      <li><a data-view="contracts"><span class="nav-icon">📄</span> 계약 고객</a></li>
     </ul>
     <div class="sidebar-section-label">운영</div>
     <ul class="sidebar-nav">
       <li><a data-view="notifications"><span class="nav-icon">🔔</span> 알림<span class="nav-badge" id="unreadBadge" style="display:none">0</span></a></li>
       <li><a data-view="system"><span class="nav-icon">⚙️</span> 시스템 설정</a></li>
     </ul>
-    <div class="sidebar-footer">ATS v2.2 · Firebase 연동</div>
+    <div class="sidebar-footer">Server CRM v1.0 · Firebase 연동</div>
   </nav>
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
@@ -731,6 +723,9 @@ import {
   onSnapshot, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+/* ⚠️ 실제 배포 시 사용 중인 Firebase 프로젝트 설정으로 교체하세요.
+   기존 채용관리(ATS) 프로젝트와 동일한 프로젝트를 재사용할 경우,
+   아래 컬렉션명이 새로 생성되므로 기존 채용 데이터와 충돌하지 않습니다. */
 const firebaseConfig = {
   apiKey: "AIzaSyA1wwPmNs9Y_MVCANN6iqj0Nn6H1YHvm3w",
   authDomain: "recruitments-1d3a0.firebaseapp.com",
@@ -745,36 +740,37 @@ const db   = getFirestore(app);
 const auth = getAuth(app);
 isAnalyticsSupported().then(ok=>{ if(ok) try{ getAnalytics(app); }catch(e){} }).catch(()=>{});
 
-const colJobs          = collection(db,"jobPostings");
-const colApplicants    = collection(db,"applicants");
+/* Firestore 컬렉션 (서버사업 고객관리 도메인) */
+const colProducts      = collection(db,"serverProducts");   // 서버 상품(플랜)
+const colCustomers      = collection(db,"customers");        // 고객(리드~계약)
 const colNotifications = collection(db,"notifications");
-const colAdmins        = collection(db,"admins");
+const colAdmins        = collection(db,"admins");            // 영업담당자
 const settingsDocRef   = doc(db,"settings","general");
 
-const STATUSES = ["면접예정","면접완료","최종합격","불합격"];
+const STATUSES = ["상담예정","상담완료","계약완료","계약보류"];
 const STATUS_META = {
-  "면접예정":{ cls:"badge-scheduled", label:"면접예정" },
-  "면접완료":{ cls:"badge-done",      label:"면접완료" },
-  "최종합격":{ cls:"badge-passed",    label:"최종합격" },
-  "불합격"  :{ cls:"badge-failed",    label:"불합격"   }
+  "상담예정":{ cls:"badge-scheduled", label:"상담예정" },
+  "상담완료":{ cls:"badge-done",      label:"상담완료" },
+  "계약완료":{ cls:"badge-passed",    label:"계약완료" },
+  "계약보류":{ cls:"badge-failed",    label:"계약보류" }
 };
-const RESUME_MAX = 700*1024;
-const DEFAULT_COMPETENCIES = [
-  { id:"c1", title:"직무 전문성",    items:"",  score:"", comment:"" },
-  { id:"c2", title:"문제해결 능력",  items:"",  score:"", comment:"" },
-  { id:"c3", title:"커뮤니케이션",   items:"",  score:"", comment:"" },
-  { id:"c4", title:"조직 적합성",    items:"",  score:"", comment:"" },
-  { id:"c5", title:"성장 가능성",    items:"",  score:"", comment:"" },
+const ATTACH_MAX = 700*1024;
+const DEFAULT_REQUIREMENTS = [
+  { id:"c1", title:"트래픽 · 사용량 규모",   items:"",  score:"", comment:"" },
+  { id:"c2", title:"기존 인프라 · 마이그레이션", items:"",  score:"", comment:"" },
+  { id:"c3", title:"예산 적합성",            items:"",  score:"", comment:"" },
+  { id:"c4", title:"보안 · 컴플라이언스 요건", items:"",  score:"", comment:"" },
+  { id:"c5", title:"의사결정 구조 · 도입 시급성", items:"",  score:"", comment:"" },
 ];
-const SCORES = ["A(우수)","B(양호)","C(보통)","D(미흡)"];
-const SCORE_POINT = { "A(우수)":4, "B(양호)":3, "C(보통)":2, "D(미흡)":1 };
-const SCORE_CLASS = { "A(우수)":"A", "B(양호)":"B", "C(보통)":"C", "D(미흡)":"D" };
+const SCORES = ["A(매우적합)","B(적합)","C(보통)","D(부적합)"];
+const SCORE_POINT = { "A(매우적합)":4, "B(적합)":3, "C(보통)":2, "D(부적합)":1 };
+const SCORE_CLASS = { "A(매우적합)":"A", "B(적합)":"B", "C(보통)":"C", "D(부적합)":"D" };
 
-let jobsCache=[], applicantsCache=[], notificationsCache=[], adminsCache=[], settingsCache={};
-let currentView="dashboard", interviewSearch="", evaluationId=null, evalDraft=null, evalSeq=0;
+let productsCache=[], customersCache=[], notificationsCache=[], adminsCache=[], settingsCache={};
+let currentView="dashboard", customerSearch="", consultationId=null, consultDraft=null, consultSeq=0;
 let isComposing = false;
-let interviewSortKey = "";   // 현재 정렬 컬럼 키
-let interviewSortDir = "asc"; // "asc" | "desc"
+let customerSortKey = "";
+let customerSortDir = "asc"; // "asc" | "desc"
 
 const contentEl = document.getElementById("content");
 
@@ -783,19 +779,20 @@ const esc = s => s==null?"":String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&
 const fmtDate     = ts => { if(!ts)return"-"; const d=ts.toDate?ts.toDate():new Date(ts); return isNaN(d)?"-":d.toLocaleDateString("ko-KR"); };
 const fmtDateTime = ts => { if(!ts)return"-"; const d=ts.toDate?ts.toDate():new Date(ts); return isNaN(d)?"-":d.toLocaleString("ko-KR"); };
 const fmtBytes    = b  => !b?"0KB": b<1048576? Math.round(b/1024)+"KB":(b/1048576).toFixed(1)+"MB";
-const uid         = ()  => "c"+(++evalSeq)+"_"+Date.now();
+const fmtWon      = n  => n?Number(n).toLocaleString()+"만원":"-";
+const uid         = ()  => "c"+(++consultSeq)+"_"+Date.now();
 
 function statusBadge(s) {
   const m=STATUS_META[s]||{cls:"badge-closed",label:s||"-"};
   return `<span class="badge ${m.cls}">${esc(m.label)}</span>`;
 }
-function jobBadge(s) {
-  return s==="진행중"?`<span class="badge badge-active">진행중</span>`:`<span class="badge badge-closed">마감</span>`;
+function productBadge(s) {
+  return s==="판매중"?`<span class="badge badge-active">판매중</span>`:`<span class="badge badge-closed">판매중지</span>`;
 }
 async function notify(message, type="info") {
   try{ await addDoc(colNotifications,{message,type,read:false,createdAt:serverTimestamp()}); }catch(e){}
 }
-function getApplicantName(id){ const a=applicantsCache.find(x=>x.id===id); return a?a.name:"지원자"; }
+function getCustomerName(id){ const c=customersCache.find(x=>x.id===id); return c?c.name:"고객"; }
 
 /* 모달 */
 function showModal(html, wide=false){
@@ -804,7 +801,6 @@ function showModal(html, wide=false){
   ov.className="modal-overlay";
   ov.id="modalOverlay";
   ov.innerHTML=`<div class="modal${wide?" modal-wide":""}">${html}</div>`;
-  ov.addEventListener("click",e=>{ if(e.target===ov)closeModal(); });
   document.body.appendChild(ov);
 }
 function closeModal(){ const ov=document.getElementById("modalOverlay"); if(ov)ov.remove(); }
@@ -813,16 +809,10 @@ function closeModal(){ const ov=document.getElementById("modalOverlay"); if(ov)o
 function readFile(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(file); }); }
 
 /* ════════════════════════════════════════════════════════════════════
-   이력서 뷰어  v5.1  ─  PDF.js 캔버스 렌더링 + 핀치줌/버튼줌 기능
-
-   수정 사항 (v5.0 → v5.1):
-   ▸ 모바일에서 핀치투줌(두 손가락 확대/축소) 지원
-   ▸ 더블탭으로 확대/원래 크기 토글
-   ▸ 줌 컨트롤 바(−/+/100%) 버튼 추가
-   ▸ 확대 시 드래그 패닝 지원
+   첨부파일 뷰어  v5.1  ─  PDF.js 캔버스 렌더링 + 핀치줌/버튼줌 기능
+   고객이 보낸 견적요청서 · 인프라구성도 · 계약서 등을 그대로 재사용
    ════════════════════════════════════════════════════════════════════ */
 
-/* ── 환경 감지 ── */
 const ENV = (() => {
   const ua = navigator.userAgent;
   const isIOS =
@@ -847,7 +837,6 @@ const ENV = (() => {
   return { isIOS, isAndroid, iosVersion, isWKWebView, isSamsung, isMobile, hasWebShare, hasWebShareFiles };
 })();
 
-/* ── PDF.js 동적 로더 ── */
 const PDFJS_VERSION = "5.4.149";
 const PDFJS_BASE = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/`;
 let _pdfjsLibPromise = null;
@@ -863,7 +852,6 @@ function loadPdfJs() {
   return _pdfjsLibPromise;
 }
 
-/* ── dataURL → Blob 변환 ── */
 function dataUrlToBlob(dataUrl, fallbackMime = "application/octet-stream") {
   const commaIdx = dataUrl.indexOf(",");
   if (commaIdx === -1) throw new Error("잘못된 dataURL 형식입니다.");
@@ -883,14 +871,12 @@ function dataUrlToBlob(dataUrl, fallbackMime = "application/octet-stream") {
   return { blob: new Blob(buffers, { type: mime }), mime };
 }
 
-/* ── Blob URL 생성 + 자동 해제 ── */
 function makeBlobUrl(blob, ttlMs = 180_000) {
   const url = URL.createObjectURL(blob);
   setTimeout(() => URL.revokeObjectURL(url), ttlMs);
   return url;
 }
 
-/* ── body 스크롤 잠금 / 해제 ── */
 let _scrollY = 0;
 function lockBodyScroll() {
   _scrollY = window.scrollY;
@@ -913,7 +899,6 @@ function unlockBodyScroll() {
   }
 }
 
-/* ── iOS Web Share ── */
 async function shareFile(blob, mime, fileName) {
   if (!ENV.hasWebShare) return false;
   try {
@@ -934,24 +919,22 @@ async function shareFile(blob, mime, fileName) {
   }
 }
 
-/* ── Android / PC: Blob URL a[download] ── */
 function downloadBlob(blob, fileName) {
   const ttl = ENV.isSamsung ? 30_000 : 10_000;
   const url  = makeBlobUrl(blob, ttl);
   const a    = Object.assign(document.createElement("a"), {
-    href: url, download: fileName || "resume", style: "display:none"
+    href: url, download: fileName || "attachment", style: "display:none"
   });
   document.body.appendChild(a);
   a.click();
   requestAnimationFrame(() => { try { document.body.removeChild(a); } catch {} });
 }
 
-/* ── PC: 새 탭 미리보기 ── */
 function openNewTab(blob, mime, fileName) {
   const blobUrl = makeBlobUrl(blob, 90_000);
   const w = window.open("", "_blank");
   if (!w) { downloadBlob(blob, fileName); return; }
-  const safeTitle = fileName ? fileName.replace(/</g,"&lt;") : "이력서";
+  const safeTitle = fileName ? fileName.replace(/</g,"&lt;") : "첨부파일";
   if (mime === "application/pdf") {
     w.document.write(`<!DOCTYPE html><html lang="ko"><head>
       <meta charset="UTF-8"><title>${safeTitle}</title>
@@ -980,9 +963,6 @@ function openNewTab(blob, mime, fileName) {
   w.document.close();
 }
 
-/* ════════════════════════════════════════════════════════
-   핀치줌 / 더블탭 / 버튼줌 컨트롤러
-   ════════════════════════════════════════════════════════ */
 function createZoomController(bodyEl, transformWrapEl, zoomLabelEl) {
   const MIN_SCALE = 0.5;
   const MAX_SCALE = 4.0;
@@ -992,14 +972,12 @@ function createZoomController(bodyEl, transformWrapEl, zoomLabelEl) {
   let translateX = 0;
   let translateY = 0;
 
-  // 패닝용 상태
   let isPanning    = false;
   let panStartX    = 0;
   let panStartY    = 0;
   let panOriginTX  = 0;
   let panOriginTY  = 0;
 
-  // 핀치용 상태
   let isPinching    = false;
   let pinchStartDist = 0;
   let pinchStartScale = 1;
@@ -1008,7 +986,6 @@ function createZoomController(bodyEl, transformWrapEl, zoomLabelEl) {
   let pinchOriginTX = 0;
   let pinchOriginTY = 0;
 
-  // 더블탭
   let lastTapTime = 0;
   let lastTapX    = 0;
   let lastTapY    = 0;
@@ -1038,12 +1015,10 @@ function createZoomController(bodyEl, transformWrapEl, zoomLabelEl) {
     translateY = clamp(translateY, -maxTY, maxTY);
   }
 
-  /* 버튼 줌 */
   function zoomIn()    { scale = clamp(scale + STEP, MIN_SCALE, MAX_SCALE); clampTranslate(); applyTransform(true); }
   function zoomOut()   { scale = clamp(scale - STEP, MIN_SCALE, MAX_SCALE); clampTranslate(); applyTransform(true); }
   function zoomReset() { scale = 1.0; translateX = 0; translateY = 0; applyTransform(true); }
 
-  /* 핀치 거리 계산 */
   function getTouchDist(t1, t2) {
     return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
   }
@@ -1055,14 +1030,12 @@ function createZoomController(bodyEl, transformWrapEl, zoomLabelEl) {
     };
   }
 
-  /* 터치 이벤트 */
   bodyEl.addEventListener("touchstart", onTouchStart, { passive: false });
   bodyEl.addEventListener("touchmove",  onTouchMove,  { passive: false });
   bodyEl.addEventListener("touchend",   onTouchEnd,   { passive: false });
 
   function onTouchStart(e) {
     if (e.touches.length === 2) {
-      // 핀치 시작
       isPinching = true;
       isPanning  = false;
       pinchStartDist  = getTouchDist(e.touches[0], e.touches[1]);
@@ -1074,12 +1047,10 @@ function createZoomController(bodyEl, transformWrapEl, zoomLabelEl) {
       pinchOriginTY = translateY;
       e.preventDefault();
     } else if (e.touches.length === 1) {
-      // 더블탭 감지
       const now = Date.now();
       const tx  = e.touches[0].clientX;
       const ty  = e.touches[0].clientY;
       if (now - lastTapTime < 300 && Math.abs(tx - lastTapX) < 30 && Math.abs(ty - lastTapY) < 30) {
-        // 더블탭: 확대/초기화 토글
         if (scale > 1.0) {
           zoomReset();
         } else {
@@ -1095,7 +1066,6 @@ function createZoomController(bodyEl, transformWrapEl, zoomLabelEl) {
       lastTapX    = tx;
       lastTapY    = ty;
 
-      // 패닝 시작 (확대 상태일 때만)
       if (scale > 1.01) {
         isPanning   = true;
         panStartX   = e.touches[0].clientX;
@@ -1129,7 +1099,6 @@ function createZoomController(bodyEl, transformWrapEl, zoomLabelEl) {
     if (e.touches.length < 2) isPinching = false;
     if (e.touches.length === 0) {
       isPanning = false;
-      // 축소되었으면 위치 초기화
       if (scale <= 1.0) { translateX = 0; translateY = 0; applyTransform(false); }
     }
   }
@@ -1137,9 +1106,6 @@ function createZoomController(bodyEl, transformWrapEl, zoomLabelEl) {
   return { zoomIn, zoomOut, zoomReset };
 }
 
-/* ════════════════════════════════════════════════════════
-   인라인 뷰어 핵심 함수
-   ════════════════════════════════════════════════════════ */
 function openInlineViewer(blob, mime, fileName, rawDataUrl) {
   document.getElementById("rv-overlay")?.remove();
 
@@ -1161,14 +1127,13 @@ function openInlineViewer(blob, mime, fileName, rawDataUrl) {
   overlay.id = "rv-overlay";
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
-  overlay.setAttribute("aria-label", "이력서 뷰어");
+  overlay.setAttribute("aria-label", "첨부파일 뷰어");
 
-  // 줌 컨트롤 바는 PDF/이미지일 때만 표시
   const showZoomBar = isPdf || isImg;
 
   overlay.innerHTML = `
     <div id="rv-toolbar">
-      <span id="rv-filename">📎 ${fileName || "이력서"}</span>
+      <span id="rv-filename">📎 ${fileName || "첨부파일"}</span>
       <div id="rv-btns">
         <button class="rv-btn rv-btn-save" id="rv-save-btn">
           ${ENV.isIOS ? "📤 저장" : "💾 저장"}
@@ -1198,7 +1163,6 @@ function openInlineViewer(blob, mime, fileName, rawDataUrl) {
   const loadingEl = overlay.querySelector("#rv-loading");
   const zoomLabel = overlay.querySelector("#rv-zoom-label");
 
-  /* 닫기 */
   const closeViewer = () => {
     overlay.remove();
     unlockBodyScroll();
@@ -1209,7 +1173,6 @@ function openInlineViewer(blob, mime, fileName, rawDataUrl) {
   overlay.querySelector("#rv-save-btn").addEventListener("click", handleSave);
   document.addEventListener("keydown", onKey);
 
-  /* 콘텐츠 렌더링 */
   if (isPdf) {
     _renderPdf(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl).then(() => {
       if (showZoomBar) _attachZoomControls(overlay, bodyEl, zoomLabel);
@@ -1217,7 +1180,6 @@ function openInlineViewer(blob, mime, fileName, rawDataUrl) {
   } else if (isImg) {
     _renderImage(bodyEl, loadingEl, blob, fileName);
     if (showZoomBar) {
-      // 이미지 로드 후 컨트롤 연결
       setTimeout(() => _attachZoomControls(overlay, bodyEl, zoomLabel), 300);
     }
   } else {
@@ -1225,9 +1187,7 @@ function openInlineViewer(blob, mime, fileName, rawDataUrl) {
   }
 }
 
-/* 줌 컨트롤 버튼 연결 */
 function _attachZoomControls(overlay, bodyEl, zoomLabelEl) {
-  // 변환 래퍼 생성 (기존 자식들을 감쌈)
   const existingChildren = Array.from(bodyEl.children).filter(c => c.id !== "rv-loading");
   const wrap = document.createElement("div");
   wrap.id = "rv-transform-wrap";
@@ -1244,7 +1204,6 @@ function _attachZoomControls(overlay, bodyEl, zoomLabelEl) {
   if (btnReset) btnReset.addEventListener("click", () => ctrl.zoomReset());
 }
 
-/* PDF 렌더링 — PDF.js 우선, 실패 시 iframe 폴백 */
 async function _renderPdf(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl) {
   try {
     const pdfjsLib = await loadPdfJs();
@@ -1256,7 +1215,6 @@ async function _renderPdf(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl) {
   _renderPdfIframeFallback(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl);
 }
 
-/* PDF.js 캔버스 렌더링 */
 async function _renderPdfWithPdfJs(bodyEl, loadingEl, blob, pdfjsLib) {
   const arrayBuffer = await blob.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -1290,14 +1248,13 @@ async function _renderPdfWithPdfJs(bodyEl, loadingEl, blob, pdfjsLib) {
   if (pdf.numPages === 0) loadingEl.style.display = "none";
 }
 
-/* iframe 폴백 */
 function _renderPdfIframeFallback(bodyEl, loadingEl, blob, mime, fileName, rawDataUrl) {
   const useGoogleProxy = ENV.isIOS && (ENV.iosVersion > 0 && ENV.iosVersion < 15);
   if (!useGoogleProxy) {
     const blobUrl = makeBlobUrl(blob, 300_000);
     const iframe = document.createElement("iframe");
     iframe.id    = "rv-pdf-frame";
-    iframe.title = fileName || "이력서";
+    iframe.title = fileName || "첨부파일";
     iframe.setAttribute("allowfullscreen", "");
     iframe.src = blobUrl;
     let loaded = false;
@@ -1315,7 +1272,7 @@ function _renderPdfIframeFallback(bodyEl, loadingEl, blob, mime, fileName, rawDa
       </object></body></html>`;
     const iframe = document.createElement("iframe");
     iframe.id    = "rv-pdf-frame";
-    iframe.title = fileName || "이력서";
+    iframe.title = fileName || "첨부파일";
     iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
     iframe.srcdoc = srcdoc;
     iframe.addEventListener("load", () => { loadingEl.style.display = "none"; });
@@ -1324,13 +1281,12 @@ function _renderPdfIframeFallback(bodyEl, loadingEl, blob, mime, fileName, rawDa
   }
 }
 
-/* 이미지 렌더링 */
 function _renderImage(bodyEl, loadingEl, blob, fileName) {
   const blobUrl = makeBlobUrl(blob, 300_000);
   const wrap = document.createElement("div");
   wrap.id = "rv-img-wrap";
   const img = document.createElement("img");
-  img.alt = fileName || "이력서 이미지";
+  img.alt = fileName || "첨부 이미지";
   img.src = blobUrl;
   img.addEventListener("load",  () => { loadingEl.style.display = "none"; });
   img.addEventListener("error", () => {
@@ -1346,7 +1302,6 @@ function _renderImage(bodyEl, loadingEl, blob, fileName) {
   bodyEl.appendChild(wrap);
 }
 
-/* 열람 불가 파일 */
 function _renderFallback(bodyEl, loadingEl, fileName, handleSave) {
   loadingEl.style.display = "none";
   const div = document.createElement("div");
@@ -1365,16 +1320,14 @@ function _renderFallback(bodyEl, loadingEl, fileName, handleSave) {
   bodyEl.appendChild(div);
 }
 
-/* ════════════════════════════════════════════
-   진입점: viewResume(id)
-   ════════════════════════════════════════════ */
-function viewResume(id) {
-  const applicant = applicantsCache.find(x => x.id === id);
-  if (!applicant?.resume?.dataUrl) {
-    alert("첨부된 이력서가 없습니다.");
+/* 진입점: viewAttachment(id) — 고객의 첨부파일(견적요청서/구성도/계약서 등) 열람 */
+function viewAttachment(id) {
+  const customer = customersCache.find(x => x.id === id);
+  if (!customer?.attachment?.dataUrl) {
+    alert("첨부된 파일이 없습니다.");
     return;
   }
-  const { dataUrl, mimeType, fileName } = applicant.resume;
+  const { dataUrl, mimeType, fileName } = customer.attachment;
   const resolvedMime = (() => {
     if (mimeType && mimeType !== "application/octet-stream") return mimeType;
     const ext = (fileName || "").split(".").pop().toLowerCase();
@@ -1382,7 +1335,9 @@ function viewResume(id) {
       pdf:"application/pdf", jpg:"image/jpeg", jpeg:"image/jpeg",
       png:"image/png", gif:"image/gif", webp:"image/webp",
       doc:"application/msword",
-      docx:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      docx:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      xls:"application/vnd.ms-excel",
+      xlsx:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     };
     return map[ext] || mimeType || "application/octet-stream";
   })();
@@ -1390,7 +1345,7 @@ function viewResume(id) {
   try {
     ({ blob, mime } = dataUrlToBlob(dataUrl, resolvedMime));
   } catch (err) {
-    console.error("[viewResume] 변환 실패:", err);
+    console.error("[viewAttachment] 변환 실패:", err);
     alert("파일 변환 오류: " + err.message);
     return;
   }
@@ -1402,7 +1357,7 @@ function viewResume(id) {
 }
 
 /* 라우터 */
-function rerender(){ switch(currentView){ case"dashboard":renderDashboard();break; case"jobs":renderJobs();break; case"interviews":renderInterviews();break; case"finalHires":renderFinalHires();break; case"notifications":renderNotifications();break; case"system":renderSystem();break; case"evaluationForm":renderEvaluationForm();break; } updateUnreadBadge(); }
+function rerender(){ switch(currentView){ case"dashboard":renderDashboard();break; case"products":renderProducts();break; case"customers":renderCustomers();break; case"contracts":renderContracts();break; case"notifications":renderNotifications();break; case"system":renderSystem();break; case"consultationForm":renderConsultationForm();break; } updateUnreadBadge(); }
 function switchView(v){ currentView=v; document.querySelectorAll(".sidebar-nav a[data-view]").forEach(el=>el.classList.toggle("active",el.dataset.view===v)); rerender(); }
 function updateUnreadBadge(){ const cnt=notificationsCache.filter(n=>!n.read).length; const el=document.getElementById("unreadBadge"); if(!el)return; el.textContent=cnt; el.style.display=cnt>0?"inline-flex":"none"; }
 
@@ -1410,84 +1365,99 @@ function updateUnreadBadge(){ const cnt=notificationsCache.filter(n=>!n.read).le
    1. 대시보드
    ══════════════════════ */
 function renderDashboard(){
-  const activeJobs=jobsCache.filter(j=>j.status==="진행중").length;
-  const total=applicantsCache.length;
-  const upcoming=applicantsCache.filter(a=>a.status==="면접예정").length;
-  const passed=applicantsCache.filter(a=>a.status==="최종합격").length;
-  const recent=applicantsCache.slice(0,6);
-  const rows=recent.length?recent.map(a=>`<tr>
-    <td><div class="cell-name">${esc(a.name)}</div></td>
-    <td>${esc(a.jobTitle||"-")}</td>
-    <td>${esc(a.experience||"-")}</td>
-    <td>${a.interviewDate||"-"}</td>
-    <td>${statusBadge(a.status)}</td>
+  const activeProducts=productsCache.filter(p=>p.status==="판매중").length;
+  const total=customersCache.length;
+  const upcoming=customersCache.filter(c=>c.status==="상담예정").length;
+  const contracted=customersCache.filter(c=>c.status==="계약완료").length;
+  const mrr=customersCache.filter(c=>c.status==="계약완료"&&c.contractCreated&&c.contract?.monthlyFee)
+    .reduce((sum,c)=>sum+Number(c.contract.monthlyFee||0),0);
+  const recent=customersCache.slice(0,6);
+  const rows=recent.length?recent.map(c=>`<tr>
+    <td><div class="cell-name">${esc(c.name)}</div><div class="cell-sub">${esc(c.company||"")}</div></td>
+    <td>${esc(c.productName||"-")}</td>
+    <td>${esc(c.infra||"-")}</td>
+    <td>${c.consultDate||"-"}</td>
+    <td>${statusBadge(c.status)}</td>
   </tr>`).join(""):
-  `<tr class="empty-row"><td colspan="5"><span class="empty-icon">📭</span>등록된 지원자가 없습니다.</td></tr>`;
+  `<tr class="empty-row"><td colspan="5"><span class="empty-icon">📭</span>등록된 고객이 없습니다.</td></tr>`;
 
   contentEl.innerHTML=`
   <div class="page-header">
-    <div><div class="page-title">대시보드</div><div class="page-subtitle">채용 현황을 한 눈에 확인하세요</div></div>
+    <div><div class="page-title">대시보드</div><div class="page-subtitle">영업 및 계약 현황을 한 눈에 확인하세요</div></div>
   </div>
   <div class="stat-grid">
-    <div class="stat-card"><div class="stat-label">진행중 공고</div><div class="stat-value">${activeJobs}</div><div class="stat-icon">📋</div></div>
-    <div class="stat-card"><div class="stat-label">총 지원자</div><div class="stat-value">${total}</div><div class="stat-icon">👥</div></div>
-    <div class="stat-card"><div class="stat-label">면접 예정</div><div class="stat-value">${upcoming}</div><div class="stat-icon">🗓</div></div>
-    <div class="stat-card"><div class="stat-label">최종 합격</div><div class="stat-value">${passed}</div><div class="stat-icon">🏆</div></div>
+    <div class="stat-card"><div class="stat-label">판매중 서버상품</div><div class="stat-value">${activeProducts}</div><div class="stat-icon">🖧</div></div>
+    <div class="stat-card"><div class="stat-label">총 고객수</div><div class="stat-value">${total}</div><div class="stat-icon">👥</div></div>
+    <div class="stat-card"><div class="stat-label">상담 예정</div><div class="stat-value">${upcoming}</div><div class="stat-icon">🗓</div></div>
+    <div class="stat-card"><div class="stat-label">계약 완료</div><div class="stat-value">${contracted}</div><div class="stat-icon">📄</div></div>
   </div>
   <div class="panel">
-    <div class="panel-header"><span class="panel-title">최근 지원자 현황</span><button class="btn btn-ghost btn-sm" data-action="go-interviews">전체 보기 →</button></div>
-    <div class="panel-body"><table><thead><tr><th>성명</th><th>지원직무</th><th>경력</th><th>면접일</th><th>상태</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="panel-header">
+      <span class="panel-title">월 반복 매출 (MRR)</span>
+      <span style="font-size:13px;font-weight:700;color:var(--brand);">${mrr.toLocaleString()}만원 / 월</span>
+    </div>
+    <div class="panel-inner"><p style="font-size:12px;color:var(--slate-400);">계약완료 고객의 월 이용료 합계입니다. 계약 정보는 [계약 고객] 메뉴에서 관리합니다.</p></div>
+  </div>
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">최근 고객 현황</span><button class="btn btn-ghost btn-sm" data-action="go-customers">전체 보기 →</button></div>
+    <div class="panel-body"><table><thead><tr><th>고객명 / 회사</th><th>관심 상품</th><th>기존 인프라</th><th>상담일</th><th>상태</th></tr></thead><tbody>${rows}</tbody></table></div>
   </div>`;
 }
 
 /* ══════════════════════
-   2. 채용공고관리
+   2. 서버 상품 관리
    ══════════════════════ */
-function renderJobs(){
-  const rows=jobsCache.length?jobsCache.map(j=>`<tr>
-    <td><div class="cell-name">${esc(j.title)}</div></td>
-    <td>${esc(j.department||"-")}</td>
-    <td>${esc(j.position||"-")}</td>
-    <td class="center">${j.headcount||0}명</td>
-    <td class="center">${j.deadline||"-"}</td>
-    <td class="center">${jobBadge(j.status)}</td>
+function renderProducts(){
+  const rows=productsCache.length?productsCache.map(p=>`<tr>
+    <td><div class="cell-name">${esc(p.name)}</div></td>
+    <td>${esc(p.category||"-")}</td>
+    <td>${esc(p.specs||"-")}</td>
+    <td class="center" style="white-space:nowrap;">${p.monthlyPrice?Number(p.monthlyPrice).toLocaleString()+"만원":"-"}</td>
+    <td class="center">${p.stock??0}대</td>
+    <td class="center">${p.promoEnd||"-"}</td>
+    <td class="center">${productBadge(p.status)}</td>
     <td class="actions">
-      <button class="btn btn-secondary btn-sm" data-action="edit-job" data-id="${j.id}">수정</button>
-      <button class="btn btn-danger btn-sm" data-action="remove-job" data-id="${j.id}">삭제</button>
+      <button class="btn btn-secondary btn-sm" data-action="edit-product" data-id="${p.id}">수정</button>
+      <button class="btn btn-danger btn-sm" data-action="remove-product" data-id="${p.id}">삭제</button>
     </td>
   </tr>`).join(""):
-  `<tr class="empty-row"><td colspan="7"><span class="empty-icon">📋</span>등록된 채용공고가 없습니다.</td></tr>`;
+  `<tr class="empty-row"><td colspan="8"><span class="empty-icon">🖧</span>등록된 서버 상품이 없습니다.</td></tr>`;
 
   contentEl.innerHTML=`
   <div class="page-header">
-    <div><div class="page-title">채용공고 관리</div><div class="page-subtitle">총 ${jobsCache.length}건 · 진행중 ${jobsCache.filter(j=>j.status==="진행중").length}건</div></div>
-    <button class="btn btn-primary" data-action="open-job-modal">+ 공고 등록</button>
+    <div><div class="page-title">서버 상품 관리</div><div class="page-subtitle">총 ${productsCache.length}종 · 판매중 ${productsCache.filter(p=>p.status==="판매중").length}종</div></div>
+    <button class="btn btn-primary" data-action="open-product-modal">+ 상품 등록</button>
   </div>
   <div class="panel">
     <div class="panel-body"><table>
-      <thead><tr><th>공고명</th><th>부서</th><th>직무</th><th style="text-align:center">모집인원</th><th style="text-align:center">마감일</th><th style="text-align:center">상태</th><th>관리</th></tr></thead>
+      <thead><tr><th>상품명</th><th>유형</th><th>사양</th><th style="text-align:center">월 이용료</th><th style="text-align:center">재고</th><th style="text-align:center">프로모션 마감</th><th style="text-align:center">판매상태</th><th>관리</th></tr></thead>
       <tbody>${rows}</tbody>
     </table></div>
   </div>`;
 }
-function openJobModal(id){
-  const job=id?jobsCache.find(j=>j.id===id):null;
+function openProductModal(id){
+  const p=id?productsCache.find(x=>x.id===id):null;
   showModal(`
-  <div class="modal-head"><span class="modal-title">${job?"채용공고 수정":"채용공고 등록"}</span><button class="modal-close" data-action="close-modal">✕</button></div>
-  <div class="modal-body"><form id="jobForm">
-    <div class="form-group"><label>공고명 *</label><input class="form-control" name="title" required value="${job?esc(job.title):""}"></div>
+  <div class="modal-head"><span class="modal-title">${p?"서버 상품 수정":"서버 상품 등록"}</span><button class="modal-close" data-action="close-modal">✕</button></div>
+  <div class="modal-body"><form id="productForm">
+    <div class="form-group"><label>상품명 *</label><input class="form-control" name="name" required placeholder="예: 클라우드 서버 Standard" value="${p?esc(p.name):""}"></div>
     <div class="form-row">
-      <div class="form-group"><label>부서</label><input class="form-control" name="department" value="${job?esc(job.department||""):""}"></div>
-      <div class="form-group"><label>직무</label><input class="form-control" name="position" value="${job?esc(job.position||""):""}"></div>
+      <div class="form-group"><label>유형</label>
+        <select class="form-control" name="category">
+          ${["클라우드 서버","전용 서버","VPS","코로케이션","매니지드 서비스"].map(c=>`<option value="${c}" ${p&&p.category===c?"selected":""}>${c}</option>`).join("")}
+        </select>
+      </div>
+      <div class="form-group"><label>사양</label><input class="form-control" name="specs" placeholder="예: 8vCPU / 16GB / SSD 500GB" value="${p?esc(p.specs||""):""}"></div>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label>모집인원</label><input class="form-control" type="number" name="headcount" min="0" value="${job?(job.headcount||0):1}"></div>
-      <div class="form-group"><label>마감일</label><input class="form-control" type="date" name="deadline" value="${job?(job.deadline||""):""}"></div>
+    <div class="form-row-3">
+      <div class="form-group"><label>월 이용료 (만원)</label><input class="form-control" type="number" name="monthlyPrice" min="0" value="${p?(p.monthlyPrice||0):0}"></div>
+      <div class="form-group"><label>재고 (대)</label><input class="form-control" type="number" name="stock" min="0" value="${p?(p.stock||0):1}"></div>
+      <div class="form-group"><label>프로모션 마감일</label><input class="form-control" type="date" name="promoEnd" value="${p?(p.promoEnd||""):""}"></div>
     </div>
-    <div class="form-group"><label>상태</label>
+    <div class="form-group"><label>판매상태</label>
       <select class="form-control" name="status">
-        <option value="진행중" ${job&&job.status==="진행중"?"selected":""}>진행중</option>
-        <option value="마감"   ${job&&job.status==="마감"?"selected":""}>마감</option>
+        <option value="판매중"   ${p&&p.status==="판매중"?"selected":""}>판매중</option>
+        <option value="판매중지" ${p&&p.status==="판매중지"?"selected":""}>판매중지</option>
       </select>
     </div>
     <div class="modal-footer" style="padding:0;border:none;margin-top:4px;">
@@ -1495,51 +1465,47 @@ function openJobModal(id){
       <button type="submit" class="btn btn-primary">저장</button>
     </div>
   </form></div>`);
-  document.getElementById("jobForm").addEventListener("submit",async e=>{
+  document.getElementById("productForm").addEventListener("submit",async e=>{
     e.preventDefault();
     const fd=new FormData(e.target);
-    const data={title:fd.get("title").trim(),department:fd.get("department").trim(),position:fd.get("position").trim(),headcount:Number(fd.get("headcount"))||0,deadline:fd.get("deadline"),status:fd.get("status")};
-    try{ if(job) await updateDoc(doc(db,"jobPostings",job.id),data); else await addDoc(colJobs,{...data,createdAt:serverTimestamp()}); closeModal(); }
+    const data={name:fd.get("name").trim(),category:fd.get("category"),specs:fd.get("specs").trim(),monthlyPrice:Number(fd.get("monthlyPrice"))||0,stock:Number(fd.get("stock"))||0,promoEnd:fd.get("promoEnd"),status:fd.get("status")};
+    try{ if(p) await updateDoc(doc(db,"serverProducts",p.id),data); else await addDoc(colProducts,{...data,createdAt:serverTimestamp()}); closeModal(); }
     catch(err){ alert("저장 오류: "+err.message); }
   });
 }
-async function removeJob(id){ if(!confirm("채용공고를 삭제하시겠습니까?"))return; try{ await deleteDoc(doc(db,"jobPostings",id)); }catch(err){ alert("삭제 오류: "+err.message); } }
+async function removeProduct(id){ if(!confirm("서버 상품을 삭제하시겠습니까?"))return; try{ await deleteDoc(doc(db,"serverProducts",id)); }catch(err){ alert("삭제 오류: "+err.message); } }
 
 /* ══════════════════════════════════════════════════════
-   3. 면접관리  (정렬 기능 포함)
+   3. 고객 관리  (정렬 기능 포함)
    ══════════════════════════════════════════════════════ */
 
-/* 컬럼 정의: key, 헤더 텍스트, 정렬 가능 여부, 정렬값 추출 함수 */
-const INTERVIEW_COLS = [
-  { key:"name",         label:"성명",     sortable:true,  align:"",       val:a=>a.name||"" },
-  { key:"jobTitle",     label:"지원직무", sortable:true,  align:"",       val:a=>a.jobTitle||"" },
-  { key:"experience",   label:"경력",     sortable:true,  align:"",       val:a=>a.experience||"" },
-  { key:"age",          label:"나이",     sortable:true,  align:"center", val:a=>a.age??-1 },
-  { key:"address",      label:"거주지",   sortable:true,  align:"",       val:a=>a.address||"" },
-  { key:"prevSalary",   label:"직전연봉", sortable:true,  align:"center", val:a=>a.prevSalary??-1 },
-  { key:"interviewDate",label:"면접일시", sortable:true,  align:"",       val:a=>[a.interviewDate||"",a.interviewTime||""].join(" ").trim() },
-  { key:"resume",       label:"이력서",   sortable:false, align:"",       val:null },
-  { key:"status",       label:"상태",     sortable:true,  align:"",       val:a=>{ const ORDER={"면접예정":0,"면접완료":1,"최종합격":2,"불합격":3}; return ORDER[a.status]??9; } },
-  { key:"actions",      label:"관리",     sortable:false, align:"",       val:null },
+const CUSTOMER_COLS = [
+  { key:"name",         label:"고객명 / 회사", sortable:true,  align:"",       val:c=>c.name||"" },
+  { key:"productName",  label:"관심 상품",     sortable:true,  align:"",       val:c=>c.productName||"" },
+  { key:"infra",        label:"기존 인프라",   sortable:true,  align:"",       val:c=>c.infra||"" },
+  { key:"employees",    label:"임직원수",      sortable:true,  align:"center", val:c=>c.employees??-1 },
+  { key:"address",      label:"소재지",        sortable:true,  align:"",       val:c=>c.address||"" },
+  { key:"budget",       label:"월 예산",       sortable:true,  align:"center", val:c=>c.budget??-1 },
+  { key:"consultDate",  label:"상담일시",      sortable:true,  align:"",       val:c=>[c.consultDate||"",c.consultTime||""].join(" ").trim() },
+  { key:"attachment",   label:"첨부파일",      sortable:false, align:"",       val:null },
+  { key:"status",       label:"상태",          sortable:true,  align:"",       val:c=>{ const ORDER={"상담예정":0,"상담완료":1,"계약완료":2,"계약보류":3}; return ORDER[c.status]??9; } },
+  { key:"actions",      label:"관리",          sortable:false, align:"",       val:null },
 ];
 
-function renderInterviews(){
-  /* 1. 검색 필터 */
-  let list=applicantsCache.slice();
-  if(interviewSearch.trim()){
-    const t=interviewSearch.trim();
-    list=list.filter(a=>(a.name&&a.name.includes(t))||(a.jobTitle&&a.jobTitle.includes(t))||(a.phone&&a.phone.includes(t)));
+function renderCustomers(){
+  let list=customersCache.slice();
+  if(customerSearch.trim()){
+    const t=customerSearch.trim();
+    list=list.filter(c=>(c.name&&c.name.includes(t))||(c.company&&c.company.includes(t))||(c.productName&&c.productName.includes(t))||(c.phone&&c.phone.includes(t)));
   }
 
-  /* 2. 정렬 */
-  if(interviewSortKey){
-    const col=INTERVIEW_COLS.find(c=>c.key===interviewSortKey);
+  if(customerSortKey){
+    const col=CUSTOMER_COLS.find(c=>c.key===customerSortKey);
     if(col&&col.val){
       list.sort((a,b)=>{
         const av=col.val(a), bv=col.val(b);
         let cmp=0;
         if(typeof av==="number"&&typeof bv==="number"){
-          // 값 없음(-1)은 항상 뒤로
           if(av===-1&&bv===-1) cmp=0;
           else if(av===-1) cmp=1;
           else if(bv===-1) cmp=-1;
@@ -1547,68 +1513,65 @@ function renderInterviews(){
         } else {
           cmp=String(av).localeCompare(String(bv),"ko");
         }
-        return interviewSortDir==="asc"?cmp:-cmp;
+        return customerSortDir==="asc"?cmp:-cmp;
       });
     }
   }
 
-  /* 3. 헤더 HTML */
-  const thHtml = INTERVIEW_COLS.map(col=>{
+  const thHtml = CUSTOMER_COLS.map(col=>{
     if(!col.sortable) return `<th${col.align?` style="text-align:${col.align}"`:""}>${col.label}</th>`;
-    const isActive = interviewSortKey===col.key;
-    const icon = isActive ? (interviewSortDir==="asc"?"▲":"▼") : "⇅";
+    const isActive = customerSortKey===col.key;
+    const icon = isActive ? (customerSortDir==="asc"?"▲":"▼") : "⇅";
     const alignStyle = col.align ? `text-align:${col.align};` : "";
-    return `<th class="sortable${isActive?" active":""}" data-action="sort-interviews" data-key="${col.key}"${alignStyle?` style="${alignStyle}"`:""}>${col.label}<span class="sort-icon">${icon}</span></th>`;
+    return `<th class="sortable${isActive?" active":""}" data-action="sort-customers" data-key="${col.key}"${alignStyle?` style="${alignStyle}"`:""}>${col.label}<span class="sort-icon">${icon}</span></th>`;
   }).join("");
 
-  /* 4. 행 HTML */
-  const rows=list.length?list.map(a=>{
-    const dtLabel=[a.interviewDate,a.interviewTime].filter(Boolean).join(" ")||"-";
-    const resumeCell=a.resume&&a.resume.dataUrl
-      ?`<a href="javascript:void(0)" data-action="view-resume" data-id="${a.id}" style="color:var(--brand);font-weight:600;">${esc(a.resume.fileName||"이력서")}</a>`
+  const rows=list.length?list.map(c=>{
+    const dtLabel=[c.consultDate,c.consultTime].filter(Boolean).join(" ")||"-";
+    const attachCell=c.attachment&&c.attachment.dataUrl
+      ?`<a href="javascript:void(0)" data-action="view-attachment" data-id="${c.id}" style="color:var(--brand);font-weight:600;">${esc(c.attachment.fileName||"첨부파일")}</a>`
       :`<span style="color:var(--slate-300);">미첨부</span>`;
-    const evalBadge = a.evaluation
-      ? `<span class="badge badge-eval-done" data-action="view-evaluation" data-id="${a.id}" style="margin-top:5px;display:inline-flex;cursor:pointer;" title="클릭하면 평가서를 확인합니다">✅ 평가완료</span>`
+    const consultBadge = c.consultation
+      ? `<span class="badge badge-eval-done" data-action="view-consultation" data-id="${c.id}" style="margin-top:5px;display:inline-flex;cursor:pointer;" title="클릭하면 상담기록서를 확인합니다">✅ 상담기록 완료</span>`
       : "";
     const actionBtns=
-      a.status==="면접예정"?`<button class="btn btn-primary btn-sm" data-action="interview-done" data-id="${a.id}">면접완료</button>`:
-      a.status==="면접완료"?`<button class="btn btn-success btn-sm" data-action="interview-pass" data-id="${a.id}">최종합격</button><button class="btn btn-danger btn-sm" data-action="interview-fail" data-id="${a.id}">불합격</button>`:"";
-    const ageTxt    = a.age       ? `${a.age}세`                               : `-`;
-    const addressTxt= a.address   ? esc(a.address)                             : `-`;
-    const salaryTxt = a.prevSalary? `${Number(a.prevSalary).toLocaleString()}만` : `-`;
+      c.status==="상담예정"?`<button class="btn btn-primary btn-sm" data-action="customer-consulted" data-id="${c.id}">상담완료</button>`:
+      c.status==="상담완료"?`<button class="btn btn-success btn-sm" data-action="customer-contracted" data-id="${c.id}">계약완료</button><button class="btn btn-danger btn-sm" data-action="customer-hold" data-id="${c.id}">계약보류</button>`:"";
+    const empTxt    = c.employees ? `${c.employees}명` : `-`;
+    const addressTxt= c.address   ? esc(c.address)     : `-`;
+    const budgetTxt = fmtWon(c.budget);
     return `<tr>
-      <td><div class="cell-name">${esc(a.name)}</div><div class="cell-sub">${esc(a.phone||"")}</div></td>
-      <td>${esc(a.jobTitle||"-")}</td>
-      <td>${esc(a.experience||"-")}</td>
-      <td class="center">${ageTxt}</td>
+      <td><div class="cell-name">${esc(c.name)}</div><div class="cell-sub">${esc(c.company||"")}${c.phone?" · "+esc(c.phone):""}</div></td>
+      <td>${esc(c.productName||"-")}</td>
+      <td>${esc(c.infra||"-")}</td>
+      <td class="center">${empTxt}</td>
       <td><div style="font-size:12px;">${addressTxt}</div></td>
-      <td class="center" style="white-space:nowrap;">${salaryTxt}</td>
+      <td class="center" style="white-space:nowrap;">${budgetTxt}</td>
       <td><div>${dtLabel}</div></td>
-      <td>${resumeCell}</td>
-      <td><div>${statusBadge(a.status)}</div>${evalBadge}</td>
+      <td>${attachCell}</td>
+      <td><div>${statusBadge(c.status)}</div>${consultBadge}</td>
       <td class="actions">
-        <button class="btn btn-secondary btn-sm" data-action="edit-applicant" data-id="${a.id}">수정</button>
-        <button class="btn btn-ghost btn-sm" data-action="open-evaluation" data-id="${a.id}">${a.evaluation?"평가수정":"평가서"}</button>
+        <button class="btn btn-secondary btn-sm" data-action="edit-customer" data-id="${c.id}">수정</button>
+        <button class="btn btn-ghost btn-sm" data-action="open-consultation" data-id="${c.id}">${c.consultation?"상담기록수정":"상담기록"}</button>
         ${actionBtns}
-        <button class="btn btn-danger btn-xs" data-action="remove-applicant" data-id="${a.id}">삭제</button>
+        <button class="btn btn-danger btn-xs" data-action="remove-customer" data-id="${c.id}">삭제</button>
       </td>
     </tr>`;}).join(""):
-    `<tr class="empty-row"><td colspan="10"><span class="empty-icon">🗓</span>${interviewSearch?"검색 결과가 없습니다.":"등록된 면접 대상자가 없습니다."}</td></tr>`;
+    `<tr class="empty-row"><td colspan="10"><span class="empty-icon">🗂</span>${customerSearch?"검색 결과가 없습니다.":"등록된 고객이 없습니다."}</td></tr>`;
 
-  /* 5. 정렬 상태 표시 레이블 */
-  const sortStatusLabel = interviewSortKey
-    ? `<span style="font-size:11px;color:var(--brand);font-weight:600;margin-left:8px;">정렬: ${INTERVIEW_COLS.find(c=>c.key===interviewSortKey)?.label} ${interviewSortDir==="asc"?"↑":"↓"}</span>
+  const sortStatusLabel = customerSortKey
+    ? `<span style="font-size:11px;color:var(--brand);font-weight:600;margin-left:8px;">정렬: ${CUSTOMER_COLS.find(c=>c.key===customerSortKey)?.label} ${customerSortDir==="asc"?"↑":"↓"}</span>
        <button class="btn btn-ghost btn-xs" data-action="sort-reset" style="margin-left:4px;">초기화</button>`
     : `<span style="font-size:11px;color:var(--slate-400);margin-left:8px;">컬럼 헤더를 클릭하면 정렬됩니다</span>`;
 
   contentEl.innerHTML=`
   <div class="page-header">
-    <div><div class="page-title">면접 관리</div><div class="page-subtitle">총 ${applicantsCache.length}명 · 면접예정 ${applicantsCache.filter(a=>a.status==="면접예정").length}명</div></div>
-    <button class="btn btn-primary" data-action="open-applicant-modal">+ 면접 대상자 등록</button>
+    <div><div class="page-title">고객 관리</div><div class="page-subtitle">총 ${customersCache.length}건 · 상담예정 ${customersCache.filter(c=>c.status==="상담예정").length}건</div></div>
+    <button class="btn btn-primary" data-action="open-customer-modal">+ 고객 등록</button>
   </div>
   <div class="panel">
     <div class="filter-row" style="align-items:center;">
-      <input class="filter-input" type="text" id="interviewSearch" placeholder="🔍  성명 · 직무 · 연락처 검색" value="${esc(interviewSearch)}">
+      <input class="filter-input" type="text" id="customerSearch" placeholder="🔍  고객명 · 회사명 · 상품명 · 연락처 검색" value="${esc(customerSearch)}">
       <div style="display:flex;align-items:center;flex-shrink:0;">${sortStatusLabel}</div>
     </div>
     <div class="panel-body"><table>
@@ -1617,74 +1580,72 @@ function renderInterviews(){
     </table></div>
   </div>`;
 
-  /* 6. 검색 이벤트 */
-  const se = document.getElementById("interviewSearch");
+  const se = document.getElementById("customerSearch");
   if(se){
     se.addEventListener("compositionstart", ()=>{ isComposing=true; });
-    se.addEventListener("compositionend",   ()=>{ isComposing=false; interviewSearch=se.value; renderInterviews(); restoreFocus(); });
+    se.addEventListener("compositionend",   ()=>{ isComposing=false; customerSearch=se.value; renderCustomers(); restoreFocus(); });
     se.addEventListener("input", ()=>{
       if(isComposing) return;
-      interviewSearch=se.value; renderInterviews(); restoreFocus();
+      customerSearch=se.value; renderCustomers(); restoreFocus();
     });
   }
   function restoreFocus(){
-    const re=document.getElementById("interviewSearch");
+    const re=document.getElementById("customerSearch");
     if(re){ re.focus(); re.selectionStart=re.selectionEnd=re.value.length; }
   }
 }
 
-/* ── [수정 2] 완성된 평가서 모달로 바로보기 ── */
-function viewEvaluationModal(id) {
-  const a = applicantsCache.find(x => x.id === id);
-  if (!a || !a.evaluation) return;
+/* 완성된 상담기록서 모달로 바로보기 */
+function viewConsultationModal(id) {
+  const c = customersCache.find(x => x.id === id);
+  if (!c || !c.consultation) return;
 
-  const ev = a.evaluation;
-  const dt = [a.interviewDate, a.interviewTime].filter(Boolean).join(" ");
+  const cs = c.consultation;
+  const dt = [c.consultDate, c.consultTime].filter(Boolean).join(" ");
 
-  // buildReport 재현을 위해 evalDraft 형태로 변환
   const draft = {
-    competencies: (ev.competencies || []).map(c => ({
-      id: uid(), title: c.title||"", items: c.items||"", score: c.score||"", comment: c.comment||""
+    requirements: (cs.requirements || []).map(r => ({
+      id: uid(), title: r.title||"", items: r.items||"", score: r.score||"", comment: r.comment||""
     })),
-    personality: ev.personality||"",
-    strengths:   ev.strengths||"",
-    risks:       ev.risks||"",
-    comment:     ev.comment||"",
-    recommendation: ev.recommendation||"",
-    interviewerName:  ev.interviewerName||"",
-    interviewerTitle: ev.interviewerTitle||""
+    background:  cs.background||"",
+    opportunity: cs.opportunity||"",
+    risks:       cs.risks||"",
+    comment:     cs.comment||"",
+    recommendation: cs.recommendation||"",
+    salesRepName:  cs.salesRepName||"",
+    salesRepTitle: cs.salesRepTitle||""
   };
 
-  const reportText = ev.reportText || buildReport(a, draft);
-  const updatedAt  = ev.updatedAt ? fmtDateTime(ev.updatedAt) : "-";
+  const reportText = cs.reportText || buildReport(c, draft);
+  const updatedAt  = cs.updatedAt ? fmtDateTime(cs.updatedAt) : "-";
 
-  const recEmoji = ev.recommendation === "채용추천" ? "✅" : ev.recommendation === "보류" ? "🔶" : ev.recommendation === "비추천" ? "❌" : "";
-  const recBadge = ev.recommendation
-    ? `<span class="badge ${ev.recommendation==="채용추천"?"badge-passed":ev.recommendation==="보류"?"badge-scheduled":"badge-failed"}">${recEmoji} ${esc(ev.recommendation)}</span>`
+  const recEmoji = cs.recommendation === "계약추천" ? "✅" : cs.recommendation === "보류" ? "🔶" : cs.recommendation === "영업종료" ? "❌" : "";
+  const recBadge = cs.recommendation
+    ? `<span class="badge ${cs.recommendation==="계약추천"?"badge-passed":cs.recommendation==="보류"?"badge-scheduled":"badge-failed"}">${recEmoji} ${esc(cs.recommendation)}</span>`
     : "";
 
   showModal(`
   <div class="modal-head">
-    <span class="modal-title">📋 면접 평가서 — ${esc(a.name)}</span>
+    <span class="modal-title">📋 고객 상담기록서 — ${esc(c.name)}</span>
     <button class="modal-close" data-action="close-modal">✕</button>
   </div>
   <div class="modal-body">
     <div class="eval-modal-meta">
-      ${statusBadge(a.status)}
+      ${statusBadge(c.status)}
       ${recBadge}
       <span style="font-size:12px;color:var(--slate-400);margin-left:auto;">작성일: ${updatedAt}</span>
     </div>
-    <div class="eval-modal-preview" id="evalModalPreviewText">${esc(reportText)}</div>
+    <div class="eval-modal-preview" id="consultModalPreviewText">${esc(reportText)}</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button type="button" class="btn btn-ghost btn-sm" id="evalModalCopyBtn">📋 텍스트 복사</button>
-      <button type="button" class="btn btn-ghost btn-sm" data-action="open-evaluation" data-id="${id}">✏️ 평가서 수정</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="consultModalCopyBtn">📋 텍스트 복사</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-action="open-consultation" data-id="${id}">✏️ 상담기록 수정</button>
     </div>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" data-action="close-modal">닫기</button>
   </div>`, true);
 
-  document.getElementById("evalModalCopyBtn")?.addEventListener("click", async () => {
+  document.getElementById("consultModalCopyBtn")?.addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(reportText);
       alert("클립보드에 복사되었습니다.");
@@ -1694,45 +1655,47 @@ function viewEvaluationModal(id) {
   });
 }
 
-function openApplicantModal(id){
-  const a=id?applicantsCache.find(x=>x.id===id):null;
-  const jobOpts=jobsCache.length
-    ?`<option value="">직접입력(아래 직무명 사용)</option>`+jobsCache.map(j=>`<option value="${j.id}" ${a&&a.jobPostingId===j.id?"selected":""}>${esc(j.title)}</option>`).join("")
-    :`<option value="">등록된 공고가 없습니다</option>`;
-  const resumeInfo=a&&a.resume&&a.resume.dataUrl
-    ?`<div class="resume-tag">📎 <a href="javascript:void(0)" data-action="view-resume" data-id="${a.id}">${esc(a.resume.fileName)}</a> (${fmtBytes(a.resume.size)}) <button type="button" class="btn btn-danger btn-xs" id="removeResumeBtn">삭제</button></div>`
+function openCustomerModal(id){
+  const c=id?customersCache.find(x=>x.id===id):null;
+  const productOpts=productsCache.length
+    ?`<option value="">직접입력(아래 상품명 사용)</option>`+productsCache.map(p=>`<option value="${p.id}" ${c&&c.productId===p.id?"selected":""}>${esc(p.name)}</option>`).join("")
+    :`<option value="">등록된 상품이 없습니다</option>`;
+  const attachInfo=c&&c.attachment&&c.attachment.dataUrl
+    ?`<div class="resume-tag">📎 <a href="javascript:void(0)" data-action="view-attachment" data-id="${c.id}">${esc(c.attachment.fileName)}</a> (${fmtBytes(c.attachment.size)}) <button type="button" class="btn btn-danger btn-xs" id="removeAttachBtn">삭제</button></div>`
     :"";
   showModal(`
-  <div class="modal-head"><span class="modal-title">${a?"면접 대상자 수정":"면접 대상자 등록"}</span><button class="modal-close" data-action="close-modal">✕</button></div>
-  <div class="modal-body"><form id="applicantForm">
-    <div class="form-group"><label>성명 *</label><input class="form-control" name="name" required value="${a?esc(a.name):""}"></div>
-    <div class="form-group"><label>채용공고 연결</label><select class="form-control" name="jobPostingId">${jobOpts}</select></div>
-    <div class="form-group"><label>직무명 (공고 미선택 시 직접 입력)</label><input class="form-control" name="jobTitleManual" placeholder="예: 백엔드 개발자" value="${a&&!a.jobPostingId?esc(a.jobTitle||""):""}"></div>
+  <div class="modal-head"><span class="modal-title">${c?"고객 정보 수정":"고객 등록"}</span><button class="modal-close" data-action="close-modal">✕</button></div>
+  <div class="modal-body"><form id="customerForm">
     <div class="form-row">
-      <div class="form-group"><label>경력</label><input class="form-control" name="experience" placeholder="3년 / 신입" value="${a?esc(a.experience||""):""}"></div>
-      <div class="form-group"><label>연락처</label><input class="form-control" name="phone" value="${a?esc(a.phone||""):""}"></div>
+      <div class="form-group"><label>담당자명 *</label><input class="form-control" name="name" required value="${c?esc(c.name):""}"></div>
+      <div class="form-group"><label>회사명</label><input class="form-control" name="company" placeholder="예: (주)예시테크" value="${c?esc(c.company||""):""}"></div>
+    </div>
+    <div class="form-group"><label>관심 서버상품 연결</label><select class="form-control" name="productId">${productOpts}</select></div>
+    <div class="form-group"><label>상품명 (상품 미선택 시 직접 입력)</label><input class="form-control" name="productNameManual" placeholder="예: 클라우드 서버 Standard" value="${c&&!c.productId?esc(c.productName||""):""}"></div>
+    <div class="form-row">
+      <div class="form-group"><label>기존 인프라</label><input class="form-control" name="infra" placeholder="예: AWS 사용중 / 자체 IDC / 신규 도입" value="${c?esc(c.infra||""):""}"></div>
+      <div class="form-group"><label>연락처</label><input class="form-control" name="phone" value="${c?esc(c.phone||""):""}"></div>
     </div>
 
-    <!-- [수정 1] 나이 / 직전연봉 / 거주지 추가 -->
     <div class="form-row-3">
-      <div class="form-group"><label>나이</label><input class="form-control" name="age" type="number" min="0" placeholder="만 나이" value="${a?esc(a.age||""):""}"></div>
-      <div class="form-group"><label>직전연봉 (만원)</label><input class="form-control" name="prevSalary" type="number" min="0" placeholder="예: 4500" value="${a?esc(a.prevSalary||""):""}"></div>
-      <div class="form-group"><label>거주지</label><input class="form-control" name="address" placeholder="예: 서울 강남구" value="${a?esc(a.address||""):""}"></div>
+      <div class="form-group"><label>임직원수</label><input class="form-control" name="employees" type="number" min="0" placeholder="명" value="${c?esc(c.employees||""):""}"></div>
+      <div class="form-group"><label>월 예산 (만원)</label><input class="form-control" name="budget" type="number" min="0" placeholder="예: 300" value="${c?esc(c.budget||""):""}"></div>
+      <div class="form-group"><label>소재지</label><input class="form-control" name="address" placeholder="예: 서울 강남구" value="${c?esc(c.address||""):""}"></div>
     </div>
 
-    <div class="form-group"><label>이메일</label><input class="form-control" type="email" name="email" value="${a?esc(a.email||""):""}"></div>
+    <div class="form-group"><label>이메일</label><input class="form-control" type="email" name="email" value="${c?esc(c.email||""):""}"></div>
     <div class="form-row">
-      <div class="form-group"><label>면접 날짜</label><input class="form-control" type="date" name="interviewDate" value="${a?(a.interviewDate||""):""}"></div>
-      <div class="form-group"><label>면접 시간</label><input class="form-control" type="time" name="interviewTime" value="${a?(a.interviewTime||""):""}"></div>
+      <div class="form-group"><label>상담 날짜</label><input class="form-control" type="date" name="consultDate" value="${c?(c.consultDate||""):""}"></div>
+      <div class="form-group"><label>상담 시간</label><input class="form-control" type="time" name="consultTime" value="${c?(c.consultTime||""):""}"></div>
     </div>
     <div class="form-group">
-      <label>이력서 첨부 (PDF·이미지·문서 · 700KB 이하)</label>
-      <input class="form-control" type="file" name="resumeFile" id="resumeFileInput" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+      <label>첨부파일 (견적요청서 · 인프라구성도 등 · 700KB 이하)</label>
+      <input class="form-control" type="file" name="attachFile" id="attachFileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
       <div class="form-hint">첨부 파일은 Firestore에 직접 저장됩니다. 용량 제한으로 약 700KB 이하만 허용됩니다.</div>
-      ${resumeInfo}
+      ${attachInfo}
     </div>
-    ${a?`<div class="form-group"><label>상태</label><select class="form-control" name="status">${STATUSES.map(s=>`<option value="${s}" ${a.status===s?"selected":""}>${s}</option>`).join("")}</select></div>`:""}
-    <div class="form-group"><label>비고</label><textarea class="form-control" name="notes" rows="2">${a?esc(a.notes||""):""}</textarea></div>
+    ${c?`<div class="form-group"><label>상태</label><select class="form-control" name="status">${STATUSES.map(s=>`<option value="${s}" ${c.status===s?"selected":""}>${s}</option>`).join("")}</select></div>`:""}
+    <div class="form-group"><label>비고</label><textarea class="form-control" name="notes" rows="2">${c?esc(c.notes||""):""}</textarea></div>
     <div class="modal-footer" style="padding:0;border:none;margin-top:4px;">
       <button type="button" class="btn btn-secondary" data-action="close-modal">취소</button>
       <button type="submit" class="btn btn-primary">저장</button>
@@ -1740,35 +1703,34 @@ function openApplicantModal(id){
   </form></div>`);
 
   let removeFlag=false;
-  const rb=document.getElementById("removeResumeBtn");
+  const rb=document.getElementById("removeAttachBtn");
   if(rb) rb.addEventListener("click",()=>{ removeFlag=true; rb.closest(".resume-tag").innerHTML=`<span style="color:var(--slate-400);font-size:12px;">저장 시 첨부가 삭제됩니다.</span>`; });
 
-  document.getElementById("applicantForm").addEventListener("submit",async e=>{
+  document.getElementById("customerForm").addEventListener("submit",async e=>{
     e.preventDefault();
     const fd=new FormData(e.target);
-    const jobId=fd.get("jobPostingId")||null;
-    const job=jobsCache.find(j=>j.id===jobId);
+    const productId=fd.get("productId")||null;
+    const product=productsCache.find(p=>p.id===productId);
     const data={
-      name:fd.get("name").trim(), jobPostingId:jobId,
-      jobTitle:job?job.title:(fd.get("jobTitleManual")||"").trim()||"-",
-      experience:fd.get("experience").trim(), phone:fd.get("phone").trim(),
-      /* [수정 1] 신규 필드 */
-      age: fd.get("age") ? Number(fd.get("age")) : null,
-      prevSalary: fd.get("prevSalary") ? Number(fd.get("prevSalary")) : null,
+      name:fd.get("name").trim(), company:fd.get("company").trim(), productId:productId,
+      productName:product?product.name:(fd.get("productNameManual")||"").trim()||"-",
+      infra:fd.get("infra").trim(), phone:fd.get("phone").trim(),
+      employees: fd.get("employees") ? Number(fd.get("employees")) : null,
+      budget: fd.get("budget") ? Number(fd.get("budget")) : null,
       address: fd.get("address").trim(),
-      email:fd.get("email").trim(), interviewDate:fd.get("interviewDate")||"",
-      interviewTime:fd.get("interviewTime")||"", notes:fd.get("notes").trim()
+      email:fd.get("email").trim(), consultDate:fd.get("consultDate")||"",
+      consultTime:fd.get("consultTime")||"", notes:fd.get("notes").trim()
     };
-    const fi=document.getElementById("resumeFileInput");
+    const fi=document.getElementById("attachFileInput");
     const file=fi&&fi.files&&fi.files[0];
     if(file){
-      if(file.size>RESUME_MAX){ alert(`이력서 크기 초과 (최대 ${fmtBytes(RESUME_MAX)}, 선택: ${fmtBytes(file.size)})`); return; }
-      try{ data.resume={fileName:file.name,mimeType:file.type||"application/octet-stream",size:file.size,dataUrl:await readFile(file)}; }
+      if(file.size>ATTACH_MAX){ alert(`첨부파일 크기 초과 (최대 ${fmtBytes(ATTACH_MAX)}, 선택: ${fmtBytes(file.size)})`); return; }
+      try{ data.attachment={fileName:file.name,mimeType:file.type||"application/octet-stream",size:file.size,dataUrl:await readFile(file)}; }
       catch(err){ alert("파일 읽기 오류: "+err.message); return; }
-    } else if(removeFlag){ data.resume=null; }
+    } else if(removeFlag){ data.attachment=null; }
     try{
-      if(a){ data.status=fd.get("status"); await updateDoc(doc(db,"applicants",a.id),data); }
-      else{ await addDoc(colApplicants,{...data,resume:data.resume||null,status:"면접예정",createdAt:serverTimestamp(),contractCreated:false}); if(settingsCache.autoNotify!==false) notify(`${data.name}님이 면접 대상자로 등록되었습니다.`,"interview"); }
+      if(c){ data.status=fd.get("status"); await updateDoc(doc(db,"customers",c.id),data); }
+      else{ await addDoc(colCustomers,{...data,attachment:data.attachment||null,status:"상담예정",createdAt:serverTimestamp(),contractCreated:false}); if(settingsCache.autoNotify!==false) notify(`${data.name}님(${data.company||"-"})이 신규 고객으로 등록되었습니다.`,"customer"); }
       closeModal();
     } catch(err){
       if(/longer than|exceeds|size/i.test(err.message||"")) alert("첨부 파일을 포함한 용량이 너무 큽니다. 더 작은 파일을 사용해주세요.");
@@ -1776,93 +1738,93 @@ function openApplicantModal(id){
     }
   });
 }
-async function removeApplicant(id){ if(!confirm("해당 지원자를 삭제하시겠습니까?"))return; try{ await deleteDoc(doc(db,"applicants",id)); }catch(err){ alert("삭제 오류: "+err.message); } }
+async function removeCustomer(id){ if(!confirm("해당 고객을 삭제하시겠습니까?"))return; try{ await deleteDoc(doc(db,"customers",id)); }catch(err){ alert("삭제 오류: "+err.message); } }
 async function updateStatus(id,status){
   try{
-    await updateDoc(doc(db,"applicants",id),{status});
+    await updateDoc(doc(db,"customers",id),{status});
     if(settingsCache.autoNotify!==false){
-      if(status==="최종합격") notify(`${getApplicantName(id)}님이 최종합격 처리되었습니다.`,"final");
-      if(status==="불합격")   notify(`${getApplicantName(id)}님이 불합격 처리되었습니다.`,"reject");
-      if(status==="면접완료") notify(`${getApplicantName(id)}님의 면접이 완료되었습니다.`,"interview");
+      if(status==="계약완료") notify(`${getCustomerName(id)}님과 계약이 체결되었습니다.`,"final");
+      if(status==="계약보류") notify(`${getCustomerName(id)}님의 계약이 보류 처리되었습니다.`,"reject");
+      if(status==="상담완료") notify(`${getCustomerName(id)}님과의 상담이 완료되었습니다.`,"interview");
     }
   }catch(err){ alert("상태 변경 오류: "+err.message); }
 }
 
 /* ══════════════════════════════════════════════════
-   면접 평가서
+   고객 상담기록서
    ══════════════════════════════════════════════════ */
-function initEvalDraft(applicant){
-  const ex=applicant&&applicant.evaluation;
-  if(ex&&ex.competencies&&ex.competencies.length){
-    evalDraft={
-      competencies:ex.competencies.map(c=>({id:uid(),title:c.title||"",items:c.items||"",score:c.score||"",comment:c.comment||""})),
-      personality:ex.personality||"", strengths:ex.strengths||"", risks:ex.risks||"",
+function initConsultDraft(customer){
+  const ex=customer&&customer.consultation;
+  if(ex&&ex.requirements&&ex.requirements.length){
+    consultDraft={
+      requirements:ex.requirements.map(r=>({id:uid(),title:r.title||"",items:r.items||"",score:r.score||"",comment:r.comment||""})),
+      background:ex.background||"", opportunity:ex.opportunity||"", risks:ex.risks||"",
       comment:ex.comment||"", recommendation:ex.recommendation||"",
-      interviewerName:ex.interviewerName||"", interviewerTitle:ex.interviewerTitle||""
+      salesRepName:ex.salesRepName||"", salesRepTitle:ex.salesRepTitle||""
     };
   } else {
-    evalDraft={
-      competencies:DEFAULT_COMPETENCIES.map(c=>({id:uid(),title:c.title,items:"",score:"",comment:""})),
-      personality:"", strengths:"", risks:"", comment:"", recommendation:"",
-      interviewerName:"", interviewerTitle:""
+    consultDraft={
+      requirements:DEFAULT_REQUIREMENTS.map(r=>({id:uid(),title:r.title,items:"",score:"",comment:""})),
+      background:"", opportunity:"", risks:"", comment:"", recommendation:"",
+      salesRepName:"", salesRepTitle:""
     };
   }
 }
-function openEvaluationView(id){ evaluationId=id; const a=applicantsCache.find(x=>x.id===id); initEvalDraft(a); currentView="evaluationForm"; rerender(); }
+function openConsultationView(id){ consultationId=id; const c=customersCache.find(x=>x.id===id); initConsultDraft(c); currentView="consultationForm"; rerender(); }
 
 function calcTotalScore(draft){
-  const scored=draft.competencies.filter(c=>c.score);
+  const scored=draft.requirements.filter(r=>r.score);
   if(!scored.length)return{total:0,avg:"-",grade:"-"};
-  const sum=scored.reduce((acc,c)=>acc+(SCORE_POINT[c.score]||0),0);
+  const sum=scored.reduce((acc,r)=>acc+(SCORE_POINT[r.score]||0),0);
   const avg=(sum/scored.length).toFixed(1);
   let grade="-";
-  if(avg>=3.5)grade="A(우수)"; else if(avg>=2.5)grade="B(양호)"; else if(avg>=1.5)grade="C(보통)"; else grade="D(미흡)";
+  if(avg>=3.5)grade="A(매우적합)"; else if(avg>=2.5)grade="B(적합)"; else if(avg>=1.5)grade="C(보통)"; else grade="D(부적합)";
   return{total:sum,avg,grade};
 }
 
-function buildReport(applicant, draft){
+function buildReport(customer, draft){
   const lines=[];
   const company=settingsCache.companyName||"";
-  const dt=[applicant.interviewDate,applicant.interviewTime].filter(Boolean).join(" ");
+  const dt=[customer.consultDate,customer.consultTime].filter(Boolean).join(" ");
   lines.push(`${"═".repeat(38)}`);
-  lines.push(`  면  접  평  가  서${company?" ("+company+")":""}`);
+  lines.push(`  고 객 상 담 기 록 서${company?" ("+company+")":""}`);
   lines.push(`${"═".repeat(38)}`);
-  lines.push(`지원자   : ${applicant.name||"-"}`);
-  lines.push(`지원직무 : ${applicant.jobTitle||"-"}`);
-  lines.push(`면접일시 : ${dt||"-"}`);
-  if(draft.interviewerName) lines.push(`면접관   : ${draft.interviewerName}${draft.interviewerTitle?" ("+draft.interviewerTitle+")":""}`);
+  lines.push(`고  객   : ${customer.name||"-"}${customer.company?" / "+customer.company:""}`);
+  lines.push(`관심상품 : ${customer.productName||"-"}`);
+  lines.push(`상담일시 : ${dt||"-"}`);
+  if(draft.salesRepName) lines.push(`담당영업 : ${draft.salesRepName}${draft.salesRepTitle?" ("+draft.salesRepTitle+")":""}`);
   lines.push(`${"─".repeat(38)}`);
-  const filledComps = draft.competencies.filter(c=>c.title.trim()||(c.items&&c.items.trim())||c.score||c.comment);
-  if(filledComps.length){
-    lines.push(`[역량 평가]`);
-    filledComps.forEach((c,i)=>{
-      const scoreLabel=c.score?` ▶ ${c.score}`:"";
+  const filledReq = draft.requirements.filter(r=>r.title.trim()||(r.items&&r.items.trim())||r.score||r.comment);
+  if(filledReq.length){
+    lines.push(`[요구사항 분석]`);
+    filledReq.forEach((r,i)=>{
+      const scoreLabel=r.score?` ▶ ${r.score}`:"";
       lines.push(``);
-      lines.push(`${i+1}. ${c.title||"역량 항목"}${scoreLabel}`);
-      if(c.items&&c.items.trim()){
-        c.items.split("\n").map(s=>s.trim()).filter(Boolean).forEach((s,j)=>{
+      lines.push(`${i+1}. ${r.title||"평가 항목"}${scoreLabel}`);
+      if(r.items&&r.items.trim()){
+        r.items.split("\n").map(s=>s.trim()).filter(Boolean).forEach((s,j)=>{
           const CIRC=["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"];
           lines.push(`   ${CIRC[j]||(j+1)+"."} ${s}`);
         });
       }
-      if(c.comment&&c.comment.trim()) lines.push(`   → ${c.comment.trim()}`);
+      if(r.comment&&r.comment.trim()) lines.push(`   → ${r.comment.trim()}`);
     });
     const {avg,grade}=calcTotalScore(draft);
-    if(avg!=="-") lines.push(`\n   ※ 종합 평균: ${avg}점 / 종합 등급: ${grade}`);
+    if(avg!=="-") lines.push(`\n   ※ 종합 적합도 평균: ${avg}점 / 종합 등급: ${grade}`);
     lines.push(`${"─".repeat(38)}`);
   }
-  if(draft.personality&&draft.personality.trim()){
-    lines.push(`[성격 및 업무 태도]`);
-    draft.personality.split("\n").map(s=>s.trim()).filter(Boolean).forEach((s,j)=>{ const CIRC=["①","②","③","④","⑤"]; lines.push(`  ${CIRC[j]||(j+1)+"."} ${s}`); });
+  if(draft.background&&draft.background.trim()){
+    lines.push(`[도입 배경 및 특이사항]`);
+    draft.background.split("\n").map(s=>s.trim()).filter(Boolean).forEach((s,j)=>{ const CIRC=["①","②","③","④","⑤"]; lines.push(`  ${CIRC[j]||(j+1)+"."} ${s}`); });
     lines.push(`${"─".repeat(38)}`);
   }
-  if(draft.strengths&&draft.strengths.trim()){
-    lines.push(`[주요 강점]`);
-    draft.strengths.split("\n").map(s=>s.trim()).filter(Boolean).forEach((s,j)=>{ const CIRC=["①","②","③","④","⑤"]; lines.push(`  ${CIRC[j]||(j+1)+"."} ${s}`); });
+  if(draft.opportunity&&draft.opportunity.trim()){
+    lines.push(`[영업 기회 · 기대 효과]`);
+    draft.opportunity.split("\n").map(s=>s.trim()).filter(Boolean).forEach((s,j)=>{ const CIRC=["①","②","③","④","⑤"]; lines.push(`  ${CIRC[j]||(j+1)+"."} ${s}`); });
     lines.push(`${"─".repeat(38)}`);
   }
   if(draft.risks&&draft.risks.trim()){
-    lines.push(`[단점 및 채용 리스크]`);
+    lines.push(`[우려사항 및 리스크]`);
     draft.risks.split("\n").map(s=>s.trim()).filter(Boolean).forEach((s,j)=>{ const CIRC=["①","②","③","④","⑤"]; lines.push(`  ${CIRC[j]||(j+1)+"."} ${s}`); });
     lines.push(`${"─".repeat(38)}`);
   }
@@ -1872,86 +1834,86 @@ function buildReport(applicant, draft){
     lines.push(`${"─".repeat(38)}`);
   }
   if(draft.recommendation){
-    const recEmoji=draft.recommendation==="채용추천"?"✅":draft.recommendation==="보류"?"🔶":"❌";
-    lines.push(`[채용 추천 여부]  ${recEmoji} ${draft.recommendation}`);
+    const recEmoji=draft.recommendation==="계약추천"?"✅":draft.recommendation==="보류"?"🔶":"❌";
+    lines.push(`[계약 추천 여부]  ${recEmoji} ${draft.recommendation}`);
     lines.push(`${"─".repeat(38)}`);
   }
   lines.push(`작성일: ${new Date().toLocaleDateString("ko-KR")}`);
-  if(draft.interviewerName) lines.push(`면접관: ${draft.interviewerName}  (서명: ____________)`);
+  if(draft.salesRepName) lines.push(`담당영업: ${draft.salesRepName}  (서명: ____________)`);
   return lines.join("\n");
 }
 
-function renderEvaluationForm(){
-  const applicant=applicantsCache.find(a=>a.id===evaluationId);
-  if(!applicant){ contentEl.innerHTML=`<div class="panel"><div class="panel-inner"><p>지원자 정보를 찾을 수 없습니다.</p><button class="btn btn-secondary" data-action="back-to-interviews" style="margin-top:12px;">← 면접관리로</button></div></div>`; return; }
-  if(!evalDraft) initEvalDraft(applicant);
-  const dt=[applicant.interviewDate,applicant.interviewTime].filter(Boolean).join(" ");
-  const {avg,grade}=calcTotalScore(evalDraft);
+function renderConsultationForm(){
+  const customer=customersCache.find(c=>c.id===consultationId);
+  if(!customer){ contentEl.innerHTML=`<div class="panel"><div class="panel-inner"><p>고객 정보를 찾을 수 없습니다.</p><button class="btn btn-secondary" data-action="back-to-customers" style="margin-top:12px;">← 고객관리로</button></div></div>`; return; }
+  if(!consultDraft) initConsultDraft(customer);
+  const dt=[customer.consultDate,customer.consultTime].filter(Boolean).join(" ");
+  const {avg,grade}=calcTotalScore(consultDraft);
 
-  const compHtml=evalDraft.competencies.map((c,i)=>`
+  const reqHtml=consultDraft.requirements.map((r,i)=>`
   <div class="eval-section">
     <div class="eval-section-header">
       <div class="eval-section-num">${i+1}</div>
-      <input class="form-control" style="font-size:13px;font-weight:600;padding:4px 8px;" placeholder="평가 항목명" data-comp-title="${c.id}" value="${esc(c.title)}">
-      <button type="button" class="btn btn-danger btn-xs" data-action="remove-comp-block" data-id="${c.id}">삭제</button>
+      <input class="form-control" style="font-size:13px;font-weight:600;padding:4px 8px;" placeholder="평가 항목명" data-req-title="${r.id}" value="${esc(r.title)}">
+      <button type="button" class="btn btn-danger btn-xs" data-action="remove-req-block" data-id="${r.id}">삭제</button>
     </div>
     <div class="eval-section-body">
       <div class="eval-score-row">
-        <span class="eval-score-label">등급 평가</span>
+        <span class="eval-score-label">적합도 평가</span>
         <div class="score-btn-group">
-          ${SCORES.map(s=>`<button type="button" class="score-btn ${SCORE_CLASS[s]||""} ${c.score===s?"selected":""}" data-action="set-score" data-id="${c.id}" data-score="${s}">${s}</button>`).join("")}
+          ${SCORES.map(s=>`<button type="button" class="score-btn ${SCORE_CLASS[s]||""} ${r.score===s?"selected":""}" data-action="set-score" data-id="${r.id}" data-score="${s}">${s}</button>`).join("")}
         </div>
       </div>
       <div class="form-group" style="margin-bottom:8px;">
-        <label style="font-size:11px;">세부 면접 내용 <span style="color:var(--slate-400);font-weight:400;">(한 줄에 한 항목)</span></label>
-        <textarea class="form-control" rows="3" placeholder="예: Python·SQL 실무 경험 3년 이상 보유&#10;REST API 설계 및 구현 능력 확인" data-comp-items="${c.id}">${esc(c.items)}</textarea>
+        <label style="font-size:11px;">세부 상담 내용 <span style="color:var(--slate-400);font-weight:400;">(한 줄에 한 항목)</span></label>
+        <textarea class="form-control" rows="3" placeholder="예: 일 평균 트래픽 500만 PV 수준&#10;성수기 트래픽 3배 급증 이력 있음" data-req-items="${r.id}">${esc(r.items)}</textarea>
       </div>
       <div class="form-group" style="margin-bottom:0;">
         <label style="font-size:11px;">총평</label>
-        <input class="form-control" style="font-size:13px;" placeholder="해당 항목에 대한 면접관 총평" data-comp-comment="${c.id}" value="${esc(c.comment)}">
+        <input class="form-control" style="font-size:13px;" placeholder="해당 항목에 대한 영업담당자 총평" data-req-comment="${r.id}" value="${esc(r.comment)}">
       </div>
     </div>
   </div>`).join("");
 
   contentEl.innerHTML=`
   <div class="page-header" style="margin-bottom:16px;">
-    <div><button class="btn btn-secondary btn-sm" data-action="back-to-interviews">← 면접관리로</button></div>
+    <div><button class="btn btn-secondary btn-sm" data-action="back-to-customers">← 고객관리로</button></div>
     <div style="display:flex;gap:8px;">
-      <button type="button" class="btn btn-ghost btn-sm" data-action="copy-evaluation">📋 복사</button>
-      <button type="button" class="btn btn-ghost btn-sm" data-action="print-evaluation">🖨 인쇄/PDF</button>
-      <button type="button" class="btn btn-primary btn-sm" data-action="save-evaluation">💾 저장</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-action="copy-consultation">📋 복사</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-action="print-consultation">🖨 인쇄/PDF</button>
+      <button type="button" class="btn btn-primary btn-sm" data-action="save-consultation">💾 저장</button>
     </div>
   </div>
   <div class="eval-candidate-info">
-    <div class="eval-avatar">👤</div>
+    <div class="eval-avatar">🏢</div>
     <div>
-      <div class="eval-candidate-name">${esc(applicant.name)}</div>
-      <div class="eval-candidate-meta">${esc(applicant.jobTitle||"-")} · 면접일시: ${dt||"-"}</div>
+      <div class="eval-candidate-name">${esc(customer.name)}${customer.company?` · ${esc(customer.company)}`:""}</div>
+      <div class="eval-candidate-meta">${esc(customer.productName||"-")} · 상담일시: ${dt||"-"}</div>
     </div>
-    <div style="margin-left:auto;">${statusBadge(applicant.status)}</div>
+    <div style="margin-left:auto;">${statusBadge(customer.status)}</div>
   </div>
-  <div class="eval-layout" id="evalLayout">
+  <div class="eval-layout" id="consultLayout">
     <div>
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">면접관 정보</span></div>
+        <div class="panel-header"><span class="panel-title">담당 영업 정보</span></div>
         <div class="panel-inner" style="padding-bottom:10px;">
           <div class="form-row">
-            <div class="form-group" style="margin-bottom:0;"><label>면접관 성명</label><input class="form-control" id="evalInterviewerName" placeholder="홍길동" value="${esc(evalDraft.interviewerName)}"></div>
-            <div class="form-group" style="margin-bottom:0;"><label>직책</label><input class="form-control" id="evalInterviewerTitle" placeholder="인사팀 부장" value="${esc(evalDraft.interviewerTitle)}"></div>
+            <div class="form-group" style="margin-bottom:0;"><label>담당자 성명</label><input class="form-control" id="consultRepName" placeholder="홍길동" value="${esc(consultDraft.salesRepName)}"></div>
+            <div class="form-group" style="margin-bottom:0;"><label>직책</label><input class="form-control" id="consultRepTitle" placeholder="영업팀 과장" value="${esc(consultDraft.salesRepTitle)}"></div>
           </div>
         </div>
       </div>
       <div class="panel">
         <div class="panel-header">
-          <span class="panel-title">역량 평가 항목</span>
-          <span style="font-size:12px;color:var(--slate-400);">등급: A(4점) B(3점) C(2점) D(1점)</span>
+          <span class="panel-title">요구사항 분석 항목</span>
+          <span style="font-size:12px;color:var(--slate-400);">적합도: A(4점) B(3점) C(2점) D(1점)</span>
         </div>
         <div class="panel-inner">
-          <form id="evalForm">
-            ${compHtml}
-            <button type="button" class="eval-add-btn" data-action="add-comp-block">+ 평가 항목 추가</button>
+          <form id="consultForm">
+            ${reqHtml}
+            <button type="button" class="eval-add-btn" data-action="add-req-block">+ 평가 항목 추가</button>
             <div class="eval-summary-block">
-              <div class="eval-summary-title">📊 종합 점수</div>
+              <div class="eval-summary-title">📊 종합 적합도</div>
               <div class="total-score-display">
                 <div class="total-score-value" id="totalScoreVal">${avg!=="-"?avg:"—"}</div>
                 <div>
@@ -1961,144 +1923,144 @@ function renderEvaluationForm(){
               </div>
             </div>
             <div class="panel" style="margin-bottom:14px;">
-              <div class="panel-header"><span class="panel-title">추가 평가</span></div>
+              <div class="panel-header"><span class="panel-title">추가 상담 메모</span></div>
               <div class="panel-inner">
-                <div class="form-group"><label>성격 및 업무 태도</label><textarea class="form-control" id="evalPersonality" rows="3" placeholder="예: 적극적인 소통 태도&#10;책임감 있는 업무 처리">${esc(evalDraft.personality)}</textarea></div>
-                <div class="form-group"><label>주요 강점</label><textarea class="form-control" id="evalStrengths" rows="3" placeholder="예: 관련 도메인 실무 경험 풍부">${esc(evalDraft.strengths)}</textarea></div>
-                <div class="form-group"><label>단점 / 채용 리스크</label><textarea class="form-control" id="evalRisks" rows="3" placeholder="예: 리더십 경험 부족">${esc(evalDraft.risks)}</textarea></div>
-                <div class="form-group" style="margin-bottom:0;"><label>종합 의견</label><textarea class="form-control" id="evalComment" rows="3">${esc(evalDraft.comment)}</textarea></div>
+                <div class="form-group"><label>도입 배경 및 특이사항</label><textarea class="form-control" id="consultBackground" rows="3" placeholder="예: 신규 서비스 런칭에 따른 서버 증설 필요&#10;현재 계약 만료 임박">${esc(consultDraft.background)}</textarea></div>
+                <div class="form-group"><label>영업 기회 · 기대 효과</label><textarea class="form-control" id="consultOpportunity" rows="3" placeholder="예: 계열사 추가 도입 가능성 높음">${esc(consultDraft.opportunity)}</textarea></div>
+                <div class="form-group"><label>우려사항 / 리스크</label><textarea class="form-control" id="consultRisks" rows="3" placeholder="예: 경쟁사 견적 비교 중">${esc(consultDraft.risks)}</textarea></div>
+                <div class="form-group" style="margin-bottom:0;"><label>종합 의견</label><textarea class="form-control" id="consultComment" rows="3">${esc(consultDraft.comment)}</textarea></div>
               </div>
             </div>
             <div style="margin-bottom:14px;">
-              <div style="font-size:12px;font-weight:700;color:var(--slate-600);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">채용 추천 여부</div>
+              <div style="font-size:12px;font-weight:700;color:var(--slate-600);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">계약 추천 여부</div>
               <div class="rec-btn-group">
-                <button type="button" class="rec-btn ${evalDraft.recommendation==="채용추천"?"selected-pass":""}" data-action="set-rec" data-rec="채용추천">✅ 채용추천</button>
-                <button type="button" class="rec-btn ${evalDraft.recommendation==="보류"?"selected-hold":""}" data-action="set-rec" data-rec="보류">🔶 보류</button>
-                <button type="button" class="rec-btn ${evalDraft.recommendation==="비추천"?"selected-reject":""}" data-action="set-rec" data-rec="비추천">❌ 비추천</button>
+                <button type="button" class="rec-btn ${consultDraft.recommendation==="계약추천"?"selected-pass":""}" data-action="set-rec" data-rec="계약추천">✅ 계약추천</button>
+                <button type="button" class="rec-btn ${consultDraft.recommendation==="보류"?"selected-hold":""}" data-action="set-rec" data-rec="보류">🔶 보류</button>
+                <button type="button" class="rec-btn ${consultDraft.recommendation==="영업종료"?"selected-reject":""}" data-action="set-rec" data-rec="영업종료">❌ 영업종료</button>
               </div>
             </div>
-            <button type="button" class="btn btn-primary" data-action="save-evaluation" style="width:100%;">💾 평가서 저장</button>
+            <button type="button" class="btn btn-primary" data-action="save-consultation" style="width:100%;">💾 상담기록 저장</button>
           </form>
         </div>
       </div>
     </div>
     <div>
       <div class="eval-preview-label">자동 생성 미리보기</div>
-      <div class="eval-preview-panel" id="evalPreview"></div>
+      <div class="eval-preview-panel" id="consultPreview"></div>
       <div class="eval-preview-actions">
-        <button type="button" class="btn btn-ghost btn-sm" data-action="copy-evaluation">📋 텍스트 복사</button>
-        <button type="button" class="btn btn-ghost btn-sm" data-action="print-evaluation">🖨 인쇄 / PDF 저장</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-action="copy-consultation">📋 텍스트 복사</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-action="print-consultation">🖨 인쇄 / PDF 저장</button>
       </div>
     </div>
   </div>`;
 
-  updateEvalPreview();
-  const evalFormEl=document.getElementById("evalForm");
-  if(evalFormEl) evalFormEl.addEventListener("input",()=>{ syncDraft(); updateEvalPreview(); });
-  const intName=document.getElementById("evalInterviewerName");
-  const intTitle=document.getElementById("evalInterviewerTitle");
-  if(intName) intName.addEventListener("input",()=>{ syncDraft(); updateEvalPreview(); });
-  if(intTitle) intTitle.addEventListener("input",()=>{ syncDraft(); updateEvalPreview(); });
+  updateConsultPreview();
+  const consultFormEl=document.getElementById("consultForm");
+  if(consultFormEl) consultFormEl.addEventListener("input",()=>{ syncDraft(); updateConsultPreview(); });
+  const repName=document.getElementById("consultRepName");
+  const repTitle=document.getElementById("consultRepTitle");
+  if(repName) repName.addEventListener("input",()=>{ syncDraft(); updateConsultPreview(); });
+  if(repTitle) repTitle.addEventListener("input",()=>{ syncDraft(); updateConsultPreview(); });
 }
 
 function syncDraft(){
-  if(!evalDraft)return;
-  evalDraft.competencies.forEach(c=>{
-    const t=document.querySelector(`[data-comp-title="${c.id}"]`); if(t)c.title=t.value;
-    const i=document.querySelector(`[data-comp-items="${c.id}"]`); if(i)c.items=i.value;
-    const cm=document.querySelector(`[data-comp-comment="${c.id}"]`); if(cm)c.comment=cm.value;
+  if(!consultDraft)return;
+  consultDraft.requirements.forEach(r=>{
+    const t=document.querySelector(`[data-req-title="${r.id}"]`); if(t)r.title=t.value;
+    const i=document.querySelector(`[data-req-items="${r.id}"]`); if(i)r.items=i.value;
+    const cm=document.querySelector(`[data-req-comment="${r.id}"]`); if(cm)r.comment=cm.value;
   });
-  const p=document.getElementById("evalPersonality");   if(p)evalDraft.personality=p.value;
-  const s=document.getElementById("evalStrengths");     if(s)evalDraft.strengths=s.value;
-  const r=document.getElementById("evalRisks");         if(r)evalDraft.risks=r.value;
-  const co=document.getElementById("evalComment");      if(co)evalDraft.comment=co.value;
-  const n=document.getElementById("evalInterviewerName"); if(n)evalDraft.interviewerName=n.value;
-  const ti=document.getElementById("evalInterviewerTitle"); if(ti)evalDraft.interviewerTitle=ti.value;
+  const bg=document.getElementById("consultBackground");  if(bg)consultDraft.background=bg.value;
+  const op=document.getElementById("consultOpportunity"); if(op)consultDraft.opportunity=op.value;
+  const r=document.getElementById("consultRisks");        if(r)consultDraft.risks=r.value;
+  const co=document.getElementById("consultComment");     if(co)consultDraft.comment=co.value;
+  const n=document.getElementById("consultRepName");      if(n)consultDraft.salesRepName=n.value;
+  const ti=document.getElementById("consultRepTitle");    if(ti)consultDraft.salesRepTitle=ti.value;
 }
 
-function updateEvalPreview(){
-  const a=applicantsCache.find(x=>x.id===evaluationId);
-  const el=document.getElementById("evalPreview");
-  if(!a||!el||!evalDraft)return;
-  el.textContent=buildReport(a,evalDraft);
+function updateConsultPreview(){
+  const c=customersCache.find(x=>x.id===consultationId);
+  const el=document.getElementById("consultPreview");
+  if(!c||!el||!consultDraft)return;
+  el.textContent=buildReport(c,consultDraft);
   const sv=document.getElementById("totalScoreVal");
-  if(sv){ const {avg}=calcTotalScore(evalDraft); sv.textContent=avg!=="-"?avg:"—"; }
+  if(sv){ const {avg}=calcTotalScore(consultDraft); sv.textContent=avg!=="-"?avg:"—"; }
 }
 
-function addCompBlock(){ syncDraft(); evalDraft.competencies.push({id:uid(),title:"",items:"",score:"",comment:""}); renderEvaluationForm(); }
-function removeCompBlock(id){ syncDraft(); if(evalDraft.competencies.length<=1){alert("최소 1개는 남아야 합니다.");return;} evalDraft.competencies=evalDraft.competencies.filter(c=>c.id!==id); renderEvaluationForm(); }
+function addReqBlock(){ syncDraft(); consultDraft.requirements.push({id:uid(),title:"",items:"",score:"",comment:""}); renderConsultationForm(); }
+function removeReqBlock(id){ syncDraft(); if(consultDraft.requirements.length<=1){alert("최소 1개는 남아야 합니다.");return;} consultDraft.requirements=consultDraft.requirements.filter(r=>r.id!==id); renderConsultationForm(); }
 
-function setScore(compId,score){
+function setScore(reqId,score){
   syncDraft();
-  const c=evalDraft.competencies.find(x=>x.id===compId);
-  if(c){ c.score=c.score===score?"":score; }
-  updateEvalPreview();
-  document.querySelectorAll(`[data-action="set-score"][data-id="${compId}"]`).forEach(btn=>{
-    btn.classList.toggle("selected", btn.dataset.score===c.score);
+  const r=consultDraft.requirements.find(x=>x.id===reqId);
+  if(r){ r.score=r.score===score?"":score; }
+  updateConsultPreview();
+  document.querySelectorAll(`[data-action="set-score"][data-id="${reqId}"]`).forEach(btn=>{
+    btn.classList.toggle("selected", btn.dataset.score===r.score);
   });
   const sv=document.getElementById("totalScoreVal");
-  if(sv){ const {avg}=calcTotalScore(evalDraft); sv.textContent=avg!=="-"?avg:"—"; }
+  if(sv){ const {avg}=calcTotalScore(consultDraft); sv.textContent=avg!=="-"?avg:"—"; }
 }
 function setRec(rec){
   syncDraft();
-  evalDraft.recommendation=evalDraft.recommendation===rec?"":rec;
-  updateEvalPreview();
+  consultDraft.recommendation=consultDraft.recommendation===rec?"":rec;
+  updateConsultPreview();
   document.querySelectorAll(`[data-action="set-rec"]`).forEach(btn=>{
     btn.className="rec-btn";
-    if(btn.dataset.rec===evalDraft.recommendation){
-      if(rec==="채용추천")btn.classList.add("selected-pass");
+    if(btn.dataset.rec===consultDraft.recommendation){
+      if(rec==="계약추천")btn.classList.add("selected-pass");
       else if(rec==="보류")btn.classList.add("selected-hold");
-      else if(rec==="비추천")btn.classList.add("selected-reject");
+      else if(rec==="영업종료")btn.classList.add("selected-reject");
     }
   });
 }
 
-async function saveEvaluation(){
+async function saveConsultation(){
   syncDraft();
-  const a=applicantsCache.find(x=>x.id===evaluationId);
-  if(!a)return;
-  const reportText=buildReport(a,evalDraft);
+  const c=customersCache.find(x=>x.id===consultationId);
+  if(!c)return;
+  const reportText=buildReport(c,consultDraft);
   try{
-    await updateDoc(doc(db,"applicants",a.id),{evaluation:{
-      competencies:evalDraft.competencies.map(c=>({title:c.title,items:c.items,score:c.score,comment:c.comment})),
-      personality:evalDraft.personality, strengths:evalDraft.strengths, risks:evalDraft.risks,
-      comment:evalDraft.comment, recommendation:evalDraft.recommendation,
-      interviewerName:evalDraft.interviewerName, interviewerTitle:evalDraft.interviewerTitle,
+    await updateDoc(doc(db,"customers",c.id),{consultation:{
+      requirements:consultDraft.requirements.map(r=>({title:r.title,items:r.items,score:r.score,comment:r.comment})),
+      background:consultDraft.background, opportunity:consultDraft.opportunity, risks:consultDraft.risks,
+      comment:consultDraft.comment, recommendation:consultDraft.recommendation,
+      salesRepName:consultDraft.salesRepName, salesRepTitle:consultDraft.salesRepTitle,
       reportText, updatedAt:serverTimestamp()
     }});
-    if(settingsCache.autoNotify!==false) notify(`${a.name}님의 면접 평가서가 저장되었습니다.`,"evaluation");
-    alert("평가서가 저장되었습니다.");
+    if(settingsCache.autoNotify!==false) notify(`${c.name}님의 고객 상담기록서가 저장되었습니다.`,"evaluation");
+    alert("상담기록서가 저장되었습니다.");
   }catch(err){ alert("저장 오류: "+err.message); }
 }
 
-async function copyEvaluation(){
+async function copyConsultation(){
   syncDraft();
-  const a=applicantsCache.find(x=>x.id===evaluationId); if(!a)return;
-  try{ await navigator.clipboard.writeText(buildReport(a,evalDraft)); alert("클립보드에 복사되었습니다."); }
+  const c=customersCache.find(x=>x.id===consultationId); if(!c)return;
+  try{ await navigator.clipboard.writeText(buildReport(c,consultDraft)); alert("클립보드에 복사되었습니다."); }
   catch(e){ alert("자동 복사 실패. 미리보기 영역을 직접 선택해 복사해주세요."); }
 }
 
-function printEvaluation(){
+function printConsultation(){
   syncDraft();
-  const a=applicantsCache.find(x=>x.id===evaluationId); if(!a)return;
-  const dt=[a.interviewDate,a.interviewTime].filter(Boolean).join(" ");
+  const c=customersCache.find(x=>x.id===consultationId); if(!c)return;
+  const dt=[c.consultDate,c.consultTime].filter(Boolean).join(" ");
   const company=settingsCache.companyName||"";
-  const {avg,grade}=calcTotalScore(evalDraft);
+  const {avg,grade}=calcTotalScore(consultDraft);
   const gradeBadge=s=>s?`<span class="grade-badge grade-${SCORE_CLASS[s]||""}">${s}</span>`:"-";
-  const compRows=evalDraft.competencies
-    .filter(c=>c.title.trim()||c.items||c.score||c.comment)
-    .map(c=>`<tr>
-      <td>${c.title||"(항목명 없음)"}</td>
-      <td style="white-space:pre-wrap;">${c.items?c.items.split("\n").filter(s=>s.trim()).map((s,j)=>{ const CIRC=["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"]; return (CIRC[j]||(j+1)+".")+" "+s.trim(); }).join("\n"):"-"}</td>
-      <td>${gradeBadge(c.score)}</td>
-      <td style="white-space:pre-wrap;">${c.comment||"-"}</td>
+  const reqRows=consultDraft.requirements
+    .filter(r=>r.title.trim()||r.items||r.score||r.comment)
+    .map(r=>`<tr>
+      <td>${r.title||"(항목명 없음)"}</td>
+      <td style="white-space:pre-wrap;">${r.items?r.items.split("\n").filter(s=>s.trim()).map((s,j)=>{ const CIRC=["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"]; return (CIRC[j]||(j+1)+".")+" "+s.trim(); }).join("\n"):"-"}</td>
+      <td>${gradeBadge(r.score)}</td>
+      <td style="white-space:pre-wrap;">${r.comment||"-"}</td>
     </tr>`).join("");
-  const recClass=evalDraft.recommendation==="채용추천"?"pass":evalDraft.recommendation==="보류"?"hold":"reject";
-  const recEmoji=evalDraft.recommendation==="채용추천"?"✅":evalDraft.recommendation==="보류"?"🔶":"❌";
+  const recClass=consultDraft.recommendation==="계약추천"?"pass":consultDraft.recommendation==="보류"?"hold":"reject";
+  const recEmoji=consultDraft.recommendation==="계약추천"?"✅":consultDraft.recommendation==="보류"?"🔶":"❌";
   const w=window.open("","_blank");
   if(!w){alert("팝업이 차단되었습니다.");return;}
   w.document.write(`<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
-  <title>면접평가서 - ${a.name}</title>
+  <title>고객상담기록서 - ${c.name}</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:'Malgun Gothic','Noto Sans KR',sans-serif;padding:32px;max-width:780px;margin:auto;color:#1e293b;font-size:13px;line-height:1.7;}
@@ -2129,24 +2091,24 @@ function printEvaluation(){
     .sign-line{border-top:1px solid #cbd5e1;padding-top:8px;font-size:12px;font-weight:600;}
     @media print{body{padding:20px;font-size:12px;}h1{font-size:18px;}@page{margin:15mm;}}
   </style></head><body>
-  <h1>면접 평가서</h1>
-  <div class="sub">${company?company+" | ":""} 채용관리시스템 ATS · 작성일: ${new Date().toLocaleDateString("ko-KR")}</div>
+  <h1>고객 상담기록서</h1>
+  <div class="sub">${company?company+" | ":""} 서버사업 고객관리시스템 · 작성일: ${new Date().toLocaleDateString("ko-KR")}</div>
   <table class="info-table">
-    <tr><td>지원자</td><td>${a.name||"-"}</td><td>지원직무</td><td>${a.jobTitle||"-"}</td></tr>
-    <tr><td>면접일시</td><td>${dt||"-"}</td><td>면접관</td><td>${evalDraft.interviewerName||"-"}${evalDraft.interviewerTitle?" ("+evalDraft.interviewerTitle+")":""}</td></tr>
-    <tr><td>연락처</td><td>${a.phone||"-"}</td><td>이메일</td><td>${a.email||"-"}</td></tr>
+    <tr><td>고객</td><td>${c.name||"-"}${c.company?" / "+c.company:""}</td><td>관심상품</td><td>${c.productName||"-"}</td></tr>
+    <tr><td>상담일시</td><td>${dt||"-"}</td><td>담당 영업</td><td>${consultDraft.salesRepName||"-"}${consultDraft.salesRepTitle?" ("+consultDraft.salesRepTitle+")":""}</td></tr>
+    <tr><td>연락처</td><td>${c.phone||"-"}</td><td>이메일</td><td>${c.email||"-"}</td></tr>
   </table>
-  ${compRows?`
-  <div class="section-title">역량 평가</div>
+  ${reqRows?`
+  <div class="section-title">요구사항 분석</div>
   <div class="score-summary"><div class="score-big">${avg!=="-"?avg+"점":"—"}</div><div><div style="font-size:12px;color:#64748b;">평균 점수 / 종합 등급</div><div style="font-size:14px;font-weight:700;">${grade!=="-"?grade:"미평가"}</div></div></div>
-  <table class="eval-table"><thead><tr><th>평가항목</th><th>면접 내용</th><th>등급</th><th>총평</th></tr></thead><tbody>${compRows}</tbody></table>`:""}
-  ${evalDraft.personality&&evalDraft.personality.trim()?`<div class="section-title">성격 및 업무 태도</div><div class="summary-box"><div style="white-space:pre-wrap;">${evalDraft.personality.split("\n").filter(s=>s.trim()).map((s,j)=>{ const C=["①","②","③","④","⑤"]; return (C[j]||(j+1)+".")+" "+s.trim(); }).join("\n")}</div></div>`:""}
-  ${evalDraft.strengths&&evalDraft.strengths.trim()?`<div class="section-title">주요 강점</div><div class="summary-box"><div style="white-space:pre-wrap;">${evalDraft.strengths.split("\n").filter(s=>s.trim()).map((s,j)=>{ const C=["①","②","③","④","⑤"]; return (C[j]||(j+1)+".")+" "+s.trim(); }).join("\n")}</div></div>`:""}
-  ${evalDraft.risks&&evalDraft.risks.trim()?`<div class="section-title">단점 및 채용 리스크</div><div class="summary-box"><div style="white-space:pre-wrap;">${evalDraft.risks.split("\n").filter(s=>s.trim()).map((s,j)=>{ const C=["①","②","③","④","⑤"]; return (C[j]||(j+1)+".")+" "+s.trim(); }).join("\n")}</div></div>`:""}
-  ${evalDraft.comment&&evalDraft.comment.trim()?`<div class="section-title">종합 의견</div><div class="summary-box"><p style="white-space:pre-wrap;">${evalDraft.comment.trim()}</p></div>`:""}
-  ${evalDraft.recommendation?`<div class="section-title">채용 추천 여부</div><div class="rec-box rec-${recClass}"><span style="font-size:20px;">${recEmoji}</span><span class="rec-text">${evalDraft.recommendation}</span></div>`:""}
+  <table class="eval-table"><thead><tr><th>평가항목</th><th>상담 내용</th><th>적합도</th><th>총평</th></tr></thead><tbody>${reqRows}</tbody></table>`:""}
+  ${consultDraft.background&&consultDraft.background.trim()?`<div class="section-title">도입 배경 및 특이사항</div><div class="summary-box"><div style="white-space:pre-wrap;">${consultDraft.background.split("\n").filter(s=>s.trim()).map((s,j)=>{ const C=["①","②","③","④","⑤"]; return (C[j]||(j+1)+".")+" "+s.trim(); }).join("\n")}</div></div>`:""}
+  ${consultDraft.opportunity&&consultDraft.opportunity.trim()?`<div class="section-title">영업 기회 · 기대 효과</div><div class="summary-box"><div style="white-space:pre-wrap;">${consultDraft.opportunity.split("\n").filter(s=>s.trim()).map((s,j)=>{ const C=["①","②","③","④","⑤"]; return (C[j]||(j+1)+".")+" "+s.trim(); }).join("\n")}</div></div>`:""}
+  ${consultDraft.risks&&consultDraft.risks.trim()?`<div class="section-title">우려사항 및 리스크</div><div class="summary-box"><div style="white-space:pre-wrap;">${consultDraft.risks.split("\n").filter(s=>s.trim()).map((s,j)=>{ const C=["①","②","③","④","⑤"]; return (C[j]||(j+1)+".")+" "+s.trim(); }).join("\n")}</div></div>`:""}
+  ${consultDraft.comment&&consultDraft.comment.trim()?`<div class="section-title">종합 의견</div><div class="summary-box"><p style="white-space:pre-wrap;">${consultDraft.comment.trim()}</p></div>`:""}
+  ${consultDraft.recommendation?`<div class="section-title">계약 추천 여부</div><div class="rec-box rec-${recClass}"><span style="font-size:20px;">${recEmoji}</span><span class="rec-text">${consultDraft.recommendation}</span></div>`:""}
   <div class="sign-row">
-    <div class="sign-box"><div class="sign-label">면접관</div><div style="height:36px;"></div><div class="sign-line">${evalDraft.interviewerName||"____________"}${evalDraft.interviewerTitle?" ("+evalDraft.interviewerTitle+")":""} (인)</div></div>
+    <div class="sign-box"><div class="sign-label">담당 영업</div><div style="height:36px;"></div><div class="sign-line">${consultDraft.salesRepName||"____________"}${consultDraft.salesRepTitle?" ("+consultDraft.salesRepTitle+")":""} (인)</div></div>
     <div class="sign-box"><div class="sign-label">확인자</div><div style="height:36px;"></div><div class="sign-line">____________ (인)</div></div>
   </div>
   <script>window.onload=()=>{ window.focus(); window.print(); }<\/script></body></html>`);
@@ -2154,60 +2116,61 @@ function printEvaluation(){
 }
 
 /* ══════════════════════
-   4. 최종합격관리
+   4. 계약 고객 관리
    ══════════════════════ */
-function renderFinalHires(){
-  const list=applicantsCache.filter(a=>a.status==="최종합격");
-  const contractedCnt=list.filter(a=>a.contractCreated).length;
-  const rows=list.length?list.map(a=>{
-    const c=a.contract||{};
-    const startTxt  = c.startDate ? c.startDate : "-";
-    const salaryTxt = c.salary ? `${Number(c.salary).toLocaleString()}만` : "-";
-    const contractBtn = a.contractCreated
-      ? `<button class="btn btn-secondary btn-sm" data-action="register-contract" data-id="${a.id}">✎ 계약 수정</button>`
-      : `<button class="btn btn-success btn-sm" data-action="register-contract" data-id="${a.id}">계약 등록</button>`;
-    const contractStatus = a.contractCreated
+function renderContracts(){
+  const list=customersCache.filter(c=>c.status==="계약완료");
+  const contractedCnt=list.filter(c=>c.contractCreated).length;
+  const mrr=list.filter(c=>c.contractCreated&&c.contract?.monthlyFee).reduce((s,c)=>s+Number(c.contract.monthlyFee||0),0);
+  const rows=list.length?list.map(c=>{
+    const ct=c.contract||{};
+    const startTxt  = ct.startDate ? ct.startDate : "-";
+    const feeTxt    = ct.monthlyFee ? `${Number(ct.monthlyFee).toLocaleString()}만/월` : "-";
+    const contractBtn = c.contractCreated
+      ? `<button class="btn btn-secondary btn-sm" data-action="register-contract" data-id="${c.id}">✎ 계약 수정</button>`
+      : `<button class="btn btn-success btn-sm" data-action="register-contract" data-id="${c.id}">계약 등록</button>`;
+    const contractStatus = c.contractCreated
       ? `<span class="badge badge-contract">계약완료</span>`
       : `<span class="badge badge-closed">미등록</span>`;
     return `<tr>
-    <td><div class="cell-name">${esc(a.name)}</div></td>
-    <td>${esc(a.jobTitle||"-")}</td>
-    <td>${esc(a.email||"-")}</td>
-    <td>${esc(a.phone||"-")}</td>
-    <td class="center">${a.interviewDate||"-"}</td>
+    <td><div class="cell-name">${esc(c.name)}</div><div class="cell-sub">${esc(c.company||"")}</div></td>
+    <td>${esc(ct.product||c.productName||"-")}</td>
+    <td>${esc(c.email||"-")}</td>
+    <td>${esc(c.phone||"-")}</td>
+    <td class="center">${c.consultDate||"-"}</td>
     <td class="center">${startTxt}</td>
-    <td class="center" style="white-space:nowrap;">${salaryTxt}</td>
+    <td class="center" style="white-space:nowrap;">${feeTxt}</td>
     <td class="center">${contractStatus}</td>
     <td class="actions">
       ${contractBtn}
-      <button class="btn btn-ghost btn-sm" data-action="edit-applicant" data-id="${a.id}">정보수정</button>
+      <button class="btn btn-ghost btn-sm" data-action="edit-customer" data-id="${c.id}">정보수정</button>
     </td>
   </tr>`;}).join(""):
-  `<tr class="empty-row"><td colspan="9"><span class="empty-icon">🏆</span>최종합격자가 없습니다.</td></tr>`;
+  `<tr class="empty-row"><td colspan="9"><span class="empty-icon">📄</span>계약 완료 고객이 없습니다.</td></tr>`;
   contentEl.innerHTML=`
   <div class="page-header">
-    <div><div class="page-title">최종합격 관리</div><div class="page-subtitle">합격자 계약 현황 · 총 ${list.length}명 · 계약완료 ${contractedCnt}명</div></div>
+    <div><div class="page-title">계약 고객 관리</div><div class="page-subtitle">계약 및 이용료 현황 · 총 ${list.length}건 · 계약등록 ${contractedCnt}건 · MRR ${mrr.toLocaleString()}만원</div></div>
   </div>
   <div class="panel">
     <div class="panel-body"><table>
-      <thead><tr><th>성명</th><th>지원직무</th><th>이메일</th><th>연락처</th><th style="text-align:center">면접일</th><th style="text-align:center">입사예정일</th><th style="text-align:center">연봉</th><th style="text-align:center">계약상태</th><th>관리</th></tr></thead>
+      <thead><tr><th>고객</th><th>이용 상품</th><th>이메일</th><th>연락처</th><th style="text-align:center">상담일</th><th style="text-align:center">이용 시작일</th><th style="text-align:center">월 이용료</th><th style="text-align:center">계약상태</th><th>관리</th></tr></thead>
       <tbody>${rows}</tbody>
     </table></div>
   </div>`;
 }
-function openContractSimpleModal(applicantId){
-  const a=applicantsCache.find(x=>x.id===applicantId); if(!a)return;
-  const c=a.contract||{};
+function openContractSimpleModal(customerId){
+  const c=customersCache.find(x=>x.id===customerId); if(!c)return;
+  const ct=c.contract||{};
   showModal(`
-  <div class="modal-head"><span class="modal-title">${a.contractCreated?"계약 정보 수정":"계약 등록"} — ${esc(a.name)}</span><button class="modal-close" data-action="close-modal">✕</button></div>
+  <div class="modal-head"><span class="modal-title">${c.contractCreated?"계약 정보 수정":"계약 등록"} — ${esc(c.name)}</span><button class="modal-close" data-action="close-modal">✕</button></div>
   <div class="modal-body"><form id="contractSimpleForm">
-    <div class="form-group"><label>입사예정일</label><input class="form-control" type="date" name="startDate" value="${esc(c.startDate||"")}"></div>
-    <div class="form-group"><label>직무</label><input class="form-control" name="position" value="${esc(c.position||a.jobTitle||"")}"></div>
-    <div class="form-group"><label>연봉 (만원)</label><input class="form-control" type="number" name="salary" min="0" value="${c.salary??0}"></div>
-    <div class="form-group"><label>비고</label><textarea class="form-control" name="memo" rows="2" placeholder="계약 관련 특이사항">${esc(c.memo||"")}</textarea></div>
+    <div class="form-group"><label>이용 시작일</label><input class="form-control" type="date" name="startDate" value="${esc(ct.startDate||"")}"></div>
+    <div class="form-group"><label>이용 상품</label><input class="form-control" name="product" value="${esc(ct.product||c.productName||"")}"></div>
+    <div class="form-group"><label>월 이용료 (만원)</label><input class="form-control" type="number" name="monthlyFee" min="0" value="${ct.monthlyFee??0}"></div>
+    <div class="form-group"><label>비고</label><textarea class="form-control" name="memo" rows="2" placeholder="계약 관련 특이사항">${esc(ct.memo||"")}</textarea></div>
     <div class="modal-footer" style="padding:0;border:none;margin-top:4px;">
       <button type="button" class="btn btn-secondary" data-action="close-modal">취소</button>
-      ${a.contractCreated?`<button type="button" class="btn btn-danger" id="cancelContractBtn">계약 취소</button>`:""}
+      ${c.contractCreated?`<button type="button" class="btn btn-danger" id="cancelContractBtn">계약 취소</button>`:""}
       <button type="submit" class="btn btn-primary">저장</button>
     </div>
   </form></div>`);
@@ -2216,14 +2179,14 @@ function openContractSimpleModal(applicantId){
     const fd=new FormData(e.target);
     const contract={
       startDate: fd.get("startDate")||"",
-      position:  fd.get("position").trim(),
-      salary:    Number(fd.get("salary"))||0,
+      product:   fd.get("product").trim(),
+      monthlyFee: Number(fd.get("monthlyFee"))||0,
       memo:      fd.get("memo").trim(),
       updatedAt: serverTimestamp()
     };
     try{
-      await updateDoc(doc(db,"applicants",a.id),{contractCreated:true,contract});
-      notify(`${a.name}님의 계약 정보가 ${a.contractCreated?"수정":"등록"}되었습니다.`,"contract");
+      await updateDoc(doc(db,"customers",c.id),{contractCreated:true,contract});
+      notify(`${c.name}님의 계약 정보가 ${c.contractCreated?"수정":"등록"}되었습니다.`,"contract");
       closeModal();
     }
     catch(err){ alert("저장 오류: "+err.message); }
@@ -2231,8 +2194,8 @@ function openContractSimpleModal(applicantId){
   const cancelBtn=document.getElementById("cancelContractBtn");
   if(cancelBtn){
     cancelBtn.addEventListener("click",async()=>{
-      if(!confirm(`${a.name}님의 계약 등록을 취소하시겠습니까? (계약 상세정보는 유지되며 상태만 미등록으로 변경됩니다)`))return;
-      try{ await updateDoc(doc(db,"applicants",a.id),{contractCreated:false}); closeModal(); }
+      if(!confirm(`${c.name}님의 계약 등록을 취소하시겠습니까? (계약 상세정보는 유지되며 상태만 미등록으로 변경됩니다)`))return;
+      try{ await updateDoc(doc(db,"customers",c.id),{contractCreated:false}); closeModal(); }
       catch(err){ alert("취소 오류: "+err.message); }
     });
   }
@@ -2281,10 +2244,10 @@ function renderSystem(){
   const adminRows=adminsCache.length?adminsCache.map(a=>`<tr>
     <td><div class="cell-name">${esc(a.name)}</div></td>
     <td>${esc(a.email)}</td>
-    <td>${esc(a.role||"운영자")}</td>
+    <td>${esc(a.role||"영업담당자")}</td>
     <td class="actions"><button class="btn btn-danger btn-xs" data-action="remove-admin" data-id="${a.id}">삭제</button></td>
   </tr>`).join(""):
-  `<tr class="empty-row"><td colspan="4"><span class="empty-icon">👤</span>등록된 운영자가 없습니다.</td></tr>`;
+  `<tr class="empty-row"><td colspan="4"><span class="empty-icon">👤</span>등록된 담당자가 없습니다.</td></tr>`;
   contentEl.innerHTML=`
   <div class="page-header">
     <div><div class="page-title">시스템 설정</div><div class="page-subtitle">회사 정보 및 시스템 동작 방식을 설정합니다</div></div>
@@ -2294,18 +2257,18 @@ function renderSystem(){
     <div class="panel-inner"><form id="settingsForm">
       <div class="settings-grid">
         <div class="form-group"><label>회사명</label><input class="form-control" name="companyName" value="${esc(s.companyName||"")}" placeholder="주식회사 예시"></div>
-        <div class="form-group"><label>알림 수신 이메일</label><input class="form-control" type="email" name="notifyEmail" value="${esc(s.notifyEmail||"")}" placeholder="hr@company.com"></div>
+        <div class="form-group"><label>알림 수신 이메일</label><input class="form-control" type="email" name="notifyEmail" value="${esc(s.notifyEmail||"")}" placeholder="sales@company.com"></div>
       </div>
       <div class="settings-divider"></div>
       <div class="toggle-row">
-        <div><div class="toggle-label">상태 변경 시 자동 알림 생성</div><div class="toggle-desc">합격·불합격·등록 등 상태가 바뀔 때 알림 항목을 자동으로 만듭니다</div></div>
+        <div><div class="toggle-label">상태 변경 시 자동 알림 생성</div><div class="toggle-desc">계약완료·계약보류·신규등록 등 상태가 바뀔 때 알림 항목을 자동으로 만듭니다</div></div>
         <label class="switch"><input type="checkbox" name="autoNotify" ${s.autoNotify!==false?"checked":""}><span class="slider"></span></label>
       </div>
       <div style="margin-top:20px;"><button type="submit" class="btn btn-primary">설정 저장</button></div>
     </form></div>
   </div>
   <div class="panel">
-    <div class="panel-header"><span class="panel-title">운영자 관리</span><button class="btn btn-primary btn-sm" data-action="open-admin-modal">+ 운영자 추가</button></div>
+    <div class="panel-header"><span class="panel-title">영업담당자 관리</span><button class="btn btn-primary btn-sm" data-action="open-admin-modal">+ 담당자 추가</button></div>
     <div class="panel-body"><table>
       <thead><tr><th>이름</th><th>이메일</th><th>역할</th><th>관리</th></tr></thead>
       <tbody>${adminRows}</tbody>
@@ -2321,11 +2284,11 @@ function renderSystem(){
 }
 function openAdminModal(){
   showModal(`
-  <div class="modal-head"><span class="modal-title">운영자 추가</span><button class="modal-close" data-action="close-modal">✕</button></div>
+  <div class="modal-head"><span class="modal-title">영업담당자 추가</span><button class="modal-close" data-action="close-modal">✕</button></div>
   <div class="modal-body"><form id="adminForm">
     <div class="form-group"><label>이름 *</label><input class="form-control" name="name" required></div>
     <div class="form-group"><label>이메일 *</label><input class="form-control" type="email" name="email" required></div>
-    <div class="form-group"><label>역할</label><input class="form-control" name="role" placeholder="예: 인사담당자"></div>
+    <div class="form-group"><label>역할</label><input class="form-control" name="role" placeholder="예: 영업팀 대리"></div>
     <div class="modal-footer" style="padding:0;border:none;margin-top:4px;">
       <button type="button" class="btn btn-secondary" data-action="close-modal">취소</button>
       <button type="submit" class="btn btn-primary">추가</button>
@@ -2345,41 +2308,41 @@ contentEl.addEventListener("click",e=>{
   const el=e.target.closest("[data-action]"); if(!el)return;
   const action=el.dataset.action, id=el.dataset.id;
   switch(action){
-    case"go-interviews":        switchView("interviews"); break;
-    case"sort-interviews":
-      if(interviewSortKey===el.dataset.key){
-        interviewSortDir = interviewSortDir==="asc"?"desc":"asc";
+    case"go-customers":         switchView("customers"); break;
+    case"sort-customers":
+      if(customerSortKey===el.dataset.key){
+        customerSortDir = customerSortDir==="asc"?"desc":"asc";
       } else {
-        interviewSortKey = el.dataset.key;
-        interviewSortDir = "asc";
+        customerSortKey = el.dataset.key;
+        customerSortDir = "asc";
       }
-      renderInterviews(); break;
-    case"sort-reset":           interviewSortKey=""; interviewSortDir="asc"; renderInterviews(); break;
-    case"open-job-modal":       openJobModal(); break;
-    case"edit-job":             openJobModal(id); break;
-    case"remove-job":           removeJob(id); break;
-    case"open-applicant-modal": openApplicantModal(); break;
-    case"edit-applicant":       openApplicantModal(id); break;
-    case"remove-applicant":     removeApplicant(id); break;
-    case"view-resume":          viewResume(id); break;
-    case"interview-done":       updateStatus(id,"면접완료"); break;
-    case"interview-pass":       updateStatus(id,"최종합격"); break;
-    case"interview-fail":       updateStatus(id,"불합격"); break;
+      renderCustomers(); break;
+    case"sort-reset":           customerSortKey=""; customerSortDir="asc"; renderCustomers(); break;
+    case"open-product-modal":   openProductModal(); break;
+    case"edit-product":         openProductModal(id); break;
+    case"remove-product":       removeProduct(id); break;
+    case"open-customer-modal":  openCustomerModal(); break;
+    case"edit-customer":        openCustomerModal(id); break;
+    case"remove-customer":      removeCustomer(id); break;
+    case"view-attachment":      viewAttachment(id); break;
+    case"customer-consulted":   updateStatus(id,"상담완료"); break;
+    case"customer-contracted":  updateStatus(id,"계약완료"); break;
+    case"customer-hold":        updateStatus(id,"계약보류"); break;
     case"register-contract":    openContractSimpleModal(id); break;
     case"mark-notif-read":      markRead(id); break;
     case"delete-notif":         deleteNotif(id); break;
     case"open-admin-modal":     openAdminModal(); break;
     case"remove-admin":         removeAdmin(id); break;
-    case"open-evaluation":      closeModal(); openEvaluationView(id); break;  /* 모달에서 수정 버튼 클릭 시 모달 닫고 이동 */
-    case"view-evaluation":      viewEvaluationModal(id); break;               /* [수정 2] 완성된 평가서 바로보기 */
-    case"back-to-interviews":   evaluationId=null; evalDraft=null; switchView("interviews"); break;
-    case"add-comp-block":       addCompBlock(); break;
-    case"remove-comp-block":    removeCompBlock(id); break;
+    case"open-consultation":    closeModal(); openConsultationView(id); break;
+    case"view-consultation":    viewConsultationModal(id); break;
+    case"back-to-customers":    consultationId=null; consultDraft=null; switchView("customers"); break;
+    case"add-req-block":        addReqBlock(); break;
+    case"remove-req-block":     removeReqBlock(id); break;
     case"set-score":            setScore(id, el.dataset.score); break;
-    case"set-rec":              setRec(el.dataset.rec); break;
-    case"save-evaluation":      saveEvaluation(); break;
-    case"copy-evaluation":      copyEvaluation(); break;
-    case"print-evaluation":     printEvaluation(); break;
+    case"set-rec":               setRec(el.dataset.rec); break;
+    case"save-consultation":    saveConsultation(); break;
+    case"copy-consultation":    copyConsultation(); break;
+    case"print-consultation":   printConsultation(); break;
     case"close-modal":          closeModal(); break;
   }
 });
@@ -2395,8 +2358,8 @@ document.querySelectorAll(".sidebar-nav a[data-view]").forEach(el=>{ el.addEvent
 
 /* Firestore 리스너 */
 function setupListeners(){
-  onSnapshot(colJobs,         snap=>{ jobsCache=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.toMillis?.())||0-(a.createdAt?.toMillis?.())||0); rerender(); },e=>console.error(e));
-  onSnapshot(colApplicants,   snap=>{ applicantsCache=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.toMillis?.())||0-(a.createdAt?.toMillis?.())||0); rerender(); },e=>console.error(e));
+  onSnapshot(colProducts,     snap=>{ productsCache=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.toMillis?.())||0-(a.createdAt?.toMillis?.())||0); rerender(); },e=>console.error(e));
+  onSnapshot(colCustomers,    snap=>{ customersCache=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.toMillis?.())||0-(a.createdAt?.toMillis?.())||0); rerender(); },e=>console.error(e));
   onSnapshot(colNotifications,snap=>{ notificationsCache=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.toMillis?.())||0-(a.createdAt?.toMillis?.())||0); rerender(); },e=>console.error(e));
   onSnapshot(colAdmins,       snap=>{ adminsCache=snap.docs.map(d=>({id:d.id,...d.data()})); rerender(); },e=>console.error(e));
   onSnapshot(settingsDocRef,  snap=>{ settingsCache=snap.exists()?snap.data():{}; rerender(); },e=>console.error(e));
