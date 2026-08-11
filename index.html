@@ -2303,8 +2303,8 @@ function openAdminModal(){
 }
 async function removeAdmin(id){ if(!confirm("삭제하시겠습니까?"))return; try{ await deleteDoc(doc(db,"admins",id)); }catch(err){ alert("삭제 오류: "+err.message); } }
 
-/* 이벤트 위임 */
-contentEl.addEventListener("click",e=>{
+/* 이벤트 위임 (모달은 #content가 아닌 document.body에 추가되므로 document에 위임) */
+document.addEventListener("click",e=>{
   const el=e.target.closest("[data-action]"); if(!el)return;
   const action=el.dataset.action, id=el.dataset.id;
   switch(action){
