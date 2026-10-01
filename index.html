@@ -96,6 +96,14 @@ td{padding:10px;border-bottom:1px solid #EEF0F2;vertical-align:middle}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 #toasts{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:80}.toast{background:#17202A;color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 6px 20px #0003;max-width:340px;white-space:pre-wrap}.toast.err{background:var(--bad)}
 .btn:disabled{opacity:.55;cursor:not-allowed}aside a[role=button]{display:block}
+.btn.dz{background:var(--bad);border-color:var(--bad);color:#fff}.btn.dz:hover:not(:disabled){background:#9F1239}
+.rdel{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:6px 10px;background:#FFF1F2;border:1px dashed #FDA4AF;border-radius:6px}
+.dlg{position:fixed;inset:0;background:#0f172acc;display:flex;align-items:center;justify-content:center;padding:16px;z-index:70}
+.dlgb{background:#fff;border-radius:10px;padding:22px;width:440px;max-width:100%;max-height:100%;overflow:auto;border-top:4px solid var(--bad)}
+.dlgb h3{font-size:17px;margin-bottom:12px}
+.dlgsum{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--bg);border-radius:8px;padding:10px 12px}
+.dlgsum span{display:block;font-size:11px;color:var(--mute)}.dlgsum b{font-size:13px}
+.dlgw{margin-top:10px;font-size:13px;color:#3B4652}
 </style>
 <noscript><p style="padding:24px">이 시스템은 JavaScript가 필요합니다.</p></noscript>
 </head>
@@ -135,6 +143,8 @@ td{padding:10px;border-bottom:1px solid #EEF0F2;vertical-align:middle}
  * 구조: Auth(이메일) → users/{uid}(role·team) → teams, config/template, reports/{주차_팀}
  * 보안: 화면의 권한 분기는 UX용일 뿐이며 실제 강제는 Firestore 보안 규칙(firestore.rules)이 담당합니다. 반드시 배포하세요.
  * 동시성: 보고서마다 rev 번호를 두고 트랜잭션으로 충돌/제출 잠금 우회를 차단합니다.
+ * 삭제: 보고서 삭제는 관리자(admin, 활성)만 가능합니다. 트랜잭션으로 최신 rev를 재검증한 뒤 reportTrash에 백업하고 삭제합니다.
+ *       reports delete / reportTrash create 는 Firestore 규칙에서도 반드시 admin 으로 제한하세요(하단 안내 참고).
  */
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -279,16 +289,83 @@ function repText(r){
   (r.extra||[]).forEach(e=>{o.push("",e.label,...lines(e.text).map(x=>" - "+x))});
   return o.join("\n");
 }
-function showReports(list,head){
+function showReports(list,head,opt={}){
   list=list.slice().sort((a,b)=>(teams.findIndex(t=>t.id===a.teamId))-(teams.findIndex(t=>t.id===b.teamId)));
-  $("#modal").innerHTML=`<div><div class="bar" style="justify-content:space-between;margin-bottom:14px"><b>${esc(head)}</b><span class="bar"><button class="btn s" id="mCopy">텍스트 복사</button><button class="btn s" id="mPrint">인쇄 / PDF</button><button class="btn s" id="mClose">닫기</button></span></div>${list.map(repHtml).join("<hr>")||"<p class='sub'>보고서가 없습니다.</p>"}</div>`;
-  const md=$("#modal"),back=document.activeElement;md.setAttribute("role","dialog");md.setAttribute("aria-modal","true");md.setAttribute("aria-label",head);md.classList.remove("hide");
+  const md=$("#modal"),back=document.activeElement;
+  const dbar=r=>opt.del&&canDel()?`<div class="rdel"><span class="sub">관리자 메뉴 · ${esc(r.teamName||teamName(r.teamId))} / ${esc(r.userName||r.updatedByName||"-")}</span><button class="btn s d" data-rd="${esc(r.id)}">이 보고서 삭제</button></div>`:"";
+  md.setAttribute("role","dialog");md.setAttribute("aria-modal","true");md.setAttribute("aria-label",head);
   const onKey=e=>{if(e.key==="Escape")close()},close=()=>{md.classList.add("hide");document.removeEventListener("keydown",onKey);back&&back.focus&&back.focus()};
+  const paint=()=>{
+    md.innerHTML=`<div><div class="bar" style="justify-content:space-between;margin-bottom:14px"><b>${esc(head)}</b><span class="bar"><button class="btn s" id="mCopy">텍스트 복사</button><button class="btn s" id="mPrint">인쇄 / PDF</button><button class="btn s" id="mClose">닫기</button></span></div>${list.map(r=>dbar(r)+repHtml(r)).join("<hr>")||"<p class='sub'>보고서가 없습니다.</p>"}</div>`;
+    $("#mClose").onclick=close;
+    $("#mCopy").onclick=async()=>{try{await navigator.clipboard.writeText(list.map(repText).join("\n\n"+"─".repeat(30)+"\n\n"));toast("복사되었습니다.")}catch{toast("복사에 실패했습니다.")}};
+    $("#mPrint").onclick=()=>{const w=window.open("","_blank");if(!w)return toast("팝업이 차단되었습니다.");
+      w.document.write(`<!DOCTYPE html><html lang="ko"><meta charset="UTF-8"><title>${esc(head)}</title><style>${RP_CSS}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{max-width:780px;margin:24px auto;padding:0 16px}hr{border:0;page-break-after:always;margin:0}@media print{body{margin:0;max-width:none;padding:0}}</style><body>${list.map(repHtml).join("<hr>")}<script>onload=()=>print()<\/script>`);w.document.close()};
+    /* 삭제 버튼은 화면 전용: repHtml(인쇄·복사 경로)에는 포함되지 않습니다 */
+    md.querySelectorAll("[data-rd]").forEach(b=>b.onclick=async()=>{const r=list.find(x=>x.id===b.dataset.rd);if(!r)return;b.disabled=true;
+      const ok=await deleteReport(r);
+      if(ok){list=list.filter(x=>x.id!==r.id);if(!list.length)return close();paint();$("#mClose").focus()}else b.disabled=false});
+  };
+  paint();md.classList.remove("hide");
   document.addEventListener("keydown",onKey);md.onclick=e=>{if(e.target===md)close()};
-  $("#mClose").onclick=close;$("#mClose").focus();
-  $("#mCopy").onclick=async()=>{try{await navigator.clipboard.writeText(list.map(repText).join("\n\n"+"─".repeat(30)+"\n\n"));toast("복사되었습니다.")}catch{toast("복사에 실패했습니다.")}};
-  $("#mPrint").onclick=()=>{const w=window.open("","_blank");if(!w)return toast("팝업이 차단되었습니다.");
-    w.document.write(`<!DOCTYPE html><html lang="ko"><meta charset="UTF-8"><title>${esc(head)}</title><style>${RP_CSS}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{max-width:780px;margin:24px auto;padding:0 16px}hr{border:0;page-break-after:always;margin:0}@media print{body{margin:0;max-width:none;padding:0}}</style><body>${list.map(repHtml).join("<hr>")}<script>onload=()=>print()<\/script>`);w.document.close()};
+  $("#mClose").focus();
+}
+
+/* ───── 보고서 삭제 (관리자 전용) ───── */
+const canDel=()=>!!me&&me.active!==false&&me.role==="admin";
+const deleting=new Set();
+function askDelete(r){
+  if($(".dlg"))return Promise.resolve(null);
+  return new Promise(res=>{
+    const back=document.activeElement,ov=document.createElement("div"),n=(r.issues||[]).filter(i=>i.title).length;
+    ov.className="dlg";
+    ov.innerHTML=`<div class="dlgb" role="alertdialog" aria-modal="true" aria-labelledby="dgT" aria-describedby="dgD"><h3 id="dgT">보고서 삭제</h3>
+     <div id="dgD"><div class="dlgsum"><div><span>주차</span><b>${esc(title(r.weekKey))}</b></div><div><span>팀</span><b>${esc(r.teamName||teamName(r.teamId))}</b></div><div><span>작성자</span><b>${esc(r.userName||r.updatedByName||"-")}</b></div><div><span>상태</span><b>${esc(r.status||"작성중")}</b></div><div><span>이슈</span><b>${n}건</b></div></div>
+     <p class="dlgw">${r.status==="제출완료"?"⚠ 이미 <b>제출 완료</b>된 보고서입니다. ":""}삭제하면 모든 사용자의 열람·통합 보기에서 즉시 사라지고 화면에서는 되돌릴 수 없습니다. 작성자는 같은 주차에 새로 작성할 수 있게 됩니다.</p></div>
+     <label class="l" for="dgR">삭제 사유 (선택 · 기록으로 남습니다)</label><input class="in" id="dgR" maxlength="200" autocomplete="off">
+     <label class="l" for="dgC">계속하려면 <b>삭제</b> 를 입력하세요</label><input class="in" id="dgC" autocomplete="off">
+     <div class="bar" style="justify-content:flex-end;margin-top:16px"><button class="btn" id="dgN" type="button">취소</button><button class="btn dz" id="dgY" type="button" disabled>삭제</button></div></div>`;
+    document.body.append(ov);
+    const q=s=>ov.querySelector(s),yes=q("#dgY"),cf=q("#dgC");
+    const done=v=>{document.removeEventListener("keydown",kd,true);ov.remove();back&&back.focus&&back.focus();res(v)};
+    const go=()=>{if(!yes.disabled)done({reason:q("#dgR").value.trim().slice(0,200)})};
+    const kd=e=>{
+      if(e.key==="Escape"){e.preventDefault();e.stopPropagation();done(null)}   /* 아래 열람 모달까지 닫히지 않도록 */
+      else if(e.key==="Enter"&&!e.isComposing&&e.target===cf){e.preventDefault();go()}
+      else if(e.key==="Tab"){const f=[...ov.querySelectorAll("input,button:not(:disabled)")],i=f.indexOf(document.activeElement);
+        if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus()}}};
+    document.addEventListener("keydown",kd,true);
+    cf.oninput=()=>{yes.disabled=cf.value.trim()!=="삭제"};
+    yes.onclick=go;q("#dgN").onclick=()=>done(null);
+    ov.onclick=e=>{if(e.target===ov)done(null)};
+    q("#dgC").focus();
+  });
+}
+async function deleteReport(r){
+  if(!canDel()){toast("삭제 권한이 없습니다. 관리자만 보고서를 삭제할 수 있습니다.",true);return false}
+  if(deleting.has(r.id))return false;
+  const a=await askDelete(r);if(!a)return false;
+  deleting.add(r.id);
+  if(draft&&editTeam&&rid(wk,editTeam,me.id)===r.id){clearTimeout(autoT);autoT=null}   /* 자동 저장이 삭제된 문서를 되살리지 않도록 */
+  const ref=doc(db,"reports",r.id);
+  const run=backup=>runTransaction(db,async tx=>{
+    const s=await tx.get(ref);
+    if(!s.exists())throw Object.assign(new Error("이미 삭제된 보고서입니다."),{code:"gone"});
+    const cur=s.data();
+    if((cur.rev||0)!==(r.rev||0)||cur.status!==r.status)throw Object.assign(new Error("열람 중 보고서가 수정되었습니다. 최신 내용을 확인한 뒤 다시 시도하세요."),{code:"stale"});
+    if(backup)tx.set(doc(collection(db,"reportTrash")),{...cur,originalId:r.id,deletedBy:me.id,deletedByName:me.name,deletedAt:serverTimestamp(),deleteReason:a.reason});
+    tx.delete(ref)});
+  const gone=()=>{reports=reports.filter(x=>x.id!==r.id);if(draft&&editTeam&&rid(wk,editTeam,me.id)===r.id)draft=null};
+  try{
+    try{await run(true)}
+    catch(e){
+      if(e.code==="permission-denied"&&confirm("삭제 백업(reportTrash) 기록이 거부되었습니다. (Firestore 규칙이 아직 배포되지 않았을 수 있습니다)\n백업 없이 삭제를 시도할까요? 되돌릴 수 없습니다."))await run(false);
+      else throw e}
+    gone();toast("보고서가 삭제되었습니다.");return true
+  }catch(e){
+    if(e.code==="gone"){gone();toast(e.message,true);return true}
+    toast(e.code==="stale"?e.message:e.code==="permission-denied"?"삭제 권한 오류: Firestore 보안 규칙(관리자 delete 허용)을 확인하세요.":e.code==="unavailable"?"네트워크 연결을 확인한 뒤 다시 시도하세요.":"삭제 오류: "+e.message,true);return false
+  }finally{deleting.delete(r.id);rr()}
 }
 
 /* ───── 화면 ───── */
@@ -340,7 +417,7 @@ function vHome(){
   :`<div class="card"><p class="sub">표시할 팀원이 없습니다. 관리자에게 팀 배정을 요청하세요.</p></div>`}`;
   bindWk();
   M.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{const d=+b.dataset.w;wk=d?toFri(ymd(new Date(+wk.slice(0,4),+wk.slice(4,6)-1,+wk.slice(6)+d))):defWk();render()});
-  M.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{const x=reports.find(q=>q.id===b.dataset.lv);if(x)showReports([x],title(x.weekKey))});
+  M.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{const x=reports.find(q=>q.id===b.dataset.lv);if(x)showReports([x],title(x.weekKey),{del:true})});
   M.querySelectorAll("[data-open]").forEach(el=>el.onclick=()=>{editTeam=el.dataset.open;draft=null;view="write";render()});
   M.querySelectorAll("[data-ro]").forEach(b=>b.onclick=async()=>{const x=reports.find(q=>q.id===b.dataset.ro);if(!x||!confirm(`${x.userName||x.updatedByName||"작성자"}의 제출을 취소하고 수정할 수 있게 할까요?`))return;
     try{await updateDoc(doc(db,"reports",x.id),{status:"작성중",submittedAt:null,reopenedBy:me.id,reopenedAt:serverTimestamp(),updatedBy:me.id,updatedByName:me.name,updatedAt:serverTimestamp(),rev:(x.rev||0)+1});toast("제출이 취소되었습니다.")}catch(e){toast("처리 오류: "+e.message,true)}});
@@ -429,11 +506,12 @@ function vList(){
   <select class="in" style="width:130px" data-fl="st"><option value="">전체 상태</option><option ${fl.st==="작성중"?"selected":""}>작성중</option><option ${fl.st==="제출완료"?"selected":""}>제출완료</option></select>
   <input class="in" style="flex:1;min-width:160px" id="flQ" placeholder="내용 검색" value="${esc(fl.q)}"></div></div>
   <div class="card scroll" style="padding:0"><table><thead><tr><th>주차</th><th>팀</th><th>작성자</th><th>상태</th><th>이슈</th><th>최종 수정</th><th></th></tr></thead><tbody>
-  ${l.map(r=>`<tr><td>${title(r.weekKey)}</td><td>${esc(r.teamName||teamName(r.teamId))}</td><td>${esc(r.userName||r.updatedByName||"-")}</td><td>${stTag(r)}</td><td>${(r.issues||[]).filter(i=>i.title&&i.status!=="완료").length}건 진행</td><td class="sub">${esc(r.updatedByName||"")} · ${fmt(r.updatedAt)}</td><td><button class="btn s" data-view="${esc(r.id)}">열람</button></td></tr>`).join("")||`<tr><td colspan="7" class="sub" style="text-align:center;padding:30px">조건에 맞는 보고서가 없습니다.</td></tr>`}</tbody></table></div>`;
+  ${l.map(r=>`<tr><td>${title(r.weekKey)}</td><td>${esc(r.teamName||teamName(r.teamId))}</td><td>${esc(r.userName||r.updatedByName||"-")}</td><td>${stTag(r)}</td><td>${(r.issues||[]).filter(i=>i.title&&i.status!=="완료").length}건 진행</td><td class="sub">${esc(r.updatedByName||"")} · ${fmt(r.updatedAt)}</td><td><div class="bar" style="flex-wrap:nowrap;gap:6px"><button class="btn s" data-view="${esc(r.id)}">열람</button>${canDel()?`<button class="btn s d" data-rdel="${esc(r.id)}" aria-label="${esc(title(r.weekKey)+" "+(r.teamName||teamName(r.teamId))+" "+(r.userName||"")+" 보고서 삭제")}">삭제</button>`:""}</div></td></tr>`).join("")||`<tr><td colspan="7" class="sub" style="text-align:center;padding:30px">조건에 맞는 보고서가 없습니다.</td></tr>`}</tbody></table></div>`;
   M.querySelectorAll("[data-fl]").forEach(s=>s.onchange=()=>{fl[s.dataset.fl]=s.value;render()});
   const q=$("#flQ");let qt;let comp=false;q.oncompositionstart=()=>comp=true;q.oncompositionend=()=>{comp=false;q.oninput()};q.oninput=()=>{if(comp)return;clearTimeout(qt);qt=setTimeout(()=>{fl.q=q.value.trim();render();const n=$("#flQ");n.focus();n.setSelectionRange(n.value.length,n.value.length)},250)};
-  M.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>showReports([reports.find(r=>r.id===b.dataset.view)],title(reports.find(r=>r.id===b.dataset.view).weekKey)));
-  const m=$("#merge");if(m)m.onclick=()=>showReports(reports.filter(r=>r.weekKey===fl.wk),title(fl.wk)+" 전체 팀 통합");
+  M.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{const x=reports.find(r=>r.id===b.dataset.view);if(x)showReports([x],title(x.weekKey),{del:true})});
+  M.querySelectorAll("[data-rdel]").forEach(b=>b.onclick=async()=>{const x=reports.find(r=>r.id===b.dataset.rdel);if(x)await deleteReport(x)});
+  const m=$("#merge");if(m)m.onclick=()=>showReports(reports.filter(r=>r.weekKey===fl.wk),title(fl.wk)+" 전체 팀 통합",{del:true});
 }
 
 function tplCard(){
@@ -462,7 +540,7 @@ function vAdmin(){
   ${tplCard()}<div class="card"><b>팀</b><form id="tmForm" class="bar" style="margin:10px 0"><input class="in" style="max-width:240px" name="n" placeholder="팀 이름" required><button class="btn p">팀 추가</button></form>
   <div class="bar">${teams.map(t=>`<span class="tag" style="padding:4px 4px 4px 12px">${esc(t.name)} <button class="btn s d" data-dt="${t.id}" style="border:0;background:none">✕</button></span>`).join("")||"<span class='sub'>등록된 팀이 없습니다.</span>"}</div></div>
   ${userTable()}
-  <p class="sub">팀원: 본인 보고서 작성·제출 · 팀장: 본인 작성·제출 + 팀 전체 열람·팀원 제출 취소 · 임원: 전체 열람(읽기 전용) · 관리자: 모든 권한</p>`;
+  <p class="sub">팀원: 본인 보고서 작성·제출 · 팀장: 본인 작성·제출 + 팀 전체 열람·팀원 제출 취소 · 임원: 전체 열람(읽기 전용) · 관리자: 모든 권한(보고서 삭제 포함)</p>`;
   M.querySelectorAll("[data-t]").forEach(el=>el.oninput=()=>{tplDraft[el.dataset.t]=el.value});
   M.querySelectorAll("[data-te]").forEach(el=>el.oninput=()=>{tplDraft.extras[+el.dataset.te].label=el.value});
   M.querySelectorAll("[data-th]").forEach(el=>el.oninput=()=>{tplDraft.holidays=lines(el.value).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x))});
