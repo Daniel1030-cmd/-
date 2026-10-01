@@ -173,16 +173,17 @@ const fmt=t=>{if(!t)return"-";const d=t.toDate?t.toDate():new Date(t);return d.t
 const title=wk=>{if(!/^\d{8}$/.test(wk))return"-";const d=new Date(+wk.slice(0,4),+wk.slice(4,6)-1,+wk.slice(6));d.setDate(d.getDate()-((d.getDay()+6)%7)+4);return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${Math.ceil(d.getDate()/7)}주차`}; /* 그 주 금요일이 속한 달 기준 N주차 */
 function toast(m,err){const e=document.createElement("div");err=err??/오류|실패|차단|권한|이미|입력하세요/.test(m);e.className="toast"+(err?" err":"");e.textContent=m;$("#toasts").append(e);setTimeout(()=>e.remove(),err?6000:3200)}
 const ready={t:0,c:0,r:0};
-const rid=(wk,t)=>`${wk}_${t}`;
+const rid=(wk,t,u)=>`${wk}_${t}_${u}`;
 
 const TPL0={thisLabel:"금주 진행사항",nextLabel:"차주 진행사항",issueLabel:"이슈사항",noteLabel:"특이사항",dueLabel:"완료예정",suffix:"주차-WBR",guide:"",thisHint:"",nextHint:"",extras:[],holidays:[]};
 let tpl={...TPL0},carry=null,autoT=null,tplDraft=null;
 let me=null,teams=[],users=[],reports=[],view="home",wk=defWk(),editTeam=null,draft=null,fl={wk:"",team:"",st:"",q:""},unsubs=[];
 const priv=()=>me&&me.active!==false&&(me.role==="admin"||me.role==="exec");
 const canWrite=t=>me&&me.active!==false&&(me.role==="admin"||(["member","leader"].includes(me.role)&&me.team===t));
+const mon=()=>priv()||(me&&me.active!==false&&me.role==="leader");
 const isLead=()=>me&&(me.role==="admin"||me.role==="leader");
 const teamName=id=>(teams.find(t=>t.id===id)||{}).name||"(팀 없음)";
-const getR=(w,t)=>reports.find(r=>r.id===rid(w,t));
+const getR=(w,t,u)=>reports.find(r=>r.id===rid(w,t,u));
 const stTag=r=>!r?`<span class="tag late">미작성</span>`:r.status==="제출완료"?`<span class="tag done">제출완료</span>`:`<span class="tag draft">작성중</span>`;
 
 /* ───── 인증 ───── */
@@ -210,8 +211,8 @@ onAuthStateChanged(auth,u=>{
     const first=!me,old=me;me={id:u.uid,...s.data()};
     $("#meTxt").innerHTML=`<b>${esc(me.name)}</b><br>${ROLE[me.role]||me.role}`;
     $("#navAdmin").classList.toggle("hide",me.role!=="admin"||me.active===false);
-    $("#navHome").classList.toggle("hide",!priv());$("#navList").classList.toggle("hide",!priv());
-    if(!priv()&&(view==="home"||view==="list"))view="write";
+    $("#navHome").classList.toggle("hide",!mon());$("#navList").classList.toggle("hide",!mon());
+    if(!mon()&&(view==="home"||view==="list"))view="write";
     if(first||old.role!==me.role||old.team!==me.team||old.active!==me.active) startData();
     render();
   },showErr));
@@ -221,9 +222,9 @@ function startData(){ready.t=ready.c=ready.r=0;reports=[];draft=null;
   unsubs.push(onSnapshot(collection(db,"teams"),s=>{teams=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));ready.t=1;rr()},showErr));
   unsubs.push(onSnapshot(doc(db,"config","template"),s=>{const d=s.exists()?s.data():{};tpl={...TPL0,...d,extras:d.extras||[]};tpl.suffix=String(tpl.suffix||TPL0.suffix).replace(/[<>&"'`]/g,"").slice(0,30);tpl.holidays=(tpl.holidays||[]).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x));if(!ready.c)wk=defWk();ready.c=1;rr()},showErr));
   if(me.role==="pending"||me.active===false)return;
-  const q=priv()?collection(db,"reports"):(me.team?query(collection(db,"reports"),where("teamId","==",me.team)):null);
+  const q=priv()?collection(db,"reports"):(me.team?(me.role==="leader"?query(collection(db,"reports"),where("teamId","==",me.team)):query(collection(db,"reports"),where("teamId","==",me.team),where("uid","==",me.id))):null);
   if(q)unsubs.push(onSnapshot(q,s=>{reports=s.docs.map(d=>({id:d.id,...d.data()}));ready.r=1;rr()},showErr));else{reports=[];ready.r=1}
-  if(me.role==="admin")unsubs.push(onSnapshot(collection(db,"users"),s=>{users=s.docs.map(d=>({id:d.id,...d.data()}));rr()},showErr));
+  const uq=priv()?collection(db,"users"):(me.team?query(collection(db,"users"),where("team","==",me.team)):null);if(uq)unsubs.push(onSnapshot(uq,s=>{users=s.docs.map(d=>({id:d.id,...d.data()}));rr()},showErr));
 }
 
 /* ───── 보고서 표시/내보내기 ───── */
@@ -264,7 +265,7 @@ function repHtml(r){
   const iss=(r.issues||[]).filter(i=>i.title).map((i,n)=>`<div class="ir"><div class="irh"><span class="n">${n+1}</span><b class="tt">${esc(i.title)}</b><span class="st ${ic(i.status)}">${esc(i.status||"진행중")}</span>${i.owner?`<span class="ow">${esc(i.owner)}</span>`:""}<i class="lead"></i><span class="due">${esc(fd(i.due))}</span></div>${(i.items||[]).length?`<ol class="si">${i.items.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:""}</div>`).join("")||none("등록된 이슈가 없습니다");
   const nt=lines(r.thisWeek),oth=nt.length?`<div class="th" style="margin-top:12px"><span><b>2</b>${esc(tpl.noteLabel||"특이사항")}</span></div><div class="is">${nt.map((x,i)=>`<div class="ir"><div class="irh"><span class="n">${i+1}</span><span>${esc(x)}</span></div></div>`).join("")}</div>`:"",nx=lines(r.nextWeek).map((x,i)=>row(i+1,x)).join("")||none("해당 사항 없음");
   const sb=r.status==="제출완료"?`<span class="st done">제출완료</span>`:`<span class="st draft">작성중</span>`,meta=(k,v)=>`<div><span>${k}</span><b>${v}</b></div>`,rm=["Ⅰ","Ⅱ","Ⅲ","Ⅳ","Ⅴ","Ⅵ","Ⅶ","Ⅷ"];
-  return `<div class="rp2"><div class="rh"><div class="ey">WEEKLY BUSINESS REPORT</div><h2>${title(r.weekKey)} 주간업무보고</h2><div class="rm">${meta("팀",esc(r.teamName||teamName(r.teamId)))}${meta("작성자",esc(r.updatedByName||"-"))}${meta("최종 수정",fmt(r.updatedAt))}${meta("상태",sb)}</div></div>
+  return `<div class="rp2"><div class="rh"><div class="ey">WEEKLY BUSINESS REPORT</div><h2>${title(r.weekKey)} 주간업무보고</h2><div class="rm">${meta("팀",esc(r.teamName||teamName(r.teamId)))}${meta("작성자",esc(r.userName||r.updatedByName||"-"))}${meta("최종 수정",fmt(r.updatedAt))}${meta("상태",sb)}</div></div>
   <section class="sc"><h3><i>Ⅰ</i>${esc(tpl.thisLabel)}</h3><div class="bd"><div class="th"><span><b>1</b>${esc(r.issueLabel||tpl.issueLabel)}</span><span>${esc(r.dueLabel||tpl.dueLabel)}</span></div><div class="is">${iss}</div>${oth}</div></section>
   <section class="sc"><h3><i>Ⅱ</i>${esc(tpl.nextLabel)}</h3><div class="bd">${nx}</div></section>
   ${(r.extra||[]).map((e,k)=>`<section class="sc"><h3><i>${rm[k+2]||k+3}</i>${esc(e.label)}</h3><div class="bd tx">${esc(e.text)}</div></section>`).join("")}</div>`;
@@ -305,7 +306,7 @@ function vSetup(u){
 }
 function render(){
   if(!me)return;M.oninput=M.onchange=null;
-  if(!priv()&&(view==="home"||view==="list"))view="write";
+  if(!mon()&&(view==="home"||view==="list"))view="write";
   document.querySelectorAll("aside a[data-v]").forEach(a=>{const o=a.dataset.v===view;a.classList.toggle("on",o);o?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
   if(me.active===false){M.innerHTML=`<div class="card"><h1 class="t">비활성화된 계정</h1><p class="sub" style="margin-top:8px">이 계정은 관리자에 의해 비활성화되었습니다. 이용이 필요하면 관리자에게 문의하세요.</p></div>`;return}
   if(me.role==="pending"){M.innerHTML=`<div class="card"><h1 class="t">승인 대기 중</h1><p class="sub" style="margin-top:8px">관리자가 팀과 권한을 지정하면 이용할 수 있습니다. 승인 후 이 화면이 자동으로 바뀝니다.</p></div>`;return}
@@ -315,47 +316,42 @@ function wkBar(){return `<div class="bar"><label class="sub">주차 기준일(�
 function bindWk(){const el=$("#wkIn");if(el)el.onchange=async()=>{if(el.value){if(!await flush())return;wk=toFri(el.value.replaceAll("-",""));if(view==="write")draft=null;render()}}}
 
 function vHome(){
-  const vis=priv()?teams:teams.filter(t=>t.id===me.team);
-  const rows=vis.map(t=>({t,r:getR(wk,t.id)}));
-  const rank=x=>!x.r?0:x.r.status==="제출완료"?2:1;
-  const n={done:rows.filter(x=>rank(x)===2).length,draft:rows.filter(x=>rank(x)===1).length};n.miss=rows.length-n.done-n.draft;
-  const pc=k=>rows.length?n[k]/rows.length*100:0;
-  rows.sort((x,y)=>rank(x)-rank(y));
-  const iss=rows.flatMap(x=>(x.r&&x.r.issues||[]).filter(i=>i.title).map(i=>({...i,t:x.t,r:x.r})));
+  const vis=priv()?teams:teams.filter(t=>t.id===me.team),rank=y=>!y.r?0:y.r.status==="제출완료"?2:1;
+  const rows=vis.map(t=>{const m=users.filter(u=>u.team===t.id&&u.active!==false&&["member","leader"].includes(u.role)).map(u=>({u,r:getR(wk,t.id,u.id)}));
+    reports.filter(x=>x.weekKey===wk&&x.teamId===t.id&&!m.some(y=>y.r&&y.r.id===x.id)).forEach(x=>m.push({u:{id:x.uid||"",name:x.userName||x.updatedByName||"(기존 팀 보고서)"},r:x}));
+    m.sort((a,b)=>rank(a)-rank(b)||String(a.u.name).localeCompare(String(b.u.name),"ko"));return{t,m}});
+  const done=x=>x.m.length&&x.m.every(y=>rank(y)===2)?1:0;rows.sort((a,b)=>done(a)-done(b));
+  const all=rows.flatMap(x=>x.m),n={done:all.filter(y=>rank(y)===2).length,draft:all.filter(y=>rank(y)===1).length};n.miss=all.length-n.done-n.draft;
+  const pc=k=>all.length?n[k]/all.length*100:0,miss=all.filter(y=>rank(y)===0).map(y=>y.u.name);
+  const iss=all.flatMap(y=>y.r?(y.r.issues||[]).filter(i=>i.title).map(i=>({...i,t:teams.find(t=>t.id===y.r.teamId)||{name:y.r.teamName||""},r:y.r,u:y.u})):[]);
   const late=iss.filter(i=>i.status==="지연"),prog=iss.filter(i=>i.status==="진행중").length,fin=iss.filter(i=>i.status==="완료").length;
-  const miss=rows.filter(x=>rank(x)===0).map(x=>x.t.name);
-  const card=({t,r})=>{
-    const is=(r&&r.issues||[]).filter(i=>i.title),dn=is.filter(i=>i.status==="완료").length,ln=is.filter(i=>i.status==="지연").length;
-    const cls=!r?"m":r.status==="제출완료"?"s":"d";
-    const btn=canWrite(t.id)?(!r?"작성 시작":r.status==="제출완료"?"제출 내용 보기":"이어서 작성"):"열람";
-    return `<div class="tc2 ${cls}" data-open="${t.id}" role="button" tabindex="0"><div class="bar" style="justify-content:space-between"><b style="font-size:16px">${esc(t.name)}</b>${stTag(r)}</div>
-    ${r?`<div class="kv"><span>${lines(r.thisWeek).length}</span> 금주 항목 &nbsp;<span>${is.length}</span> 이슈 ${ln?`<span class="tag late">지연 ${ln}</span>`:""}</div>
-    ${is.length?`<div><div class="mini"><i style="width:${dn/is.length*100}%"></i></div><div class="sub" style="margin-top:3px">이슈 완료 ${dn}/${is.length}</div></div>`:""}
-    <div class="sub">${esc(r.updatedByName||"")} · ${fmt(r.updatedAt)}</div>`:`<div class="sub">이번 주 보고서가 아직 작성되지 않았습니다</div>`}
-    <div><button class="btn s ${canWrite(t.id)?"p":""}">${btn}</button></div></div>`};
-  M.innerHTML=`<div class="top"><div><h1 class="t">제출 현황</h1><div class="sub">${title(wk)}</div></div>
+  const card=({t,m})=>{const d=m.filter(y=>rank(y)===2).length,tot=m.length,cls=tot&&d===tot?"s":d?"d":"m",mgr=isLead()&&(me.role==="admin"||me.team===t.id);
+    const line=y=>`<div class="bar" style="justify-content:space-between;padding:6px 0;border-top:1px solid #EEF0F2"><span>${esc(y.u.name)}${y.u.role==="leader"?' <span class="sub">팀장</span>':""}</span><span class="bar" style="gap:6px">${stTag(y.r)}${y.r?`<button class="btn s" data-lv="${esc(y.r.id)}">보기</button>`:""}${y.r&&y.r.status==="제출완료"&&mgr?`<button class="btn s d" data-ro="${esc(y.r.id)}">취소</button>`:""}</span></div>`;
+    return `<div class="tc2 ${cls}"><div class="bar" style="justify-content:space-between"><b style="font-size:16px">${esc(t.name)}</b><span class="tag ${tot&&d===tot?"done":"draft"}">${d}/${tot}명 제출</span></div><div class="mini"><i style="width:${tot?d/tot*100:0}%"></i></div><div>${m.map(line).join("")||'<div class="sub">등록된 팀원이 없습니다</div>'}</div>${canWrite(t.id)?`<div><button class="btn s p" data-open="${esc(t.id)}">내 보고서 작성</button></div>`:""}</div>`};
+  M.innerHTML=`<div class="top"><div><h1 class="t">제출 현황</h1><div class="sub">${title(wk)} · 팀원별 개인 보고서 기준</div></div>
    <div class="bar"><button class="btn s" data-w="-7">◀ 이전 주</button><input class="in" style="width:150px" type="date" id="wkIn" value="${iso(wk)}"><button class="btn s" data-w="7">다음 주 ▶</button><button class="btn s" data-w="0">이번 주</button></div></div>
-  ${rows.length?`<div class="card"><div class="bar" style="justify-content:space-between;align-items:flex-end"><div><div class="sub">${priv()?"전체 팀":"우리 팀"} 제출률</div><div style="font-size:30px;font-weight:700;line-height:1.2">${Math.round(pc("done"))}<span style="font-size:16px">%</span> <span class="sub" style="font-size:13px;font-weight:400">${n.done}/${rows.length}개 팀 제출 완료</span></div></div>
-   <div class="sub" style="text-align:right">${miss.length?`미작성: <b style="color:var(--bad)">${miss.map(esc).join(", ")}</b>`:"모든 팀이 작성을 시작했습니다"}</div></div>
+  ${all.length?`<div class="card"><div class="bar" style="justify-content:space-between;align-items:flex-end"><div><div class="sub">${priv()?"전체":"우리 팀"} 제출률 (팀원 기준)</div><div style="font-size:30px;font-weight:700;line-height:1.2">${Math.round(pc("done"))}<span style="font-size:16px">%</span> <span class="sub" style="font-size:13px;font-weight:400">${n.done}/${all.length}명 제출 완료</span></div></div>
+   <div class="sub" style="text-align:right;max-width:55%">${miss.length?`미작성: <b style="color:var(--bad)">${miss.slice(0,8).map(esc).join(", ")}${miss.length>8?` 외 ${miss.length-8}명`:""}</b>`:"모든 팀원이 작성을 시작했습니다"}</div></div>
    <div class="stack" style="margin-top:12px"><i style="width:${pc("done")}%;background:var(--ok)"></i><i style="width:${pc("draft")}%;background:#D97706"></i></div>
    <div class="legend"><span><span class="dot" style="background:var(--ok)"></span>제출완료 <b>${n.done}</b></span><span><span class="dot" style="background:#D97706"></span>작성중 <b>${n.draft}</b></span><span><span class="dot" style="background:#C5CBD2"></span>미작성 <b>${n.miss}</b></span>
    <span style="margin-left:auto" class="sub">이슈 진행 <b>${prog}</b> · 지연 <b style="color:${late.length?"var(--bad)":"inherit"}">${late.length}</b> · 완료 <b>${fin}</b></span></div></div>
   <div class="grid2">${rows.map(card).join("")}</div>
-  ${late.length?`<div class="card" style="margin-top:14px;padding:0"><div style="padding:12px 16px;font-weight:700;color:var(--bad)">지연 이슈 ${late.length}건</div><div class="scroll"><table><thead><tr><th>팀</th><th>이슈</th><th>담당</th><th>완료예정</th><th></th></tr></thead><tbody>${late.map(i=>`<tr><td>${esc(i.t.name)}</td><td>${esc(i.title)}</td><td>${esc(i.owner||"-")}</td><td>${esc(i.due||"-")}</td><td><button class="btn s" data-lv="${esc(i.r.id)}">보고서</button></td></tr>`).join("")}</tbody></table></div></div>`:""}`
-  :`<div class="card"><p class="sub">소속된 팀이 없습니다. 관리자에게 팀 배정을 요청하세요.</p></div>`}`;
+  ${late.length?`<div class="card" style="margin-top:14px;padding:0"><div style="padding:12px 16px;font-weight:700;color:var(--bad)">지연 이슈 ${late.length}건</div><div class="scroll"><table><thead><tr><th>팀</th><th>이슈</th><th>담당</th><th>${esc(tpl.dueLabel)}</th><th></th></tr></thead><tbody>${late.map(i=>`<tr><td>${esc(i.t.name)}</td><td>${esc(i.title)}</td><td>${esc(i.owner||i.u.name||"-")}</td><td>${esc(fd(i.due))}</td><td><button class="btn s" data-lv="${esc(i.r.id)}">보고서</button></td></tr>`).join("")}</tbody></table></div></div>`:""}`
+  :`<div class="card"><p class="sub">표시할 팀원이 없습니다. 관리자에게 팀 배정을 요청하세요.</p></div>`}`;
   bindWk();
   M.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{const d=+b.dataset.w;wk=d?toFri(ymd(new Date(+wk.slice(0,4),+wk.slice(4,6)-1,+wk.slice(6)+d))):defWk();render()});
-  M.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{const r=reports.find(x=>x.id===b.dataset.lv);if(r)showReports([r],title(r.weekKey))});
-  M.querySelectorAll("[data-open]").forEach(el=>el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();el.click()}});
-  M.querySelectorAll("[data-open]").forEach(el=>el.onclick=()=>{const t=el.dataset.open;if(canWrite(t)){editTeam=t;draft=null;view="write";render()}else{const r=getR(wk,t);r?showReports([r],title(wk)):toast("작성된 보고서가 없습니다.")}});
+  M.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{const x=reports.find(q=>q.id===b.dataset.lv);if(x)showReports([x],title(x.weekKey))});
+  M.querySelectorAll("[data-open]").forEach(el=>el.onclick=()=>{editTeam=el.dataset.open;draft=null;view="write";render()});
+  M.querySelectorAll("[data-ro]").forEach(b=>b.onclick=async()=>{const x=reports.find(q=>q.id===b.dataset.ro);if(!x||!confirm(`${x.userName||x.updatedByName||"작성자"}의 제출을 취소하고 수정할 수 있게 할까요?`))return;
+    try{await updateDoc(doc(db,"reports",x.id),{status:"작성중",submittedAt:null,reopenedBy:me.id,reopenedAt:serverTimestamp(),updatedBy:me.id,updatedByName:me.name,updatedAt:serverTimestamp(),rev:(x.rev||0)+1});toast("제출이 취소되었습니다.")}catch(e){toast("처리 오류: "+e.message,true)}});
 }
 
 function initDraft(){
-  const r=getR(wk,editTeam),blank={title:"",due:"",status:"진행중",owner:"",items:""};
+  const r=getR(wk,editTeam,me.id),blank={title:"",due:"",status:"진행중",owner:"",items:""};
   carry=null;
   if(r)draft={thisWeek:r.thisWeek||"",nextWeek:r.nextWeek||"",issues:(r.issues||[]).map(i=>({...i,items:(i.items||[]).join("\n")})),status:r.status,rev:r.rev||0};
   else{
-    const prev=reports.filter(x=>x.teamId===editTeam&&x.weekKey<wk).sort((x,y)=>y.weekKey.localeCompare(x.weekKey))[0];
+    const prev=reports.filter(x=>x.teamId===editTeam&&x.uid===me.id&&x.weekKey<wk).sort((x,y)=>y.weekKey.localeCompare(x.weekKey))[0];
     draft={thisWeek:prev?prev.nextWeek||"":"",nextWeek:"",issues:prev?(prev.issues||[]).filter(i=>i.status!=="완료").map(i=>({...i,items:(i.items||[]).join("\n")})):[],status:"",rev:0};
     if(prev&&(draft.thisWeek||draft.issues.length))carry=prev.weekKey;
   }
@@ -371,13 +367,13 @@ function vWrite(){if(!(ready.t&&ready.c&&ready.r)){M.innerHTML='<p class="sub">�
   if(!draft)initDraft();
   const locked=draft.status==="제출완료";
   const dis=locked?"disabled":"";
-  const R=getR(wk,editTeam),idx=st=>Math.max(0,ISS_ST.indexOf(st));
+  const R=getR(wk,editTeam,me.id),idx=st=>Math.max(0,ISS_ST.indexOf(st));
   M.innerHTML=`<div class="top"><div><h1 class="t">보고서 작성</h1><div class="sub">내용은 입력하는 대로 자동 저장됩니다</div></div>
    <div class="bar">${me.role==="admin"?`<select class="in" id="tmSel" style="width:150px">${teams.map(t=>`<option value="${t.id}" ${t.id===editTeam?"selected":""}>${esc(t.name)}</option>`).join("")}</select>`:""}${wkBar()}</div></div>
   <div class="sheet"><div class="actbar"><div><h2>${title(wk)}</h2><div class="sub" style="margin-top:4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b style="color:var(--ink)">${esc(teamName(editTeam))}</b>${stTag(R)}<span id="autoStat">${locked?"":"변경 사항은 자동 저장됩니다"}</span></div></div>
-   <div class="bar"><button class="btn" id="prev">미리보기</button><button class="btn ${locked?"":"p"}" id="save" ${dis}>임시 저장</button>${isLead()&&!locked?`<button class="btn" id="submit">제출하기</button>`:""}${isLead()&&locked?`<button class="btn" id="reopen">제출 취소(수정 재개)</button>`:""}</div></div>
+   <div class="bar"><button class="btn" id="prev">미리보기</button><button class="btn ${locked?"":"p"}" id="save" ${dis}>임시 저장</button>${!locked?`<button class="btn" id="submit">제출하기</button>`:""}${isLead()&&locked?`<button class="btn" id="reopen">제출 취소(수정 재개)</button>`:""}</div></div>
   <div class="sheet-b">
-  ${locked?`<div class="note ok">✅ 제출 완료 · ${fmt(R&&R.submittedAt)} — 다시 제출할 수 없습니다.${isLead()?" 내용을 고치려면 ‘제출 취소’를 누르세요.":""}</div>`:""}${tpl.guide?`<div class="note">${esc(tpl.guide)}</div>`:""}${carry?`<div class="note acc">지난 보고서(${title(carry)})의 차주 계획과 미완료 이슈를 자동으로 가져왔습니다. 필요한 부분을 수정하세요.</div>`:""}
+  ${locked?`<div class="note ok">✅ 제출 완료 · ${fmt(R&&R.submittedAt)} — 다시 제출할 수 없습니다.${isLead()?" 내용을 고치려면 ‘제출 취소’를 누르세요.":" 수정이 필요하면 팀장에게 제출 취소를 요청하세요."}</div>`:""}${tpl.guide?`<div class="note">${esc(tpl.guide)}</div>`:""}${carry?`<div class="note acc">지난 보고서(${title(carry)})의 차주 계획과 미완료 이슈를 자동으로 가져왔습니다. 필요한 부분을 수정하세요.</div>`:""}
   <div class="sec"><h3>${esc(tpl.thisLabel)}</h3><div style="display:flex;gap:8px;align-items:center;margin:0 0 10px 10px;font-size:14px;font-weight:700">1.<input class="in-title" style="width:160px;font-size:14px" data-l="issueLabel" maxlength="30" value="${esc(draft.issueLabel)}" aria-label="항목명" ${dis}>|<input class="in-title" style="width:120px;font-size:14px" data-l="dueLabel" maxlength="30" value="${esc(draft.dueLabel)}" aria-label="완료일 항목명" ${dis}><span class="cnt">${draft.issues.length}건 · 항목명은 직접 수정할 수 있습니다</span></div>
   ${draft.issues.map((i,n)=>`<div class="iss2 is${idx(i.status)}"><div class="inum">${n+1}</div><div class="ibody">
    <input class="in-title" data-i="${n}" data-k="title" value="${esc(i.title)}" placeholder="이슈 제목 (예: 사규 정리)" ${dis}>
@@ -403,12 +399,12 @@ function vWrite(){if(!(ready.t&&ready.c&&ready.r)){M.innerHTML='<p class="sub">�
   const ro=$("#reopen");if(ro)ro.onclick=()=>save("작성중",false,{reopen:true});
   $("#prev").onclick=()=>showReports([toDoc("작성중")],title(wk)+" 미리보기");
 }
-const toDoc=st=>({id:rid(wk,editTeam),weekKey:wk,teamId:editTeam,teamName:teamName(editTeam),thisWeek:draft.thisWeek,nextWeek:draft.nextWeek,issueLabel:(draft.issueLabel||"").trim().slice(0,30)||tpl.issueLabel,dueLabel:(draft.dueLabel||"").trim().slice(0,30)||tpl.dueLabel,issues:draft.issues.filter(i=>i.title.trim()||i.items.trim()).map(i=>({title:i.title.trim(),due:i.due.trim(),status:i.status,owner:i.owner.trim(),items:lines(i.items)})),extra:draft.extra.filter(e=>e.text.trim()).map(e=>({id:e.id,label:e.label,text:e.text})),status:st,updatedBy:me.id,updatedByName:me.name,updatedAt:new Date()});
+const toDoc=st=>({id:rid(wk,editTeam,me.id),uid:me.id,userName:me.name,weekKey:wk,teamId:editTeam,teamName:teamName(editTeam),thisWeek:draft.thisWeek,nextWeek:draft.nextWeek,issueLabel:(draft.issueLabel||"").trim().slice(0,30)||tpl.issueLabel,dueLabel:(draft.dueLabel||"").trim().slice(0,30)||tpl.dueLabel,issues:draft.issues.filter(i=>i.title.trim()||i.items.trim()).map(i=>({title:i.title.trim(),due:i.due.trim(),status:i.status,owner:i.owner.trim(),items:lines(i.items)})),extra:draft.extra.filter(e=>e.text.trim()).map(e=>({id:e.id,label:e.label,text:e.text})),status:st,updatedBy:me.id,updatedByName:me.name,updatedAt:new Date()});
 async function save(st,silent,o={}){
   if(!draft||!editTeam)return;
   const z=toDoc(st);
   if(silent&&!z.thisWeek.trim()&&!z.nextWeek.trim()&&!z.issues.length&&!z.extra.length)return;
-  const ref=doc(db,"reports",rid(wk,editTeam)),d={...z};delete d.id;d.updatedAt=serverTimestamp();if(st==="제출완료"){d.submittedAt=serverTimestamp();d.submittedBy=me.id}else if(o.reopen){d.submittedAt=null;d.reopenedBy=me.id;d.reopenedAt=serverTimestamp()}
+  const ref=doc(db,"reports",rid(wk,editTeam,me.id)),d={...z};delete d.id;d.updatedAt=serverTimestamp();if(st==="제출완료"){d.submittedAt=serverTimestamp();d.submittedBy=me.id}else if(o.reopen){d.submittedAt=null;d.reopenedBy=me.id;d.reopenedAt=serverTimestamp()}
   try{
     const rev=await runTransaction(db,async tx=>{
       const snap=await tx.get(ref),cur=snap.exists()?snap.data():null;
@@ -427,13 +423,13 @@ function vList(){
   let l=reports.filter(r=>(!fl.wk||r.weekKey===fl.wk)&&(!fl.team||r.teamId===fl.team)&&(!fl.st||r.status===fl.st)&&(!fl.q||[r.thisWeek,r.nextWeek,...(r.issues||[]).flatMap(i=>[i.title,i.owner,...(i.items||[])]),...(r.extra||[]).map(e=>e.text)].join("\n").toLowerCase().includes(fl.q.toLowerCase())));
   l.sort((a,b)=>b.weekKey.localeCompare(a.weekKey)||(a.teamName||"").localeCompare(b.teamName||"","ko"));
   M.innerHTML=`<div class="top"><div><h1 class="t">보고서 열람</h1><div class="sub">${priv()?"전체 팀 보고서를 열람할 수 있습니다":"소속 팀 보고서만 열람할 수 있습니다"} · ${l.length}건</div></div>
-  ${priv()&&fl.wk?`<button class="btn p" id="merge">${title(fl.wk)} 통합 보기</button>`:""}</div>
+  ${mon()&&fl.wk?`<button class="btn p" id="merge">${title(fl.wk)} 통합 보기</button>`:""}</div>
   <div class="card"><div class="bar"><select class="in" style="width:170px" data-fl="wk"><option value="">전체 주차</option>${wks.map(w=>`<option ${fl.wk===w?"selected":""} value="${esc(w)}">${title(w)}</option>`).join("")}</select>
   ${priv()?`<select class="in" style="width:150px" data-fl="team"><option value="">전체 팀</option>${teams.map(t=>`<option value="${t.id}" ${fl.team===t.id?"selected":""}>${esc(t.name)}</option>`).join("")}</select>`:""}
   <select class="in" style="width:130px" data-fl="st"><option value="">전체 상태</option><option ${fl.st==="작성중"?"selected":""}>작성중</option><option ${fl.st==="제출완료"?"selected":""}>제출완료</option></select>
   <input class="in" style="flex:1;min-width:160px" id="flQ" placeholder="내용 검색" value="${esc(fl.q)}"></div></div>
-  <div class="card scroll" style="padding:0"><table><thead><tr><th>주차</th><th>팀</th><th>상태</th><th>이슈</th><th>최종 수정</th><th></th></tr></thead><tbody>
-  ${l.map(r=>`<tr><td>${title(r.weekKey)}</td><td>${esc(r.teamName||teamName(r.teamId))}</td><td>${stTag(r)}</td><td>${(r.issues||[]).filter(i=>i.title&&i.status!=="완료").length}건 진행</td><td class="sub">${esc(r.updatedByName||"")} · ${fmt(r.updatedAt)}</td><td><button class="btn s" data-view="${esc(r.id)}">열람</button></td></tr>`).join("")||`<tr><td colspan="6" class="sub" style="text-align:center;padding:30px">조건에 맞는 보고서가 없습니다.</td></tr>`}</tbody></table></div>`;
+  <div class="card scroll" style="padding:0"><table><thead><tr><th>주차</th><th>팀</th><th>작성자</th><th>상태</th><th>이슈</th><th>최종 수정</th><th></th></tr></thead><tbody>
+  ${l.map(r=>`<tr><td>${title(r.weekKey)}</td><td>${esc(r.teamName||teamName(r.teamId))}</td><td>${esc(r.userName||r.updatedByName||"-")}</td><td>${stTag(r)}</td><td>${(r.issues||[]).filter(i=>i.title&&i.status!=="완료").length}건 진행</td><td class="sub">${esc(r.updatedByName||"")} · ${fmt(r.updatedAt)}</td><td><button class="btn s" data-view="${esc(r.id)}">열람</button></td></tr>`).join("")||`<tr><td colspan="7" class="sub" style="text-align:center;padding:30px">조건에 맞는 보고서가 없습니다.</td></tr>`}</tbody></table></div>`;
   M.querySelectorAll("[data-fl]").forEach(s=>s.onchange=()=>{fl[s.dataset.fl]=s.value;render()});
   const q=$("#flQ");let qt;let comp=false;q.oncompositionstart=()=>comp=true;q.oncompositionend=()=>{comp=false;q.oninput()};q.oninput=()=>{if(comp)return;clearTimeout(qt);qt=setTimeout(()=>{fl.q=q.value.trim();render();const n=$("#flQ");n.focus();n.setSelectionRange(n.value.length,n.value.length)},250)};
   M.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>showReports([reports.find(r=>r.id===b.dataset.view)],title(reports.find(r=>r.id===b.dataset.view).weekKey)));
@@ -466,7 +462,7 @@ function vAdmin(){
   ${tplCard()}<div class="card"><b>팀</b><form id="tmForm" class="bar" style="margin:10px 0"><input class="in" style="max-width:240px" name="n" placeholder="팀 이름" required><button class="btn p">팀 추가</button></form>
   <div class="bar">${teams.map(t=>`<span class="tag" style="padding:4px 4px 4px 12px">${esc(t.name)} <button class="btn s d" data-dt="${t.id}" style="border:0;background:none">✕</button></span>`).join("")||"<span class='sub'>등록된 팀이 없습니다.</span>"}</div></div>
   ${userTable()}
-  <p class="sub">팀원: 소속 팀 작성 · 팀장: 작성 + 제출/재개 · 임원: 전체 열람(읽기 전용) · 관리자: 모든 권한</p>`;
+  <p class="sub">팀원: 본인 보고서 작성·제출 · 팀장: 본인 작성·제출 + 팀 전체 열람·팀원 제출 취소 · 임원: 전체 열람(읽기 전용) · 관리자: 모든 권한</p>`;
   M.querySelectorAll("[data-t]").forEach(el=>el.oninput=()=>{tplDraft[el.dataset.t]=el.value});
   M.querySelectorAll("[data-te]").forEach(el=>el.oninput=()=>{tplDraft.extras[+el.dataset.te].label=el.value});
   M.querySelectorAll("[data-th]").forEach(el=>el.oninput=()=>{tplDraft.holidays=lines(el.value).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x))});
