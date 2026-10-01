@@ -178,8 +178,8 @@ const rid=(wk,t)=>`${wk}_${t}`;
 const TPL0={thisLabel:"금주 진행사항",nextLabel:"차주 진행사항",issueLabel:"이슈사항",noteLabel:"특이사항",dueLabel:"완료예정",suffix:"주차-WBR",guide:"",thisHint:"",nextHint:"",extras:[],holidays:[]};
 let tpl={...TPL0},carry=null,autoT=null,tplDraft=null;
 let me=null,teams=[],users=[],reports=[],view="home",wk=defWk(),editTeam=null,draft=null,fl={wk:"",team:"",st:"",q:""},unsubs=[];
-const priv=()=>me&&(me.role==="admin"||me.role==="exec");
-const canWrite=t=>me&&(me.role==="admin"||(["member","leader"].includes(me.role)&&me.team===t));
+const priv=()=>me&&me.active!==false&&(me.role==="admin"||me.role==="exec");
+const canWrite=t=>me&&me.active!==false&&(me.role==="admin"||(["member","leader"].includes(me.role)&&me.team===t));
 const isLead=()=>me&&(me.role==="admin"||me.role==="leader");
 const teamName=id=>(teams.find(t=>t.id===id)||{}).name||"(팀 없음)";
 const getR=(w,t)=>reports.find(r=>r.id===rid(w,t));
@@ -209,10 +209,10 @@ onAuthStateChanged(auth,u=>{
     hideErr();
     const first=!me,old=me;me={id:u.uid,...s.data()};
     $("#meTxt").innerHTML=`<b>${esc(me.name)}</b><br>${ROLE[me.role]||me.role}`;
-    $("#navAdmin").classList.toggle("hide",me.role!=="admin");
+    $("#navAdmin").classList.toggle("hide",me.role!=="admin"||me.active===false);
     $("#navHome").classList.toggle("hide",!priv());$("#navList").classList.toggle("hide",!priv());
     if(!priv()&&(view==="home"||view==="list"))view="write";
-    if(first||old.role!==me.role||old.team!==me.team) startData();
+    if(first||old.role!==me.role||old.team!==me.team||old.active!==me.active) startData();
     render();
   },showErr));
 });
@@ -220,7 +220,7 @@ function startData(){ready.t=ready.c=ready.r=0;reports=[];draft=null;
   unsubs.slice(1).forEach(f=>f());unsubs=unsubs.slice(0,1);
   unsubs.push(onSnapshot(collection(db,"teams"),s=>{teams=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0));ready.t=1;rr()},showErr));
   unsubs.push(onSnapshot(doc(db,"config","template"),s=>{const d=s.exists()?s.data():{};tpl={...TPL0,...d,extras:d.extras||[]};tpl.suffix=String(tpl.suffix||TPL0.suffix).replace(/[<>&"'`]/g,"").slice(0,30);tpl.holidays=(tpl.holidays||[]).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x));if(!ready.c)wk=defWk();ready.c=1;rr()},showErr));
-  if(me.role==="pending")return;
+  if(me.role==="pending"||me.active===false)return;
   const q=priv()?collection(db,"reports"):(me.team?query(collection(db,"reports"),where("teamId","==",me.team)):null);
   if(q)unsubs.push(onSnapshot(q,s=>{reports=s.docs.map(d=>({id:d.id,...d.data()}));ready.r=1;rr()},showErr));else{reports=[];ready.r=1}
   if(me.role==="admin")unsubs.push(onSnapshot(collection(db,"users"),s=>{users=s.docs.map(d=>({id:d.id,...d.data()}));rr()},showErr));
@@ -307,6 +307,7 @@ function render(){
   if(!me)return;M.oninput=M.onchange=null;
   if(!priv()&&(view==="home"||view==="list"))view="write";
   document.querySelectorAll("aside a[data-v]").forEach(a=>{const o=a.dataset.v===view;a.classList.toggle("on",o);o?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
+  if(me.active===false){M.innerHTML=`<div class="card"><h1 class="t">비활성화된 계정</h1><p class="sub" style="margin-top:8px">이 계정은 관리자에 의해 비활성화되었습니다. 이용이 필요하면 관리자에게 문의하세요.</p></div>`;return}
   if(me.role==="pending"){M.innerHTML=`<div class="card"><h1 class="t">승인 대기 중</h1><p class="sub" style="margin-top:8px">관리자가 팀과 권한을 지정하면 이용할 수 있습니다. 승인 후 이 화면이 자동으로 바뀝니다.</p></div>`;return}
   if(view==="home")vHome();else if(view==="write")vWrite();else if(view==="list")vList();else if(view==="admin"&&me.role==="admin")vAdmin();
 }
@@ -450,14 +451,21 @@ function tplCard(){
   ${t.extras.map((e,n)=>`<div class="bar" style="margin-bottom:6px"><input class="in" style="max-width:280px" data-te="${n}" value="${esc(e.label)}"><button class="btn s d" data-tx="${n}">삭제</button></div>`).join("")}
   <div class="bar" style="margin-top:8px"><button class="btn s" id="tAdd">+ 항목 추가</button><button class="btn p" id="tSave">양식 저장</button><button class="btn" id="tReset">기본값</button></div></div>`;
 }
+function userTable(){
+  const rank=u=>u.active===false?2:u.role==="pending"?0:1,L=users.slice().sort((a,b)=>rank(a)-rank(b)||String(a.name).localeCompare(String(b.name),"ko"));
+  const np=users.filter(u=>u.role==="pending"&&u.active!==false).length,no=users.filter(u=>u.active===false).length;
+  const row=u=>{const off=u.active===false,self=u.id===me.id,id=esc(u.id);
+    const st=off?'<span class="tag">비활성</span>':u.role==="pending"?'<span class="tag draft">승인대기</span>':'<span class="tag done">사용중</span>';
+    return `<tr data-row="${esc((u.name+" "+u.email).toLowerCase())}" style="${off?"opacity:.6":""}"><td>${esc(u.name)}${self?' <span class="tag prog">나</span>':""}</td><td class="sub">${esc(u.email)}</td>
+    <td><select class="in" data-u="${id}" data-k="team"><option value="">(없음)</option>${teams.map(t=>`<option value="${esc(t.id)}" ${u.team===t.id?"selected":""}>${esc(t.name)}</option>`).join("")}</select></td>
+    <td><select class="in" data-u="${id}" data-k="role">${Object.entries(ROLE).map(([k,v])=>`<option value="${k}" ${u.role===k?"selected":""}>${v}</option>`).join("")}</select></td>
+    <td>${st}</td><td><div class="bar" style="flex-wrap:nowrap"><button class="btn s" data-un="${id}">이름 수정</button><button class="btn s" data-ua="${id}" ${self?"disabled":""}>${off?"활성화":"비활성화"}</button><button class="btn s d" data-ud="${id}" ${self?"disabled":""}>삭제</button></div></td></tr>`};
+  return `<div class="card scroll" style="padding:0"><div class="bar" style="padding:12px 14px;justify-content:space-between"><div><b>사용자</b> <span class="sub">전체 ${users.length}명 · 승인대기 ${np} · 비활성 ${no}</span></div><input class="in" id="uQ" style="max-width:240px" placeholder="이름·이메일 검색"></div><table><thead><tr><th>이름</th><th>이메일</th><th>팀</th><th>권한</th><th>상태</th><th>관리</th></tr></thead><tbody>${L.map(row).join("")}</tbody></table></div>`}
 function vAdmin(){
   M.innerHTML=`<div class="top"><div><h1 class="t">팀 · 권한 관리</h1><div class="sub">가입한 사용자에게 팀과 권한을 지정합니다</div></div></div>
   ${tplCard()}<div class="card"><b>팀</b><form id="tmForm" class="bar" style="margin:10px 0"><input class="in" style="max-width:240px" name="n" placeholder="팀 이름" required><button class="btn p">팀 추가</button></form>
   <div class="bar">${teams.map(t=>`<span class="tag" style="padding:4px 4px 4px 12px">${esc(t.name)} <button class="btn s d" data-dt="${t.id}" style="border:0;background:none">✕</button></span>`).join("")||"<span class='sub'>등록된 팀이 없습니다.</span>"}</div></div>
-  <div class="card scroll" style="padding:0"><table><thead><tr><th>이름</th><th>이메일</th><th>팀</th><th>권한</th></tr></thead><tbody>
-  ${users.map(u=>`<tr><td>${esc(u.name)}</td><td class="sub">${esc(u.email)}</td>
-   <td><select class="in" data-u="${u.id}" data-k="team"><option value="">(없음)</option>${teams.map(t=>`<option value="${t.id}" ${u.team===t.id?"selected":""}>${esc(t.name)}</option>`).join("")}</select></td>
-   <td><select class="in" data-u="${u.id}" data-k="role">${Object.entries(ROLE).map(([k,v])=>`<option value="${k}" ${u.role===k?"selected":""}>${v}</option>`).join("")}</select></td></tr>`).join("")}</tbody></table></div>
+  ${userTable()}
   <p class="sub">팀원: 소속 팀 작성 · 팀장: 작성 + 제출/재개 · 임원: 전체 열람(읽기 전용) · 관리자: 모든 권한</p>`;
   M.querySelectorAll("[data-t]").forEach(el=>el.oninput=()=>{tplDraft[el.dataset.t]=el.value});
   M.querySelectorAll("[data-te]").forEach(el=>el.oninput=()=>{tplDraft.extras[+el.dataset.te].label=el.value});
@@ -467,6 +475,19 @@ function vAdmin(){
   $("#tSave").onclick=async()=>{const t=tplDraft;t.extras=t.extras.filter(e=>e.label.trim());t.suffix=(t.suffix||"").trim()||TPL0.suffix;t.holidays=[...new Set(t.holidays||[])].sort();try{await setDoc(doc(db,"config","template"),t);tplDraft=null;toast("양식이 저장되었습니다. 모든 팀에 즉시 반영됩니다.")}catch(e){showErr(e)}};
   $("#tReset").onclick=()=>{if(confirm("기본 양식으로 되돌릴까요?")){tplDraft={...TPL0,extras:[]};render()}};
   $("#tmForm").onsubmit=async e=>{e.preventDefault();const n=new FormData(e.target).get("n").trim();if(n){try{await addDoc(collection(db,"teams"),{name:n,order:Date.now()});e.target.reset()}catch(er){showErr(er)}}};
+  const uget=id=>users.find(x=>x.id===id),lastAdm=u=>u.role==="admin"&&u.active!==false&&users.filter(x=>x.role==="admin"&&x.active!==false).length<2;
+  const uq=$("#uQ");if(uq)uq.oninput=()=>{const v=uq.value.trim().toLowerCase();M.querySelectorAll("tr[data-row]").forEach(tr=>tr.classList.toggle("hide",!!v&&!tr.dataset.row.includes(v)))};
+  M.querySelectorAll("[data-un]").forEach(b=>b.onclick=async()=>{const u=uget(b.dataset.un);if(!u)return;const n=prompt("표시 이름을 입력하세요 (1~30자)",u.name);if(n==null)return;const v=n.trim();if(!v||v.length>30)return toast("이름은 1~30자로 입력하세요.",true);if(v===u.name)return;
+    try{await updateDoc(doc(db,"users",u.id),{name:v});toast("이름이 변경되었습니다. (이미 제출된 보고서의 작성자명은 유지됩니다)")}catch(e){toast("변경 오류: "+e.message,true)}});
+  M.querySelectorAll("[data-ua]").forEach(b=>b.onclick=async()=>{const u=uget(b.dataset.ua);if(!u||u.id===me.id)return;const off=u.active===false;
+    if(!off&&lastAdm(u))return toast("마지막 관리자는 비활성화할 수 없습니다. 먼저 다른 관리자를 지정하세요.",true);
+    if(!off&&!confirm(`${u.name} (${u.email}) 계정을 비활성화할까요?\n\n· 로그인은 되지만 모든 데이터 접근이 차단됩니다.\n· 작성한 보고서는 그대로 보존되며, 언제든 다시 활성화할 수 있습니다.\n· 퇴사·휴직 처리에는 삭제보다 비활성화를 권장합니다.`))return;
+    try{await updateDoc(doc(db,"users",u.id),{active:off});toast(off?"활성화되었습니다.":"비활성화되었습니다.")}catch(e){toast("변경 오류: "+e.message,true)}});
+  M.querySelectorAll("[data-ud]").forEach(b=>b.onclick=async()=>{const u=uget(b.dataset.ud);if(!u||u.id===me.id)return;
+    if(lastAdm(u))return toast("마지막 관리자는 삭제할 수 없습니다. 먼저 다른 관리자를 지정하세요.",true);
+    const t=prompt(`${u.name} (${u.email}) 사용자 정보를 삭제합니다.\n\n· 작성한 보고서는 유지됩니다.\n· 로그인 계정(Firebase Auth) 자체는 삭제되지 않아, 다시 로그인하면 '사용자 등록(승인대기)' 화면이 나옵니다.\n· 접근을 확실히 막으려면 삭제 대신 '비활성화'를 사용하세요.\n\n계속하려면 이메일을 정확히 입력하세요.`);
+    if(t==null)return;if(t.trim().toLowerCase()!==String(u.email||"").toLowerCase())return toast("이메일이 일치하지 않아 삭제하지 않았습니다.",true);
+    try{await deleteDoc(doc(db,"users",u.id));toast("사용자 정보가 삭제되었습니다.")}catch(e){toast("삭제 오류: "+e.message,true)}});
   M.querySelectorAll("[data-dt]").forEach(b=>b.onclick=async()=>{if(users.some(u=>u.team===b.dataset.dt))return toast("소속 사용자가 있는 팀은 삭제할 수 없습니다. 먼저 사용자의 팀을 변경하세요.",true);if(confirm("팀을 삭제할까요? (기존 보고서는 유지됩니다)"))try{await deleteDoc(doc(db,"teams",b.dataset.dt))}catch(er){showErr(er)}});
   M.querySelectorAll("[data-u]").forEach(s=>s.onchange=async()=>{
     if(s.dataset.k==="role"&&s.value!=="admin"&&(users.find(u=>u.id===s.dataset.u)||{}).role==="admin"&&users.filter(u=>u.role==="admin").length<2){toast("마지막 관리자는 강등할 수 없습니다. 먼저 다른 관리자를 지정하세요.",true);render();return}
