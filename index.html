@@ -8,68 +8,105 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https:; img-src 'self' data:">
 <title>실시간 양방향 통역</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-title" content="통역">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
-:root{--bg:#f3f4f7;--card:#fff;--ink:#111827;--sub:#6b7280;--line:#e5e7eb;--me:#2155d6;--peer:#15803d;--warn:#b45309;--wbg:#fef3c7;color-scheme:light dark}
-@media(prefers-color-scheme:dark){:root{--bg:#0b1220;--card:#151d2e;--ink:#f3f4f6;--sub:#9ca3af;--line:#25304a;--me:#6b8cf0;--peer:#4ade80;--warn:#fbbf24;--wbg:#3b2f0a}}
-*{box-sizing:border-box}html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Malgun Gothic",-apple-system,"Apple SD Gothic Neo",system-ui,sans-serif;display:flex;flex-direction:column}
+:root{--bg:#f2f4f8;--card:#fff;--ink:#0f172a;--sub:#64748b;--line:#e2e8f0;--me:#2155d6;--mebg:#eaf0ff;--peer:#15803d;--peerbg:#e9f8ef;--warn:#b45309;--wbg:#fef3c7;--ok:#15803d;--ng:#b91c1c;--fs:20px;--r:16px;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#0a0f1c;--card:#131b2e;--ink:#f1f5f9;--sub:#94a3b8;--line:#243049;--me:#7c9cf5;--mebg:#16244a;--peer:#4ade80;--peerbg:#10281c;--warn:#fbbf24;--wbg:#3b2f0a;--ok:#4ade80;--ng:#f87171}}
+*{box-sizing:border-box}body{margin:0;height:100dvh;background:var(--bg);color:var(--ink);font:16px/1.5 "Pretendard","Malgun Gothic",-apple-system,"Apple SD Gothic Neo",system-ui,sans-serif;display:flex;flex-direction:column;-webkit-text-size-adjust:100%}
 button,input,select,textarea{font:inherit;color:inherit}
-button{min-height:44px;min-width:44px;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:0 12px;cursor:pointer}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--me);outline-offset:1px}
-header{display:flex;align-items:center;gap:8px;padding:calc(8px + env(safe-area-inset-top)) 12px 8px;background:var(--card);border-bottom:1px solid var(--line)}
-header b{flex:1;font-size:17px}#st{font-size:12px;color:var(--sub)}
-.lang{display:flex;gap:6px;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--line)}
-.lang select{flex:1;min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:0 8px}
-#log{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
-.empty{margin:auto;text-align:center;color:var(--sub);font-size:14px;max-width:320px}
-.b{max-width:92%;padding:10px 12px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
-.b.me{align-self:flex-end;border-color:var(--me)}.b.peer{align-self:flex-start;border-color:var(--peer)}
-.b .who{font-size:12px;font-weight:700}.me .who{color:var(--me)}.peer .who{color:var(--peer)}
-.src{color:var(--sub);font-size:13px;margin-top:2px;word-break:break-word}
-.tgt{font-size:19px;font-weight:700;margin-top:4px;word-break:break-word}
-.tgt.w{background:var(--wbg);border-radius:8px;padding:2px 6px}
-.wn{color:var(--warn);font-size:12px;margin-top:4px}
-.meta{display:flex;align-items:center;gap:6px;color:var(--sub);font-size:11px;margin-top:4px}.meta button{min-height:32px;min-width:32px;padding:0 8px;font-size:14px}
-.live{opacity:.7;font-style:italic}
-footer{background:var(--card);border-top:1px solid var(--line);padding:8px 12px calc(10px + env(safe-area-inset-bottom))}
-details summary{color:var(--sub);font-size:13px;cursor:pointer;padding:4px 0}
-.tx{display:flex;gap:6px;margin:6px 0}.tx input{flex:1;min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:0 10px}
-.mics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mic{min-height:68px;font-size:17px;font-weight:700;border-width:2px}
+button{min-height:48px;min-width:48px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 14px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button:active{transform:scale(.97)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--me);outline-offset:2px}
+header{display:flex;align-items:center;gap:8px;padding:calc(6px + env(safe-area-inset-top)) 10px 6px 14px;background:var(--card);border-bottom:1px solid var(--line)}
+.brand{flex:1;display:flex;align-items:center;gap:8px}.brand b{font-size:18px;letter-spacing:-.3px}
+#st{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--bg);color:var(--sub)}
+#st[data-s=listen]{background:var(--mebg);color:var(--me)}#st[data-s=work]{background:var(--wbg);color:var(--warn)}#st[data-s=err]{background:#fee2e2;color:var(--ng)}
+.ib{border:0;background:transparent;min-height:44px;min-width:44px;padding:0 8px;border-radius:12px;font-size:15px}
+.lang{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:end;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--line)}
+.sel span{display:block;font-size:11px;color:var(--sub);margin:0 2px 2px}.sel select{width:100%;min-height:46px;border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:0 10px;font-weight:600}
+.sw{border-radius:99px;color:var(--me);font-size:18px}
+#log{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:12px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.em{margin:auto;max-width:360px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px}
+.em h1{font-size:19px;margin:0}.em p{color:var(--sub);margin:4px 0 12px;font-size:14px}.em ol{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.em li{display:flex;align-items:center;gap:10px;font-size:15px}.em li>span{flex:none;width:26px;height:26px;border-radius:50%;background:var(--mebg);color:var(--me);display:grid;place-items:center;font-weight:700;font-size:13px}
+.em li.ok>span{background:var(--ok);color:#fff}.em li button{min-height:36px;margin-left:auto;font-size:13px}
+.b{max-width:94%;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.b.me{align-self:flex-end;border-right:5px solid var(--me);background:linear-gradient(var(--mebg),var(--card) 70%)}.b.peer{align-self:flex-start;border-left:5px solid var(--peer);background:linear-gradient(var(--peerbg),var(--card) 70%)}
+.who{display:flex;gap:8px;align-items:baseline;font-size:12px;font-weight:700}.me .who{color:var(--me)}.peer .who{color:var(--peer)}.dir{color:var(--sub);font-weight:400}
+.tgt{font-size:var(--fs);font-weight:700;line-height:1.35;margin-top:4px;word-break:break-word;letter-spacing:-.2px}.tgt.w{background:var(--wbg);border-radius:8px;padding:2px 8px}
+.pend{font-size:0}.pend::after{content:"번역 중…";font-size:15px;font-weight:400;color:var(--sub);animation:bl 1s infinite}@keyframes bl{50%{opacity:.35}}
+.src{color:var(--sub);font-size:14px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);word-break:break-word}
+.wn{margin-top:8px;background:var(--wbg);color:var(--warn);border-radius:10px;padding:6px 10px;font-size:13px}.wn:empty{display:none}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:2px;color:var(--sub);font-size:11px;margin-top:6px}.mt{flex:1}.meta .ib{min-height:40px;min-width:40px;font-size:17px}.meta .rt{font-size:13px;color:var(--warn);font-weight:700}
+.live{opacity:.75;font-style:italic;font-size:17px}
+.jump{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(178px + env(safe-area-inset-bottom));background:var(--me);color:#fff;border:0;min-height:40px;border-radius:99px;box-shadow:0 4px 14px rgba(0,0,0,.25);font-weight:700}
+.ban{margin:8px 12px 0;background:var(--wbg);color:var(--warn);border-radius:12px;padding:8px 12px;font-size:13px}
+footer{background:var(--card);border-top:1px solid var(--line);padding:6px 12px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px rgba(0,0,0,.06)}
+details summary{color:var(--sub);font-size:13px;cursor:pointer;padding:6px 0;min-height:32px}
+.tx{display:flex;gap:6px;margin:4px 0 8px}.tx input{flex:1;min-height:46px;border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:0 12px}.tx button{min-height:46px}
+.mics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.mic{min-height:84px;border-width:2px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;line-height:1.2}
+.mic i{font-style:normal;font-size:24px}.mic b{font-size:17px}.mic small{font-size:12px;color:var(--sub)}
 #bm{border-color:var(--me);color:var(--me)}#bp{border-color:var(--peer);color:var(--peer)}
-.mic.on{color:#fff!important;animation:pl 1.2s infinite}#bm.on{background:var(--me)}#bp.on{background:var(--peer)}
-@keyframes pl{50%{box-shadow:0 0 0 8px rgba(33,85,214,.18)}}@media(prefers-reduced-motion:reduce){.mic.on{animation:none}}
-dialog{width:min(560px,94vw);max-height:90vh;border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);padding:14px}
-dialog::backdrop{background:rgba(0,0,0,.5)}dialog label{display:block;font-size:13px;color:var(--sub);margin-top:10px}
-dialog input:not([type=checkbox]),dialog select,dialog textarea{width:100%;min-height:42px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:6px 8px}
-dialog textarea{min-height:90px}.row{display:flex;gap:8px;margin-top:12px}.row button{flex:1}.p{background:var(--me);border-color:var(--me);color:#fff;font-weight:700}
-.note{font-size:12px;color:var(--sub);margin-top:6px}
-#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(170px + env(safe-area-inset-bottom));background:#111827;color:#fff;padding:8px 14px;border-radius:99px;font-size:14px;max-width:90vw;display:none}
+.mic.on{color:#fff;animation:pl 1.3s infinite}.mic.on small{color:#fff;opacity:.85}#bm.on{background:var(--me)}#bp.on{background:var(--peer)}#bm.on{--c:33,85,214}#bp.on{--c:21,128,61}
+@keyframes pl{0%,100%{box-shadow:0 0 0 0 rgba(var(--c),.45)}50%{box-shadow:0 0 0 10px rgba(var(--c),0)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+dialog{margin:auto auto 0;width:100%;max-width:560px;max-height:92dvh;overflow:auto;border:0;border-radius:22px 22px 0 0;background:var(--card);color:var(--ink);padding:0}
+dialog[open]{animation:up .25s ease-out}@keyframes up{from{transform:translateY(40px);opacity:0}}dialog::backdrop{background:rgba(0,0,0,.5)}
+.dh{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;padding:8px 8px 8px 18px;background:var(--card);border-bottom:1px solid var(--line);font-size:17px}
+.sec{padding:6px 18px 12px;border-bottom:1px solid var(--line)}.sec h3{font-size:13px;color:var(--sub);margin:12px 0 0;letter-spacing:.3px}
+dialog label{display:block;font-size:13px;color:var(--sub);margin-top:12px}dialog label small{color:var(--sub)}
+dialog input:not([type=checkbox]),dialog select,dialog textarea{width:100%;min-height:46px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:8px 10px;margin-top:4px}dialog textarea{min-height:96px}
+.ck{display:flex;gap:8px;align-items:center;color:var(--ink)!important;font-size:14px!important}.ck input{width:22px;height:22px;flex:none}
+.row{display:flex;gap:8px;margin-top:12px}.row button{flex:1}.p{background:var(--me);border-color:var(--me);color:#fff;font-weight:700}
+.dgo{margin-top:8px;font-size:13px;display:grid;gap:3px}.dgo .ok{color:var(--ok)}.dgo .ng{color:var(--ng)}.note{font-size:12px;color:var(--sub);margin:8px 0}
+.da{position:sticky;bottom:0;display:flex;gap:8px;padding:10px 18px calc(10px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line)}.da button{flex:1}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(190px + env(safe-area-inset-bottom));background:#0f172a;color:#fff;padding:10px 16px;border-radius:99px;font-size:14px;max-width:90vw;display:none;z-index:9}
 </style>
 </head>
 <body>
-<header><b>실시간 양방향 통역</b><span id="st"></span><button id="exp" aria-label="대화 내보내기">⬇</button><button id="cfg" aria-label="설정">⚙</button></header>
-<div class="lang"><select id="ml" aria-label="내 언어"></select><button id="sw" aria-label="언어 바꾸기">⇄</button><select id="pl" aria-label="상대 언어"></select></div>
-<main id="log" aria-live="polite"><p class="empty" id="em">⚙ 설정에서 API 키를 입력한 뒤,<br>아래 <b>나</b> 또는 <b>상대</b> 버튼을 눌러 말하세요.<br>버튼을 다시 누르면 듣기를 멈춥니다.</p></main>
+<header>
+  <div class="brand"><b>통역</b><span id="st" data-s="idle">대기</span></div>
+  <button class="ib" id="fm" aria-label="글자 작게">A−</button><button class="ib" id="fp" aria-label="글자 크게">A+</button>
+  <button class="ib" id="exp" aria-label="대화 내보내기">⬇</button><button class="ib" id="cfg" aria-label="설정">⚙</button>
+</header>
+<div class="lang" role="group" aria-label="통역 방향">
+  <label class="sel"><span>내 언어</span><select id="ml"></select></label>
+  <button id="sw" class="sw" aria-label="내 언어와 상대 언어 바꾸기">⇄</button>
+  <label class="sel"><span>상대 언어</span><select id="pl"></select></label>
+</div>
+<div id="ban" class="ban" role="alert" hidden></div>
+<main id="log" aria-live="polite" aria-relevant="additions text">
+  <section id="em" class="em"><h1>실시간 양방향 통역</h1><p>3단계로 바로 시작하세요</p>
+    <ol><li data-s="k"><span>1</span>AI Studio(Gemini) API 키 입력<button id="e1">설정 열기</button></li><li><span>2</span>설정에서 “연결 테스트” 확인</li><li><span>3</span>아래 <b>나</b> / <b>상대</b> 버튼을 누르고 말하기</li></ol></section>
+</main>
+<button id="jump" class="jump" hidden>새 번역 ↓</button>
 <footer>
-<details><summary>텍스트로 입력 (음성인식 미지원 브라우저용)</summary><div class="tx"><input id="ti" placeholder="문장 입력" enterkeyhint="send"><button id="tm">나</button><button id="tp">상대</button></div></details>
-<div class="mics"><button class="mic" id="bm">🎤 나</button><button class="mic" id="bp">🎤 상대</button></div>
+<details><summary>텍스트로 입력</summary><div class="tx"><input id="ti" placeholder="문장 입력" enterkeyhint="send" aria-label="통역할 문장"><button id="tm">나</button><button id="tp">상대</button></div></details>
+<div class="mics"><button class="mic" id="bm" aria-pressed="false"><i>🎤</i><b>나</b><small id="lm"></small></button><button class="mic" id="bp" aria-pressed="false"><i>🎤</i><b>상대</b><small id="lp"></small></button></div>
 </footer>
 <div id="toast" role="status"></div>
-<dialog id="dlg"><form method="dialog" id="f">
-<b>설정</b>
-<label for="k">Anthropic API 키</label><input id="k" type="password" autocomplete="off" placeholder="sk-ant-…">
-<label><input id="rk" type="checkbox"> 이 기기에 키 기억 (끄면 탭을 닫을 때 삭제)</label>
-<label for="bu">API 주소 (사내 게이트웨이 사용 시 변경)</label><input id="bu">
-<label for="md">번역 모델</label><input id="md" list="ml2"><datalist id="ml2"><option value="claude-haiku-5-5"><option value="claude-sonnet-5-5"></datalist>
+<dialog id="dlg" aria-labelledby="dt"><form method="dialog" id="f">
+<div class="dh"><b id="dt">설정</b><button value="x" class="ib" aria-label="닫기">✕</button></div>
+<section class="sec"><h3>연결</h3>
+<label for="pv">AI 공급자</label><select id="pv"><option value="gemini">Google Gemini (AI Studio)</option><option value="claude">Anthropic Claude</option></select>
+<label for="k" id="kl">API 키</label><input id="k" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"><p class="note" id="kh"></p>
+<label class="ck"><input id="rk" type="checkbox"> 이 기기에 키 기억 <small>(끄면 탭을 닫을 때 삭제)</small></label>
+<label for="bu">API 주소 <small>(사내 게이트웨이 사용 시 변경)</small></label><input id="bu" inputmode="url" autocapitalize="off">
+<div class="row"><button type="button" id="dg">연결 테스트</button><button type="button" id="ck">키 삭제</button></div><div id="dgo" class="dgo" role="status"></div></section>
+<section class="sec"><h3>번역 품질</h3>
+<label for="md">번역 모델</label><input id="md" list="ml2" autocapitalize="off"><datalist id="ml2"><option value="claude-haiku-5-5"><option value="claude-sonnet-5-5"></datalist>
 <label for="tn">톤</label><select id="tn"><option value="formal">격식 있는 비즈니스</option><option value="neutral">자연스러운 정중체</option><option value="technical">기술·엔지니어링</option></select>
 <label for="dm">업무 분야</label><input id="dm">
-<label for="gl">용어집 (한 줄에 하나: 내 언어 용어=상대 언어 용어)</label><textarea id="gl" placeholder="납기=delivery date&#10;청소로봇=cleaning robot"></textarea>
-<label for="cx">문맥 유지 턴 수</label><input id="cx" type="number" min="0" max="12">
-<label><input id="sp" type="checkbox"> 내 발화 번역을 음성으로 읽어 주기 (검증 경고 시 보류)</label>
-<p class="note">API 키는 이 기기 브라우저에만 저장되며 서버로 전송되지 않습니다(번역 요청 시 API 주소로만 사용). 키를 GitHub 저장소에 올리지 마세요. 공용 기기에서는 “키 기억”을 끄세요. 대화 내용은 저장하지 않으며 ⬇로 내보낼 수 있습니다.</p>
-<div class="row"><button type="button" id="ck">키 삭제</button><button type="button" id="cl">대화 지우기</button></div>
-<div class="row"><button value="x">닫기</button><button class="p" value="ok" id="sv">저장</button></div>
+<label for="gl">용어집 <small>(한 줄에 하나: 내 언어 용어=상대 언어 용어)</small></label><textarea id="gl" placeholder="납기=delivery date&#10;청소로봇=cleaning robot"></textarea>
+<label for="cx">문맥 유지 턴 수</label><input id="cx" type="number" min="0" max="12"></section>
+<section class="sec"><h3>음성</h3><label class="ck"><input id="sp" type="checkbox"> 내 발화 번역을 음성으로 읽기 <small>(검증 경고 시 보류)</small></label></section>
+<section class="sec"><h3>데이터·보안</h3><p class="note">API 키는 이 기기 브라우저에만 저장되며 번역 요청 시 API 주소로만 전송됩니다. 키를 GitHub 저장소에 올리지 마세요. 공용 기기에서는 “키 기억”을 끄세요. 대화는 저장하지 않으며 ⬇로 내보낼 수 있습니다.</p>
+<button type="button" id="cl">대화 지우기</button></section>
+<div class="da"><button value="x">닫기</button><button class="p" value="ok" id="sv">저장</button></div>
 </form></dialog>
 <script>
 'use strict';
@@ -78,10 +115,12 @@ const h=(t,a={},...k)=>{const e=document.createElement(t);for(const[n,v]of Objec
 const LG={ko:['한국어','ko-KR','Korean'],en:['English','en-US','English'],ja:['日本語','ja-JP','Japanese'],zh:['中文','zh-CN','Chinese'],vi:['Tiếng Việt','vi-VN','Vietnamese'],th:['ไทย','th-TH','Thai'],es:['Español','es-ES','Spanish'],de:['Deutsch','de-DE','German'],fr:['Français','fr-FR','French'],id:['Indonesia','id-ID','Indonesian']};
 const TONE={formal:'Formal business register: polished, courteous, executive-meeting appropriate (Korean: 합니다/하십시오체; English: professional, no slang).',neutral:'Polite but natural conversational business register.',technical:'Precise technical register for engineering/R&D discussions; keep terminology exact.'};
 const sto=(w,k,v)=>{try{if(v===undefined)return w.getItem(k);v===null?w.removeItem(k):w.setItem(k,v)}catch{}};
-let S={my:'ko',peer:'en',tone:'formal',domain:'General business meeting',model:'claude-haiku-5-5',base:'https://api.anthropic.com',gloss:'',ctx:6,speak:false,rk:false};
+let S={my:'ko',peer:'en',tone:'formal',domain:'General business meeting',prov:'gemini',model:'gemini-2.5-flash',base:'https://generativelanguage.googleapis.com',gloss:'',ctx:6,speak:false,rk:false,fs:20};
+const DEF={gemini:{base:'https://generativelanguage.googleapis.com',model:'gemini-2.5-flash',list:['gemini-2.5-flash','gemini-2.5-flash-lite','gemini-2.5-pro']},claude:{base:'https://api.anthropic.com',model:'claude-haiku-5-5',list:['claude-haiku-5-5','claude-sonnet-5-5']}};
 try{Object.assign(S,JSON.parse(sto(localStorage,'ri:s')||'{}'))}catch{}
+if(S.prov==='gemini'){if(/^claude/.test(S.model))S.model=DEF.gemini.model;if(/anthropic/.test(S.base))S.base=DEF.gemini.base}   // 이전 버전(Claude) 설정 이관
 const saveS=()=>sto(localStorage,'ri:s',JSON.stringify(S));
-const getKey=()=>sto(sessionStorage,'ri:k')||sto(localStorage,'ri:k')||'';
+const KN=p=>'ri:k:'+p,keyOf=p=>sto(sessionStorage,KN(p))||sto(localStorage,KN(p))||'',getKey=()=>keyOf(S.prov);
 let turns=[],hist=[],useTemp=true,rec=null,active=null,muted=false,wl=null,liveEl=null;
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let tt;const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',3500)};
@@ -114,10 +153,13 @@ ABSOLUTE RULES
 6. Use <context> only to resolve pronouns, dropped subjects, and terminology consistency. Never translate or repeat it.
 7. If the utterance is unintelligible or too corrupted to translate reliably, output exactly: [unclear]
 `+(pairs.length?'8. MANDATORY GLOSSARY (use exactly these target terms):\n'+pairs.slice(0,200).map(([a,b])=>`   - ${a} => ${b}`).join('\n'):'');
+const H=()=>({'content-type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}),U=p=>S.base.replace(/\/$/,'')+p;
+const NETMSG='서버(API)에 연결하지 못했습니다. ⚙ 설정 → “연결 테스트”로 원인을 확인하세요.';
 async function claude(system,user,onDelta){
  const body={model:S.model,max_tokens:700,stream:true,system,messages:[{role:'user',content:user}]};if(useTemp)body.temperature=0;
  const t0=performance.now();let ttft=0,out='';
- const res=await fetch(S.base.replace(/\/$/,'')+'/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
+ const init={method:'POST',headers:H(),body:JSON.stringify(body)};let res;
+ for(let a=0;;a++){try{res=await fetch(U('/v1/messages'),init);break}catch{if(a>=1)throw new Error('NET');await new Promise(r=>setTimeout(r,800))}}   // 일시적 모바일 망 끊김은 1회 자동 재시도
  if(!res.ok){const tx=await res.text();if(res.status===400&&useTemp&&/temperature/i.test(tx)){useTemp=false;return claude(system,user,onDelta)}
   throw new Error(res.status===401?'API 키가 올바르지 않습니다':res.status===404?'모델명을 확인하세요':res.status===429?'요청 한도 초과 — 잠시 후 다시 시도':'API 오류 '+res.status)}
  const rd=res.body.getReader(),dec=new TextDecoder();let buf='';
@@ -125,40 +167,70 @@ async function claude(system,user,onDelta){
   while((i=buf.indexOf('\n\n'))>=0){const ev=buf.slice(0,i);buf=buf.slice(i+2);const d=ev.split('\n').find(l=>l.startsWith('data:'));if(!d)continue;
    try{const j=JSON.parse(d.slice(5));if(j.type==='content_block_delta'&&j.delta&&j.delta.text){if(!ttft)ttft=performance.now()-t0;out+=j.delta.text;if(onDelta)onDelta(out)}}catch{}}}
  return{text:out.trim(),ttft:Math.round(ttft)}}
+let useThink=true;
+async function gemini(system,user,onDelta){
+ const m=S.model,body={systemInstruction:{parts:[{text:system}]},contents:[{role:'user',parts:[{text:user}]}],generationConfig:{maxOutputTokens:700}};
+ if(!/gemini-3/.test(m))body.generationConfig.temperature=0;            // Gemini 3 계열은 기본 온도 유지 권장
+ if(useThink)body.generationConfig.thinkingConfig={thinkingBudget:0};   // 실시간성: 추론(thinking) 지연 제거
+ const t0=performance.now();let ttft=0,out='';
+ const init={method:'POST',headers:{'content-type':'application/json','x-goog-api-key':getKey()},body:JSON.stringify(body)},
+  url=`${S.base.replace(/\/$/,'')}/v1beta/models/${encodeURIComponent(m)}:streamGenerateContent?alt=sse`;
+ let res;for(let a=0;;a++){try{res=await fetch(url,init);break}catch{if(a>=1)throw new Error('NET');await new Promise(r=>setTimeout(r,800))}}
+ if(!res.ok){const tx=await res.text();let msg='';try{msg=JSON.parse(tx).error.message||''}catch{}
+  if(res.status===400&&useThink&&/think/i.test(msg)){useThink=false;return gemini(system,user,onDelta)}   // 일부 모델은 thinking 끄기 불가 → 자동 재시도
+  throw new Error(/API key not valid|API_KEY_INVALID/i.test(msg)?'API 키가 올바르지 않습니다':res.status===403?'API 키 권한 없음/차단됨 — AI Studio에서 키 상태 확인':res.status===404?'모델명을 확인하세요':res.status===429?'사용 한도 초과(무료 등급은 분당 요청 제한) — 잠시 후 다시 시도':res.status>=500?'Google 서버 일시 오류 — 잠시 후 다시 시도':'API 오류 '+res.status+(msg?' · '+msg.slice(0,80):''))}
+ const rd=res.body.getReader(),dec=new TextDecoder();let buf='',fin='';
+ for(;;){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true}).replace(/\r/g,'');let i;
+  while((i=buf.indexOf('\n\n'))>=0){const ev=buf.slice(0,i);buf=buf.slice(i+2);const d=ev.split('\n').find(l=>l.startsWith('data:'));if(!d)continue;
+   try{const j=JSON.parse(d.slice(5));if(j.promptFeedback&&j.promptFeedback.blockReason)throw new Error('SAFE:'+j.promptFeedback.blockReason);
+    const c=j.candidates&&j.candidates[0];if(c){if(c.finishReason&&c.finishReason!=='STOP'&&c.finishReason!=='MAX_TOKENS')fin=c.finishReason;
+     const tx=((c.content&&c.content.parts)||[]).filter(p=>!p.thought).map(p=>p.text||'').join('');if(tx){if(!ttft)ttft=performance.now()-t0;out+=tx;if(onDelta)onDelta(out)}}}
+   catch(e){if(/^SAFE:/.test(e.message))throw new Error('Google 안전 필터가 번역을 차단했습니다('+e.message.slice(5)+') — 표현을 바꿔 다시 말씀해 주세요')}}}
+ if(!out&&fin)throw new Error('응답이 차단/중단되었습니다('+fin+')');
+ if(!out)throw new Error('빈 응답을 받았습니다 — 다시 시도하세요');
+ return{text:out.trim(),ttft:Math.round(ttft)}}
+const llm=(a,b,c)=>S.prov==='gemini'?gemini(a,b,c):claude(a,b,c);
 /* ---------- 화면 ---------- */
 const log=$('#log');
-function paint(el,t){el.querySelector('.src').textContent=t.src;const g=el.querySelector('.tgt');g.textContent=t.tgt;g.classList.toggle('w',!!t.bad);
+function paint(el,t){el.querySelector('.src').textContent=t.src;const g=el.querySelector('.tgt');g.textContent=t.tgt;g.classList.toggle('w',!!t.bad);g.classList.toggle('pend',t.tgt==='…');
  el.querySelector('.wn').textContent=t.warns.length?'⚠ '+t.warns.join(' | '):'';
  el.querySelector('.mt').textContent=(t.time||'')+(t.ms?` · 첫 글자 ${t.ms}ms`:'')+(t.conf!=null?` · 인식 ${Math.round(t.conf*100)}%`:'');
- const b=log.scrollHeight-log.scrollTop-log.clientHeight<140;if(b)log.scrollTop=log.scrollHeight}
+ const rt=el.querySelector('.rt');if(rt)rt.hidden=!t.failed;
+ const b=log.scrollHeight-log.scrollTop-log.clientHeight<140;if(b)log.scrollTop=log.scrollHeight;else $('#jump').hidden=false}
+const copy=async x=>{try{await navigator.clipboard.writeText(x);toast('복사했습니다')}catch{toast('복사할 수 없습니다')}};
 function bubble(t){$('#em')&&$('#em').remove();const sl=t.who==='me'?S.my:S.peer,tl=t.who==='me'?S.peer:S.my;
- const el=h('div',{class:'b '+t.who},h('div',{class:'who'},(t.who==='me'?'나':'상대')+` · ${LG[sl][0]} → ${LG[tl][0]}`),h('div',{class:'src'}),h('div',{class:'tgt'}),h('div',{class:'wn'}),
-  h('div',{class:'meta'},h('span',{class:'mt'}),h('button',{'aria-label':'번역 읽기',onclick:()=>speak(t.tgt,tl)},'🔊')));
+ const ib=(l,ic,f)=>h('button',{class:'ib','aria-label':l,title:l,onclick:f},ic);
+ const el=h('article',{class:'b '+t.who},h('div',{class:'who'},h('span',{},t.who==='me'?'나':'상대'),h('span',{class:'dir'},`${LG[sl][0]} → ${LG[tl][0]}`)),
+  h('div',{class:'tgt pend',lang:tl}),h('div',{class:'src',lang:sl}),h('div',{class:'wn',role:'note'}),
+  h('div',{class:'meta'},h('span',{class:'mt'}),ib('번역 읽기','🔊',()=>speak(t.tgt,tl)),ib('번역 복사','⧉',()=>copy(t.tgt)),h('button',{class:'ib rt',hidden:true,onclick:()=>interpret(t.who,t.src,t.conf,t,el)},'↻ 다시 시도')));
  log.append(el);return el}
 function showLive(who,text){if(!text){liveEl&&liveEl.remove();liveEl=null;return}
  if(!liveEl){$('#em')&&$('#em').remove();liveEl=h('div',{class:'b live '+who});log.append(liveEl)}liveEl.textContent=text;log.scrollTop=log.scrollHeight}
 function speak(text,lang){if(!window.speechSynthesis||!text)return;const u=new SpeechSynthesisUtterance(text);u.lang=LG[lang][1];muted=true;u.onend=u.onerror=()=>setTimeout(()=>muted=false,700);speechSynthesis.cancel();speechSynthesis.speak(u)}
-async function interpret(who,src,conf){
+async function interpret(who,src,conf,t0,el0){
  src=src.replace(/<\/?\s*(utterance|context|review)[^>]*>/gi,'').trim();if(!src)return;
  const me=who==='me',sl=me?S.my:S.peer,tl=me?S.peer:S.my,pairs=me?G():G().map(([a,b])=>[b,a]);
- const t={who,src,tgt:'…',warns:[],conf,bad:false,time:new Date().toTimeString().slice(0,8)},el=bubble(t);turns.push(t);
+ const t=t0||{who,src,tgt:'…',warns:[],conf,bad:false,time:new Date().toTimeString().slice(0,8)},el=el0||bubble(t);
+ if(t0)Object.assign(t,{tgt:'…',warns:[],bad:false,failed:false});else turns.push(t);
  if(conf!=null&&conf<.5)t.warns.push(`음성인식 신뢰도 낮음(${Math.round(conf*100)}%) — 중요 내용은 재확인`);
- paint(el,t);
+ paint(el,t);setState('work');
  try{const system=sysP(sl,tl,pairs),cx=hist.length?'<context>\n'+hist.map(x=>`[${x.w}] ${x.s.slice(0,300)} => ${x.t.slice(0,300)}`).join('\n')+'\n</context>\n':'',
    user=`${cx}<utterance lang="${sl}">\n${src}\n</utterance>`;
-  let r=await claude(system,user,x=>{t.tgt=x;paint(el,t)});
+  let r=await llm(system,user,x=>{t.tgt=x;paint(el,t)});
   if(r.text==='[unclear]'){t.tgt='[불명확 — 다시 말씀해 주세요]';t.bad=true;t.warns.push('번역 불가로 판단')}
   else{let is=check(src,r.text,pairs,sl,tl);
    if(is.length){t.warns.push('자동 재번역 수행됨');const fb=is.map(x=>'- '+x).join('\n');
-    const r2=await claude(system,user+`\n<review>\nPrevious translation: ${r.text}\nAutomatic checker found:\n${fb}\nRetranslate faithfully, fixing these exactly. Output only the translation.\n</review>`).catch(()=>null);
+    const r2=await llm(system,user+`\n<review>\nPrevious translation: ${r.text}\nAutomatic checker found:\n${fb}\nRetranslate faithfully, fixing these exactly. Output only the translation.\n</review>`).catch(()=>null);
     if(r2&&r2.text){const i2=check(src,r2.text,pairs,sl,tl);if(i2.length<=is.length){r={...r,text:r2.text};is=i2}}}
    t.tgt=r.text;t.ms=r.ttft;t.warns.push(...is);t.bad=is.length>0;
    if(!is.length&&S.my!==S.peer){hist.push({w:me?'나':'상대',s:src,t:r.text});while(hist.length>Math.max(0,+S.ctx||0))hist.shift()}   // 검증 통과한 번역만 문맥에 반영
    if(S.speak&&me&&!is.length)speak(r.text,tl)}
- }catch(e){t.tgt='[번역 실패]';t.bad=true;t.warns.push(e.message||'네트워크 오류')}
- paint(el,t)}
+ }catch(e){t.tgt='[번역 실패]';t.bad=t.failed=true;t.warns.push(e.message==='NET'||e.name==='TypeError'?NETMSG:(e.message||'알 수 없는 오류'))}
+ setState(t.failed?'err':active?'listen':'idle');paint(el,t)}
 /* ---------- 음성인식 ---------- */
-function setMic(w){$('#bm').classList.toggle('on',w==='me');$('#bp').classList.toggle('on',w==='peer');$('#st').textContent=w?'● 듣는 중':''}
+const STX={idle:'대기',listen:'● 듣는 중',work:'번역 중…',err:'⚠ 오류'};
+function setState(k){const e=$('#st');e.dataset.s=k;e.textContent=STX[k]}
+function setMic(w){for(const[id,v]of[['bm','me'],['bp','peer']]){const e=$('#'+id);e.classList.toggle('on',w===v);e.setAttribute('aria-pressed',w===v)}setState(w?'listen':'idle')}
 function stopListen(){const r=rec;rec=null;active=null;try{r&&r.stop()}catch{}setMic(null);showLive('',' ');try{wl&&wl.release()}catch{}wl=null}
 function listen(who){
  if(active===who)return stopListen();if(active)stopListen();
@@ -172,25 +244,48 @@ function listen(who){
   try{r.start()}catch{}};
  start()}
 /* ---------- 설정/내보내기 ---------- */
-const fill=()=>{const o=Object.entries(LG).map(([c,v])=>h('option',{value:c},v[0]));for(const[id,k]of[['ml','my'],['pl','peer']]){const s=$('#'+id);s.replaceChildren(...Object.entries(LG).map(([c,v])=>h('option',{value:c,selected:S[k]===c},v[0])))}};
-function openCfg(){$('#k').value=getKey();$('#rk').checked=!!sto(localStorage,'ri:k');$('#bu').value=S.base;$('#md').value=S.model;$('#tn').value=S.tone;$('#dm').value=S.domain;$('#gl').value=S.gloss;$('#cx').value=S.ctx;$('#sp').checked=S.speak;$('#dlg').showModal()}
-$('#sv').onclick=()=>{const b=$('#bu').value.trim();if(!/^https:\/\//.test(b)){toast('API 주소는 https:// 로 시작해야 합니다');return}
- Object.assign(S,{base:b,model:$('#md').value.trim()||'claude-haiku-5-5',tone:$('#tn').value,domain:$('#dm').value.trim()||'General business meeting',gloss:$('#gl').value,ctx:+$('#cx').value||0,speak:$('#sp').checked});saveS();
- const k=$('#k').value.trim();sto(sessionStorage,'ri:k',null);sto(localStorage,'ri:k',null);if(k)sto($('#rk').checked?localStorage:sessionStorage,'ri:k',k);useTemp=true;toast('저장됨')};
-$('#ck').onclick=()=>{sto(sessionStorage,'ri:k',null);sto(localStorage,'ri:k',null);$('#k').value='';toast('API 키를 삭제했습니다')};
+const lab=()=>{$('#lm').textContent=LG[S.my][0];$('#lp').textContent=LG[S.peer][0]};
+const fill=()=>{lab();const o=Object.entries(LG).map(([c,v])=>h('option',{value:c},v[0]));for(const[id,k]of[['ml','my'],['pl','peer']]){const s=$('#'+id);s.replaceChildren(...Object.entries(LG).map(([c,v])=>h('option',{value:c,selected:S[k]===c},v[0])))}};
+function pvUI(){const p=$('#pv').value,o=p==='gemini'?'claude':'gemini';
+ for(const[id,k]of[['bu','base'],['md','model']]){const e=$('#'+id),v=e.value.trim();if(!v||v===DEF[o][k])e.value=DEF[p][k]}
+ $('#k').value=keyOf(p);$('#k').placeholder=p==='gemini'?'AIza…':'sk-ant-…';$('#kl').textContent=p==='gemini'?'Google AI Studio API 키':'Anthropic API 키';$('#rk').checked=!!sto(localStorage,KN(p));
+ $('#kh').textContent=p==='gemini'?'aistudio.google.com/apikey 에서 발급 · Google Cloud에서 키에 “웹사이트 제한(Referrer)”을 걸어 두세요 · 무료 등급은 입력 내용이 Google 제품 개선에 사용될 수 있으니 업무 기밀은 유료 등급 사용을 권장합니다':'console.anthropic.com 에서 발급';
+ $('#ml2').replaceChildren(...DEF[p].list.map(v=>h('option',{value:v})))}
+$('#pv').onchange=pvUI;
+function openCfg(){$('#pv').value=S.prov;$('#bu').value=S.base;$('#md').value=S.model;$('#tn').value=S.tone;$('#dm').value=S.domain;$('#gl').value=S.gloss;$('#cx').value=S.ctx;$('#sp').checked=S.speak;pvUI();$('#dlg').showModal()}
+$('#sv').onclick=e=>{const b=$('#bu').value.trim(),k0=$('#k').value.trim();
+ if(!/^https:\/\//.test(b)){e.preventDefault();toast('API 주소는 https:// 로 시작해야 합니다');return}
+ if(k0&&!/^[\x21-\x7e]+$/.test(k0)){e.preventDefault();toast('API 키에 공백·한글·특수문자가 섞여 있습니다. 다시 붙여넣어 주세요');return}
+ Object.assign(S,{prov:$('#pv').value,base:b,model:$('#md').value.trim()||DEF[$('#pv').value].model,tone:$('#tn').value,domain:$('#dm').value.trim()||'General business meeting',gloss:$('#gl').value,ctx:+$('#cx').value||0,speak:$('#sp').checked});saveS();
+ const k=$('#k').value.trim(),P=S.prov;sto(sessionStorage,KN(P),null);sto(localStorage,KN(P),null);if(k)sto($('#rk').checked?localStorage:sessionStorage,KN(P),k);useTemp=useThink=true;toast('저장됨');emOk()};
+$('#ck').onclick=()=>{const P=$('#pv').value;sto(sessionStorage,KN(P),null);sto(localStorage,KN(P),null);$('#k').value='';toast('API 키를 삭제했습니다')};
 $('#cl').onclick=()=>{if(!confirm('화면의 대화와 문맥을 모두 지울까요?'))return;turns=[];hist=[];log.replaceChildren();toast('대화를 지웠습니다')};
 async function exportTxt(){if(!turns.length)return toast('내보낼 대화가 없습니다');
  const tx=turns.map(t=>`[${t.time}] ${t.who==='me'?'나':'상대'}\n  원문: ${t.src}\n  번역: ${t.tgt}${t.warns.length?'\n  ⚠ '+t.warns.join(' | '):''}`).join('\n\n');
  const f=new File([tx],`통역기록_${new Date().toISOString().slice(0,16).replace(/[-:T]/g,'')}.txt`,{type:'text/plain'});
  if(navigator.canShare&&navigator.canShare({files:[f]})){try{return await navigator.share({files:[f]})}catch(e){if(e.name==='AbortError')return}}
  const a=h('a',{href:URL.createObjectURL(f),download:f.name});document.body.append(a);a.click();a.remove()}
+async function diag(){$('#dgo').textContent='확인 중…';const o=[],p=$('#pv').value,g=p==='gemini',b=($('#bu').value.trim()||DEF[p].base).replace(/\/$/,''),k=$('#k').value.trim()||keyOf(p),m=encodeURIComponent($('#md').value.trim()||DEF[p].model);
+ o.push(navigator.onLine?'✔ 인터넷 연결됨':'✘ 오프라인 상태입니다');
+ try{const t0=performance.now(),r=await fetch(g?`${b}/v1beta/models/${m}`:`${b}/v1/models/${m}`,{headers:g?{'x-goog-api-key':k||'none'}:{'x-api-key':k||'none','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}});
+  o.push(`✔ 서버 연결 정상 (${Math.round(performance.now()-t0)}ms)`);
+  o.push(r.status===200?'✔ API 키·모델 정상':[400,401,403].includes(r.status)?'✘ API 키가 올바르지 않거나 권한이 없습니다':r.status===404?'✘ 모델명을 찾을 수 없습니다 (설정의 번역 모델 확인)':'ℹ 서버 응답 '+r.status)}
+ catch{o.push('✘ 서버에 연결하지 못했습니다','원인 후보: ① 회사·학교 방화벽/VPN/프록시가 API 도메인 차단 ② 콘텐츠 차단 앱·광고 차단 확장프로그램 ③ 잘못된 API 주소','조치: Wi-Fi를 끄고 모바일 데이터로 시험 / 시크릿 창에서 시험 / 사내 게이트웨이 주소를 “API 주소”에 입력')}
+ const d=$('#dgo');d.textContent='';o.forEach(x=>d.append(h('div',{class:x[0]==='✔'?'ok':x[0]==='✘'?'ng':''},x)))}
+$('#dg').onclick=diag;
 fill();
-$('#ml').onchange=e=>{S.my=e.target.value;saveS()};$('#pl').onchange=e=>{S.peer=e.target.value;saveS()};
+$('#ml').onchange=e=>{S.my=e.target.value;saveS();lab()};$('#pl').onchange=e=>{S.peer=e.target.value;saveS();lab()};
 $('#sw').onclick=()=>{[S.my,S.peer]=[S.peer,S.my];saveS();fill();hist=[]};
 $('#bm').onclick=()=>listen('me');$('#bp').onclick=()=>listen('peer');$('#cfg').onclick=openCfg;$('#exp').onclick=exportTxt;
 const typed=w=>{const i=$('#ti'),v=i.value.trim();if(!v)return;if(!getKey()){toast('먼저 설정에서 API 키를 입력하세요');return openCfg()}i.value='';interpret(w,v,null)};
 $('#tm').onclick=()=>typed('me');$('#tp').onclick=()=>typed('peer');$('#ti').addEventListener('keydown',e=>{if(e.key==='Enter')typed('me')});
-if(!SR)$('#st').textContent='음성인식 미지원 — 텍스트 입력 사용';
+const emOk=()=>{const l=document.querySelector('#em li[data-s=k]');l&&l.classList.toggle('ok',!!getKey())};emOk();
+const e1=$('#e1');if(e1)e1.onclick=openCfg;
+const fs=()=>document.documentElement.style.setProperty('--fs',S.fs+'px');fs();
+$('#fm').onclick=()=>{S.fs=Math.max(15,S.fs-2);saveS();fs()};$('#fp').onclick=()=>{S.fs=Math.min(34,S.fs+2);saveS();fs()};
+$('#jump').onclick=()=>{log.scrollTop=log.scrollHeight;$('#jump').hidden=true};
+log.addEventListener('scroll',()=>{if(log.scrollHeight-log.scrollTop-log.clientHeight<140)$('#jump').hidden=true});
+if(!SR){$('#ban').hidden=false;$('#ban').textContent='이 브라우저는 음성인식을 지원하지 않습니다(Chrome/Safari 권장). “텍스트로 입력”을 사용하세요.';document.querySelector('details').open=true}
 </script>
 </body>
 </html>
